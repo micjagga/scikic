@@ -1,4 +1,4 @@
-#!/home/ubuntu/anaconda/bin/python
+#!/usr/bin/env python
 
 """Example queries:
 
