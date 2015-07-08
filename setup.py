@@ -1,18 +1,16 @@
-import answer_where
 import answer as ans
-#todo: currently have to import all the answer... classes
-import answer_babynames
-import answer_census
-import answer_facebook
-import answer_movielens
-import answer_postcode
+
+#import all answer_something.py classes
+import os
+import glob
+modules = glob.glob("answer_*.py")
+trimmedmods = [f[:f.find('.py')] for f in modules]
+for mod in trimmedmods:
+     __import__(mod)
 
 import config
-import os
 
 import sqlite3 as lite
-import web_helper_functions as whf
-import other_helper_functions as ohf
 
 #Creates the target folder for our data
 #Initialise the main database if this isn't already done.

@@ -1,14 +1,13 @@
-import answer_where
 import answer as ans
 import random
 
-#todo: currently have to import all the answer... classes
-import answer_babynames
-import answer_census
-import answer_facebook
-import answer_movielens
-import answer_postcode
-import answer_personality
+#import all answer_something.py classes
+import os
+import glob
+modules = glob.glob("answer_*.py")
+trimmedmods = [f[:f.find('.py')] for f in modules]
+for mod in trimmedmods:
+     __import__(mod)
 
 import pymc as pm
 import numpy as np
