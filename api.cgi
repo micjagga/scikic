@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/compbio-10/anaconda/bin/python
 
 """Example queries:
 

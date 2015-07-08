@@ -1,1 +1,1 @@
-pathToData = '../../scikic_api_data/';
+pathToData = '../../api_data/';

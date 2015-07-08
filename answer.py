@@ -12,43 +12,6 @@ class DuplicateFeatureException(Exception):
     def __str__(self):
         return repr(self.value)
 
-
-def distribute_probs(p,j,spread=False): #TODO: THIS SHOULD BE MOVED
-    """Distributes age probabilities.
-    
-    Distributes discrete age probabilities over the "more" continuous
-    range from 0 to 100.
-    
-    Args:
-        p - numpy array of probabilities (doesn't need to be normalised)
-        j - numpy array of where the boundaries are. It is assumed the first value is from 0
-            for example j=np.array([16,25,50]) will have four probabilities associated:
-            between 0-15, 16-24, 25-49, 50+
-	spread - default False. In the case where you're spreading the values over
-	    p(r|0<a<10) where a is the parameter, into, e.g. p(r=4|a) we can say that
-	    p(r|a=4) = p(r|0<a<10), unless we know something else.
-          however...
-	    if we're spreading p(0<a<10|r), then the probabilities will be divided
-	    (assuming a uniform distribution) equally over the values of a in the range.
-	    so p(a=4|r) = p(0<a<10|r)/10
-        
-    Returns:
-        A numpy array of probabilities from 0 to 100.
-        
-    Example:
-        distribute_probs(p,np.array([18,25,35,45,50,56]))
-    """
-
-    res = np.zeros(101)  
-    jend = np.append(j,101)
-    j = np.insert(j,0,0)
-    for start,end,v in zip(j,jend,p):
-        if (spread):
-            res[start:end] = 1.0*v/(end-start)
-        else:
-            res[start:end] = 1.0*v
-    return res
-
 class Answer(object):
     """Base class for the possible types of data and answers given
     
@@ -144,6 +107,12 @@ class Answer(object):
           DuplicateFeatureException: If an identically named feature already exists that clashes with this instance
         """
         pass
+
+    def insights(self,inference_result,facts):        
+        #returns a list of insights:
+        # - inference_result: probability distributions of the features
+        # - facts: a dictionary of 'facts' provided by the Answer classes        
+        return []
     
     @classmethod
     def metaData(cls):
