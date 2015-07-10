@@ -61,6 +61,33 @@ class CensusAnswer(ans.Answer):
         data = {'religions':cls.religions,'religion_text':cls.religion_text}
         return data
 
+    def insights(self,inference_result,facts):
+        #returns a list of insights:
+        # - inference_result: probability distributions of the features
+        # - facts: a dictionary of 'facts' provided by the Answer classes      
+        
+        insightlist = []
+        msg = 'You are aged between %d and %d.\n<br />' % (inference_result['factor_age']['quartiles']['lower'],inference_result['factor_age']['quartiles']['upper'])
+        insightlist.append(msg)
+
+        if (inference_result['factor_gender']['quartiles']['mean']>0.9):
+            insightlist.append('You are female')
+        elif (inference_result['factor_gender']['quartiles']['mean']<0.1):
+            insightlist.append('You are male')
+
+        rel = inference_result['religion']['distribution']
+  
+        listOfReligions = []
+        import numpy as np
+        for ratio,name in zip(rel,CensusAnswer.religion_text):
+            if (ratio>0.17):
+                listOfReligions.append(name)
+        if (len(listOfReligions)>1):
+            relmsg = ', '.join(listOfReligions[:-1]) + ' or ' + listOfReligions[-1]
+        else:
+            relmsg = listOfReligions[0]
+        insightlist.append(" I think you are " + relmsg)
+        return insightlist
 
     @classmethod
     def ONSapiQuery(cls,geoArea, dataSet):

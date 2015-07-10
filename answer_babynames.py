@@ -185,6 +185,19 @@ class BabyNamesAnswer(ans.Answer):
         self.featurename = name
         self.answer = answer
 
+    def insights(self,inference_result,facts):
+        #returns a list of insights:
+        # - inference_result: probability distributions of the features
+        # - facts: a dictionary of 'facts' provided by the Answer classes      
+    #    female = self.probs[:,1,1]
+    #    male = self.probs[:,1,1]
+    #    male[:,1,1].argmax()
+        if 'first_name' in facts:
+            name = facts['first_name']
+        else:
+            name = '?????!';
+        return ["You're called %s" % name]
+
     def question_to_text(self):
         if (self.dataitem=='name'):
             return "What's your name?"#TODO We don't need to ask a question, get it from Facts dictionary.

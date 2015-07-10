@@ -12,8 +12,7 @@ for mod in trimmedmods:
 import pymc as pm
 import numpy as np
 
-def do_inference(data,feature_list):
-#feature_list = features we want estimates for
+def do_inference(data):
 #data = data we have about the user
 #stored in an array of dictionaries:
 #each dictionary has four fields:
@@ -67,16 +66,36 @@ def do_inference(data,feature_list):
     mcmc = pm.MCMC(model)
     mcmc.sample(10000,1000,4,progress_bar=False)
     output = {}
-    for feature in feature_list:
-        if feature not in features:
-            continue #silently skip this feature
-        trc = mcmc.trace(features[feature])[:]
-        count = np.zeros(max(trc)+1)
-        for v in range(min(trc),max(trc)+1):            
-            count[v] = np.sum(trc==v)
-        count = 1.0*count/count.sum() #normalise
-        output[feature] = count.tolist()
-    return output
+
+    for feature in features:
+        try:
+            trc = mcmc.trace(features[feature])[:]
+            count = np.zeros(max(trc)+1)
+            for v in range(min(trc),max(trc)+1):            
+                count[v] = np.sum(trc==v)
+            count = 1.0*count/count.sum() #normalise
+            output[feature] = {'distribution':count.tolist()}
+        except KeyError:
+            pass #we silently discard features we can't get a trace on, as these are the observed features.
+
+    answer_range = {}
+    for o in output:
+        vals = output[o]['distribution']
+        tally = 0
+        mean = 0
+        for i,v in enumerate(vals):
+            if tally<0.25:
+                lower_range = i
+            if tally<0.75:
+                upper_range = i
+            tally += v
+            mean += i*1.0*v
+        output[o]['quartiles'] = {'lower':lower_range,'upper':upper_range,'mean':mean}
+
+    insights = []
+    for a in answers:
+        insights.extend(a.insights(output, facts))
+    return output, facts, insights
 
 #Some datasets need to process an answer (for example lookup where a location is, etc). It's best to do this once, when you get
 #the user response, rather than repeatedly later, when you read it.
@@ -138,4 +157,3 @@ def get_meta_data(data):
     if len(c)==0:
         return "Don't know this type of data";
     return c[0].metaData()
-

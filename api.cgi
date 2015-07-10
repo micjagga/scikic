@@ -1,4 +1,4 @@
-#!/home/compbio-10/anaconda/bin/python
+#!/usr/bin/env python
 
 """Example queries:
 
@@ -42,6 +42,26 @@ def check_format(item):
 #        exit()
 
 
+import numpy as np
+#We need to json things like the 'facts' dictionary, but json breaks on np.arrays, so this converts them to python arrays.
+def recursive_numpy_array_removal(arr):
+    out = None
+    if isinstance(arr,list):
+        out = []
+        for item in arr:
+            out.append(recursive_numpy_array_removal(item))
+        return out
+    if isinstance(arr,np.ndarray):
+       # print "NP ARRAY"
+        return recursive_numpy_array_removal(arr.tolist()) #convert to list, and apply fn
+    if isinstance(arr,dict):
+        out = {}
+        for key in arr:
+            out[key] = recursive_numpy_array_removal(arr[key])
+        return out
+    return arr
+        
+
 rawform = cgi.FieldStorage().value
 print 'Content-Type: text/html\n'; #TODO Is the page text/html
 
@@ -70,10 +90,6 @@ apikey = form['apikey']
 action = form['action']
 version = form['version']
 data = form['data']
-if 'features' in form:
-    features = form['features']
-else:
-    features = None
 
 if (action=='question'):
     if not isinstance(data,list):
@@ -86,21 +102,22 @@ if (action=='inference'):
     if not isinstance(data,list):
         print "Inference requires a list of dictionaries."
         exit()
-    if features is None:
-        print "Inference requires a list of features that need to be acquired as 'features' in the dictionary"
-        exit()
-    if not isinstance(features,list):
-        print "Inference requires features to be a list."
     for it in data:
         check_format(it)
 #data should be a single dictionary...
 if (action=='questionstring'):
     check_format(data)
 
+if (action=='metadata'):
+    if 'dataset' not in data:
+        print "Metadata needs dataset to be specified."
+        exit()
+
 ##Do the actions....
 if action=='inference':
-    output = inference.do_inference(data,features)
-    print json.dumps(output)
+    output, facts, insights = inference.do_inference(data)
+    facts = recursive_numpy_array_removal(facts)
+    print json.dumps({'features':output,'facts':facts,'insights':insights})
 
 if action=='question':
     question = inference.pick_question(data)
