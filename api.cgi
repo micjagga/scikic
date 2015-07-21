@@ -63,14 +63,16 @@ def recursive_numpy_array_removal(arr):
         
 
 rawform = cgi.FieldStorage().value
-print 'Content-Type: text/html\n'; #TODO Is the page text/html
+print 'Content-Type: text/html\n\n'; #TODO Is the page text/html
 
 try:
     form = json.loads(rawform)
 except ValueError:
     print "Invalid JSON" #TODO Set error code header
+    exit()
 except TypeError:
     print "Missing API query JSON" #TODO Set error code header
+    exit()
 
 
 if not 'apikey' in form:
