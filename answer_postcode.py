@@ -111,6 +111,8 @@ class PostcodeAnswer(ans.Answer):
                 oas = [r[0]]
             if (oas != None):
                 facts['where'] = {'probabilities':np.array([1.]), 'OAs':oas}
+        facts['city'] = 'Sheffield'
+        facts['country'] = 'UK'
 
     @classmethod
     def pick_question(self,questions_asked):

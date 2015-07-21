@@ -1,3 +1,5 @@
+#Written by Felix, July 2015
+
 import pymc as pm
 import numpy as np
 import pandas as pd
@@ -49,12 +51,14 @@ class MusicAnswer(ans.Answer):
         event_locations = []
         
         artist = self.answer
-        artist = artist.replace(" ", "+")   
-        url_r = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%s&limit=%i&autocorrect=1&api_key=02c3301ab9e648c504edf4d7dc93c99b" %(artist, limit)
-        page_r = urllib2.urlopen(url_r)
-        contents_r = str(page_r.read())    
-
-        r_r = ET.fromstring(contents_r)
+        artist = artist.replace(" ", "+")
+        try: #Mike's change, to handle if a band doesn't exist
+            url_r = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%s&limit=%i&autocorrect=1&api_key=02c3301ab9e648c504edf4d7dc93c99b" %(artist, limit)
+            page_r = urllib2.urlopen(url_r)
+            contents_r = str(page_r.read())
+            r_r = ET.fromstring(contents_r)
+        except urllib2.HTTPError:
+            return []
 
         global results_artist_name
         results_artist_name = []

@@ -55,6 +55,10 @@ class FacebookAnswer(ans.Answer):
     
         if ('first_name' in fb_data):
             facts['first_name'] = fb_data['first_name']
+
+        if ('likes' in fb_data):
+            facts['facebook_likes'] = fb_data['likes']
+
     @classmethod
     def pick_question(self,questions_asked):
         return 'Skip', 'None'       #we don't want to ask questions to get this data

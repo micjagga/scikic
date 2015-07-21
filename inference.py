@@ -121,8 +121,9 @@ def pick_question(data):
 
     found = False           #have we found a question?
     for counter in range(20):
-#        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset not in ['postcode']] #stops it asking about postcode
-        c = [cls for cls in ans.Answer.__subclasses__()]
+#        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset not in ['personality']] 
+        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset not in ['census','facebook','movielens','personality']]
+       # c = [cls for cls in ans.Answer.__subclasses__()]
         cl = random.choice(c)
   #      print cl.dataset + "<br/>"
 #        if (cl.dataset=='movielens' or cl.dataset=='personality'):
