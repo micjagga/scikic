@@ -99,7 +99,7 @@ class PostcodeAnswer(ans.Answer):
 
     def question_to_text(self):
      #   if (self.dataitem=='postcode'):
-        return "What's your postcode?"
+        return {'question':"What's your postcode?",'type':'text'}
       #  return "Some sort of postcode question..."
         
     def append_facts(self,facts,all_answers):

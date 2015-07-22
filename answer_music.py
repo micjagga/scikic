@@ -83,8 +83,11 @@ class MusicAnswer(ans.Answer):
                  event_listings.append(event)
    
         if len(event_listings) == 0:
-            x = random.randint(0,len(results_artist_name))  
-            return ["Unfortunately there are no local events I think you'd like but why not give " + results_artist_name[x] + " a listen ?"]
+            if len(results_artist_name)>0:
+                x = random.randint(0,len(results_artist_name)-1)  
+                return ["Unfortunately there are no local events I think you'd like but why not give " + results_artist_name[x] + " a listen ?"]
+            else:
+                return []
         else:
             return [self.output_events(event_listings, results_artist_name)]
 
@@ -140,7 +143,7 @@ class MusicAnswer(ans.Answer):
         self.featurename = name
         
     def question_to_text(self):        
-        return "What's your favourite band or artist? (be honest!)" #TODO Rewrite
+        return {'question':"What's your favourite band or artist? (be honest!)",'type':'text'} #TODO Rewrite
       
     def append_features(self,features,facts): 
         pass

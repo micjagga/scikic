@@ -122,8 +122,8 @@ def pick_question(data):
     found = False           #have we found a question?
     for counter in range(20):
 #        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset not in ['personality']] 
-        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset not in ['census','facebook','movielens','personality']]
-       # c = [cls for cls in ans.Answer.__subclasses__()]
+#        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset not in ['census','facebook','movielens','personality']]
+        c = [cls for cls in ans.Answer.__subclasses__()]
         cl = random.choice(c)
   #      print cl.dataset + "<br/>"
 #        if (cl.dataset=='movielens' or cl.dataset=='personality'):
@@ -143,7 +143,7 @@ def pick_question(data):
             found = True
             break
     if not found:
-        return {'dataset':None, 'dataitem':None, 'detail':None}
+        return {'dataset':None, 'dataitem':None, 'detail':None, 'structure':None}
     return {'dataset':dataset, 'dataitem':dataitem, 'detail':detail}
 
 def get_question_string(data):

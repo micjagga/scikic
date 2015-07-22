@@ -52,7 +52,8 @@ class Answer(object):
     dataset = 'None'; #override this property with the name of your dataset
 
     def question_to_text(self):
-        return "Base class, no question."
+        return {"question":"Base class, no question.",'type':'none'}
+#The first item is the string of the question, the second item describes what type of question (select, text)
     
     def get_pymc_function(self,features):
         """Returns a function for use with the pyMC module, using the
@@ -120,10 +121,9 @@ class Answer(object):
 
     @classmethod
     def pick_question(cls):
-        return 'None', 'None' 
+        return 'None', 'None'
 #None = no question to ask the user, but we still want to call it before inference
 #Skip = no question to ask user, and we want to skip it when calling inference: It gets called separately (e.g. when jquery gets facebook info, etc)
-
 #Nones are not handled well when put into the database, using string instead
 
 #TODO: Not currently used - delete?

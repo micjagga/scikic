@@ -97,9 +97,9 @@ class MovieAnswer(ans.Answer):
     def question_to_text(self):
         m = self.get_movie_name(self.movie)
     	if (self.dataitem=='seen'):
-            return "Have you seen %s? (yes or no)" % m
+            return {'question':"Have you seen %s? (yes or no)" % m,'type':'select','options':['yes','no']};
         if (self.dataitem=='rate'):
-            return "Rate %s on a scale of 1 to 5" % m
+            return {'question':"Rate %s on a scale of 1 to 5" % m,'type':'select','option':['5','4','3','2','1']};
         return "Some sort of movie question..."
         
     def calc_probs(self):
@@ -196,5 +196,5 @@ class MovieAnswer(ans.Answer):
         filmn = random.randint(0,len(films)-1);
         movie_index = films[filmn][0];
         movie_name = films[filmn][1];
-        return 'seen',movie_index;
+        return 'seen',movie_index
 
