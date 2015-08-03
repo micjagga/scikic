@@ -345,8 +345,15 @@ class LikeLocationsAnswer(ans.Answer):
             datetime = like['created_time']
             for fullword in like['name'].split(' '):
                 word = s.lemmatize(fullword.lower()) #strips -s etc from end of word
+
+                import sys
+              #  print >>sys.stderr, "checking if %s is a word" % word
+
                 if word in words.words():
                     continue 
+
+               # print >>sys.stderr, "word %s appended" % word
+
                 places.append({'word':word,'datetime':datetime})
        
         threads = []
@@ -357,6 +364,9 @@ class LikeLocationsAnswer(ans.Answer):
 
         for t in threads:
             t.join()
+
+      #  print >>sys.stderr, "PLACES"
+      #  print >>sys.stderr, places
         return places
 
     def get_guess(self,res):
@@ -400,16 +410,12 @@ class LikeLocationsAnswer(ans.Answer):
         # - facts: a dictionary of 'facts' provided by the Answer classes
        # return [self.get_places(facts['facebook_likes'])]
                    
-                
- #       import sys
- #       print >>sys.stderr, facts
- #       print >>sys.stderr, "---------------------------------"
- #       print >>sys.stderr, facts['facebook_likes']
- #       print >>sys.stderr, "---------------------------------"
+
         if 'facebook_likes' not in facts:
             return ["I can't tell which country you're in, just looking at your facebook likes, as I can't see your facebook likes!"]
+
+
         places = self.get_places(facts['facebook_likes'])    
-        places = []
         points = []
         for p in places:
             if p['found']:
@@ -449,7 +455,6 @@ class LikeLocationsAnswer(ans.Answer):
             if len(countries)>2:
                 msg += " and %s" % countries[-1][0][0]
 
-        
         return [msg]
 
     def question_to_text(self):
@@ -466,5 +471,14 @@ class LikeLocationsAnswer(ans.Answer):
     def get_pymc_function(self,features):
         pass
     
+    def append_facts(self,facts,all_answers):
+        """Alters the facts dictionary in place, adding facts associated with
+        this instance.
+        Args:
+          facts (dictionary): Dictionary of facts.
+          all_answers: array of all the instantiated answers"""
+        pass
+    
+
     def append_features(self,features,facts): 
         pass

@@ -46,6 +46,12 @@ class MusicAnswer(ans.Answer):
         #Their location will be in...
             #facts['city'] maybe???
             #facts['country'] maaaaaybe?
+
+        if 'city' not in facts:
+            return []
+        if 'country' not in facts:
+            return []
+        
         event_names = []  
         event_datetimes = []
         event_locations = []
