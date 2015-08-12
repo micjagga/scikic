@@ -33,6 +33,28 @@ class Answer(object):
       factor_gender - a categorical list of two values (male or female)
       seen - whether a film's been seen (true or false)
       rating - the integer rating given to a film (between 0 and 5).
+
+    Fact Descriptions:
+      where_history
+        error - optional, equals a string identifying the problem (can be 'no_fb_likes', 'no_fb_countries', ..)
+        countrylist - optional, a list of tuple-pairs of (country-name, date), where date is the date the person started living there
+        citylist - not yet implemented, a list of tuple-pairs of ((city, country), date) where date is as above
+
+      where
+        city - a list of dictionaries:
+          probability - the probability of being in this city
+          item - the (city, country) pair
+        country - a list of dictionaries: 
+          probability - the probability of being in this country
+          item - the country (whole name) TODO Might be better to use country codes or something similar
+        uscensus - a list of dictionaries. Each dictionary consists of:
+          probability - the probability of the person being in this blockgroup
+          level - the geographical level that this item consists of (e.g. blockgroup is what I'm using at the moment)
+          item - the id of the blockgroup (or other level)
+        ukcensus - a list of dictionaries. Each dictionary consists of:
+          probability - the probability of the person being in this Output Area
+          level - the geographical level that this item consists of (e.g. oa - output area)
+          item - the id of the OA
     """
 
     @classmethod
@@ -120,7 +142,7 @@ class Answer(object):
         return {}
 
     @classmethod
-    def pick_question(cls):
+    def pick_question(cls,questions_asked,facts,target):
         return 'None', 'None'
 #None = no question to ask the user, but we still want to call it before inference
 #Skip = no question to ask user, and we want to skip it when calling inference: It gets called separately (e.g. when jquery gets facebook info, etc)
@@ -129,7 +151,12 @@ class Answer(object):
 #TODO: Not currently used - delete?
     @classmethod
     def process_answer(cls, dataitem, detail, answer):
-        #this function may alter an answer or the details of the question to provide additional information, or reformat it into a standard format.
+    #TODO: DEPRECATED: This function is no longer needed
+    #instead classes add details to the facts dictionary
+    #
+    #This function may alter an answer or the details of
+    #the question to provide additional information, or
+    #reformat it into a standard format.
         return answer, detail;
 
 

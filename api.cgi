@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+#import answer_where
+
 """Example queries:
 
 #An inference request
@@ -95,19 +97,22 @@ version = form['version']
 data = form['data']
 
 if (action=='question'):
-    if not isinstance(data,list):
-        print "Generating a question requires a list of dictionaries of previous questions."
+    if not isinstance(data,dict):
+        print "Generating a question requires a dictionary of 'previous_questions', 'facts' and 'target'. The 'previous_questions' is a list of dictionaries of previous questions."
         exit()
-    for it in data:
+    if 'previous_questions' in data:
+        for it in data['previous_questions']:
+            check_format(it)
+
+if (action=='inference') or (action=='getfacts'):
+    if not isinstance(data,dict) or 'answers' not in data or 'facts' not in data:
+        print "Inference and getfacts require a dictionary of answers and facts."
+    if not isinstance(data['answers'],list) or not isinstance(data['facts'],dict):
+        print "Inference and getfacts require a dictionary of answers and facts. Answers should be a list. Facts should be a dictionary"
+        exit()
+    for it in data['answers']:
         check_format(it)
 
-if (action=='inference'):
-    if not isinstance(data,list):
-        print "Inference requires a list of dictionaries."
-        exit()
-    for it in data:
-        check_format(it)
-#data should be a single dictionary...
 if (action=='questionstring'):
     check_format(data)
 
@@ -118,9 +123,15 @@ if (action=='metadata'):
 
 ##Do the actions....
 if action=='inference':
-    output, facts, insights = inference.do_inference(data)
+    output, facts, insights = inference.do_inference(data['answers'],data['facts'])
     facts = recursive_numpy_array_removal(facts)
     print json.dumps({'features':output,'facts':facts,'insights':insights})
+
+if action=='getfacts':
+    facts = data['facts']
+    inference.process_answers(data['answers'],facts)
+    facts = recursive_numpy_array_removal(facts)
+    print json.dumps({'facts':facts})
 
 if action=='question':
     question = inference.pick_question(data)

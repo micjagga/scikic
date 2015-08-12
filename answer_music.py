@@ -155,6 +155,6 @@ class MusicAnswer(ans.Answer):
         pass
 
     @classmethod
-    def pick_question(self,questions_asked):
+    def pick_question(self,questions_asked,facts,target):
         return 'favourite_artist','';
 

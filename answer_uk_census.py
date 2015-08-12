@@ -9,6 +9,7 @@ import answer as ans
 
 from StringIO import StringIO
 from zipfile import ZipFile
+from threading import Thread
 
 #Some helpful functions
 def hasNumbers(strings):
@@ -49,10 +50,15 @@ def dict_to_array(data):
 
 
 
-class CensusAnswer(ans.Answer):
+
+
+
+
+
+class UKCensusAnswer(ans.Answer):
     """Census answer: handles gender & age, etc"""
 
-    dataset = 'census';
+    dataset = 'ukcensus';
     religions = ['Christian','Buddhist','Hindu','Jewish','Muslim','Sikh','Other religion','No religion']
     religion_text = ['Christian','Buddhist','Hindu','Jewish','Muslim','Sikh','religious (but I do\'t know which)','of no religion']
 
@@ -67,26 +73,29 @@ class CensusAnswer(ans.Answer):
         # - facts: a dictionary of 'facts' provided by the Answer classes      
         
         insightlist = []
-        msg = 'You are aged between %d and %d.\n<br />' % (inference_result['factor_age']['quartiles']['lower'],inference_result['factor_age']['quartiles']['upper'])
-        insightlist.append(msg)
+        if 'factor_age' in inference_result:
+            msg = 'You are aged between %d and %d.\n<br />' % (inference_result['factor_age']['quartiles']['lower'],inference_result['factor_age']['quartiles']['upper'])
+            insightlist.append(msg)
 
-        if (inference_result['factor_gender']['quartiles']['mean']>0.9):
-            insightlist.append('You are female')
-        elif (inference_result['factor_gender']['quartiles']['mean']<0.1):
-            insightlist.append('You are male')
+        if ('factor_gender' in inference_result):
+            if (inference_result['factor_gender']['quartiles']['mean']>0.9):
+                insightlist.append('You are female')
+            elif (inference_result['factor_gender']['quartiles']['mean']<0.1):
+                insightlist.append('You are male')
 
-        rel = inference_result['religion']['distribution']
-  
-        listOfReligions = []
-        import numpy as np
-        for ratio,name in zip(rel,CensusAnswer.religion_text):
-            if (ratio>0.17):
-                listOfReligions.append(name)
-        if (len(listOfReligions)>1):
-            relmsg = ', '.join(listOfReligions[:-1]) + ' or ' + listOfReligions[-1]
-        else:
-            relmsg = listOfReligions[0]
-        insightlist.append(" I think you are " + relmsg)
+        if ('religion' in inference_result):
+            rel = inference_result['religion']['distribution']
+            listOfReligions = []
+            import numpy as np
+            for ratio,name in zip(rel,UKCensusAnswer.religion_text):
+                if (ratio>0.17):
+                    listOfReligions.append(name)
+            if (len(listOfReligions)>1):
+                relmsg = ', '.join(listOfReligions[:-1]) + ' or ' + listOfReligions[-1]
+            else:
+                relmsg = listOfReligions[0]
+            insightlist.append(" I think you are " + relmsg)
+
         return insightlist
 
     @classmethod
@@ -106,8 +115,6 @@ class CensusAnswer(ans.Answer):
         zipfile = ZipFile(StringIO(url.read()))
         for filename in zipfile.namelist():
             if (filename[-3:]=='csv'):
-                #Handle API change
-                #data = pd.read_csv(zipfile.open(filename),skiprows=np.append(np.array(range(8)),10))
                 data = pd.read_csv(zipfile.open(filename),skiprows=np.array(range(8)),skipfooter=1,header=0)
 
 
@@ -173,55 +180,51 @@ class CensusAnswer(ans.Answer):
     def question_to_text(self):
         return "No questions"
         
-    def calc_probs_religion(self,facts):
-       
+    def get_list_of_oas(self,facts):
+        oas = ['K04000001'] #if we don't know where we are, just use whole of England and Wales to get a prior.
         if 'where' in facts:
-            oas = facts['where']['OAs']
-        else:
-            oas = ['K04000001'] #don't know where we are, just use whole of England and Wales to get a prior.
-        from threading import Thread
+            if 'ukcensus' in facts['where']:
+                oas = [it['item'] for it in facts['where']['ukcensus']] #get the list of OA values
+        return oas
+
+    def get_list_of_oa_probs(self,facts):
+        probs = np.array([1.0]) #if we don't know just reply with one.
+        if 'where' in facts:
+            if 'ukcensus' in facts['where']:
+                probs = np.array([it['probability'] for it in facts['where']['ukcensus']]) #get the list of OA values
+        probs = probs/probs.sum() #shouldn't be necessary
+        return probs
+
+    def calc_probs_religion(self,facts):
+        oas = self.get_list_of_oas(facts)
         threadData = []
         threads = []
-    #    oas.append('K04000001') #last OA is whole of England+Wales #DON'T NEED THAT HERE
         for oa in oas:
             data = [0]
             threadData.append(data)
-            t = Thread(target=CensusAnswer.getReligionDist,args=(oa,data))
+            t = Thread(target=UKCensusAnswer.getReligionDist,args=(oa,data))
             threads.append(t)
             t.start()
 
         for t in threads:
             t.join()
 
-#        localDists = [td[0] for td in threadData[:-1]] #TODO Made this change, assuming we don't include the whole of England+Wales as the last item
         localDists = [td[0] for td in threadData]
 
         shape = localDists[0].shape
-        #self.rel_probs = np.empty((len(localDists),shape[0],shape[1],shape[2],2))
         self.rel_probs = np.empty((len(localDists),shape[0],shape[1],shape[2]))
-        for i,p in enumerate(localDists):
-            #self.rel_probs[i,:,:,:,0] = 1-p
-            #self.rel_probs[i,:,:,:,1] = p
+        for i,p in enumerate(localDists): 
             self.rel_probs[i,:,:,:] = p
-        #Probabilities are p(religion|outputarea,gender,age)
-        #organised as: [oa,genderi,agei,religioni]
-        #so sum[0,0,0,:,1]=1
 
     def calc_probs_age(self,facts):
-       
-        if 'where' in facts:
-            oas = facts['where']['OAs'][:] #make a copy
-        else:
-            oas = ['K04000001'] #don't know where we are, just use whole of England and Wales to get a prior.
-
-        from threading import Thread
+        oas = self.get_list_of_oas(facts)
         threadData = []
         threads = []
         oas.append('K04000001') #last OA is whole of England+Wales
         for oa in oas:
             data = [0]
             threadData.append(data)
-            t = Thread(target=CensusAnswer.getAgeDist,args=(oa,data))
+            t = Thread(target=UKCensusAnswer.getAgeDist,args=(oa,data))
             threads.append(t)
             t.start()
 
@@ -292,6 +295,14 @@ class CensusAnswer(ans.Answer):
             return pReligion[oa,gender,age_p]
         return givenReligion
     
+    def prob_in_uk(self,facts):
+        if 'where' in facts:
+            if 'country' in facts['where']:
+                for con in facts['where']['country']:
+                    if con['item'] == 'uk':
+                        return con['probability']
+        return 0 #if it's not been found
+
     def append_features(self,features,facts): 
         """Alters the features dictionary in place, adds:
          - age
@@ -304,20 +315,24 @@ class CensusAnswer(ans.Answer):
         Raises:
           DuplicateFeatureException: If an identically named feature already exists that clashes with this instance
         """
-        #age: 0-100
+
+        #if we're not in the uk then we just skip
+        if self.prob_in_uk(facts)<0.01:
+            return
+
         self.calc_probs_age(facts)
         self.calc_probs_religion(facts)
         if not 'factor_age' in features:
             p = np.ones(101) #flat prior
             p = p/p.sum()
             features['factor_age'] = pm.Categorical('factor_age',p);
+        if not 'factor_gender' in features:
+            p = np.array([.5,.5]) #approx flat            
+            features['factor_gender'] = pm.Categorical('factor_gender',p);
         if not 'oa' in features:
-            if 'where' in facts:
-                p = facts['where']['probabilities'] #prior is weighted by how likely each OA is
-                p = p/p.sum() #not necessary.
-                features['oa'] = pm.Categorical('oa',p);
-            else:
-                features['oa'] = pm.Categorical('oa',np.array([1]));      
+            probs = self.get_list_of_oa_probs(facts)
+            features['oa'] = pm.Categorical('oa',probs); #if we don't have the ukcensus array then we just have a probability of one for one output area
+
         if self.featurename+"_age" in features:
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename+"_age");
         if "religion" in features:
@@ -327,6 +342,6 @@ class CensusAnswer(ans.Answer):
         features["religion"]=pm.Categorical("religion", self.get_pymc_function_religion(features)) #, value=True, observed=False)
  
     @classmethod
-    def pick_question(self,questions_asked):
+    def pick_question(cls,questions_asked,facts,target):
 	    return 'None','agegender'
 

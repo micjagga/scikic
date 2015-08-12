@@ -21,6 +21,8 @@ from nltk.corpus import words
 from nltk.stem import WordNetLemmatizer
 import shapefile
 
+from integrate_location import add_location
+
 import zipfile,os.path,os
 
 class LikeLocationsAnswer(ans.Answer):
@@ -371,7 +373,6 @@ class LikeLocationsAnswer(ans.Answer):
 
     def get_guess(self,res):
         #generates a list of countries user lived in at each like (currently ignores time aspect of likes)
-
         #probability of staying in the same country for each like
         pStay = 0.9 #0.8
         #the following probabilities get spread across...
@@ -408,13 +409,53 @@ class LikeLocationsAnswer(ans.Answer):
         #returns a list of insights:
         # - inference_result: probability distributions of the features
         # - facts: a dictionary of 'facts' provided by the Answer classes
-       # return [self.get_places(facts['facebook_likes'])]
+        # return [self.get_places(facts['facebook_likes'])]
                    
 
+        if 'where_history' not in facts:
+            return []
+
+        wh = facts['where_history']
+        if 'error' in wh:
+            if wh['error']=='no_fb_likes':
+                return ["I can't tell which country you're in, just looking at your facebook likes, as I can't see your facebook likes!"]
+            if wh['error']=='no_fb_countries':
+                return ["I can't tell which country you're in, just looking at your facebook likes."]
+        countries = wh['list']
+        if len(countries)==1:
+            con = countries[0]          
+            msg = "Since at least %d you've lived in %s" % (con[1][0],con[0][0])
+        else:
+            con = countries[0]
+            msg = "Since at least %d you've mainly lived in %s" % (con[1][0],con[0][0])
+            con = countries[1]
+            msg += " but have also lived in %s, around %d" % (con[0][0], con[1][0])
+            for i,con in enumerate(countries[2:-1]):
+                msg +=", %s" % (con[0][0])
+            if len(countries)>2:
+                msg += " and %s" % countries[-1][0][0]
+
+        return [msg]
+
+    def question_to_text(self):
+        return "Doesn't need to ask questions."
+
+    @classmethod
+    def pick_question(self,questions_asked,facts,target):
+    	#return 'name', '' #could return None,None in future, depending on if we get name from facebook
+        return 'None', 'None' #None string used to help database
+
+    def calc_probs(self):
+       pass
+
+    def get_pymc_function(self,features):
+        pass
+    
+    def append_facts(self,facts,all_answers):
+        facts['where_history'] = {}
         if 'facebook_likes' not in facts:
-            return ["I can't tell which country you're in, just looking at your facebook likes, as I can't see your facebook likes!"]
-
-
+            facts['where_history'] = {'error':'no_fb_likes'}
+            return
         places = self.get_places(facts['facebook_likes'])    
         points = []
         for p in places:
@@ -439,45 +480,10 @@ class LikeLocationsAnswer(ans.Answer):
             datetime = points[idx][2]['datetime']
             t = time.strptime(datetime, '%Y-%m-%dT%H:%M:%S+0000')
             countries.append((pl[item[0]],t))
-        #print [c[0][0] for c in countries]
+        add_location(facts,countries=[pl[guesses[-1]]]) #add last country from the process as our guess #TODO We can do better (probabilistic)
         if len(countries)==0:
-            return ["I can't tell which country you're in, just looking at your facebook likes."]
-        if len(countries)==1:
-            con = countries[0]          
-            msg = "Since at least %d you've lived in %s" % (con[1][0],con[0][0])
-        else:
-            con = countries[0]
-            msg = "Since at least %d you've mainly lived in %s" % (con[1][0],con[0][0])
-            con = countries[1]
-            msg += " but have also lived in %s, around %d" % (con[0][0], con[1][0])
-            for i,con in enumerate(countries[2:-1]):
-                msg +=", %s" % (con[0][0])
-            if len(countries)>2:
-                msg += " and %s" % countries[-1][0][0]
-
-        return [msg]
-
-    def question_to_text(self):
-        return "Doesn't need to ask questions."
-
-    @classmethod
-    def pick_question(self,questions_asked):
-    	#return 'name', '' #could return None,None in future, depending on if we get name from facebook
-        return 'None', 'None' #None string used to help database
-
-    def calc_probs(self):
-       pass
-
-    def get_pymc_function(self,features):
-        pass
-    
-    def append_facts(self,facts,all_answers):
-        """Alters the facts dictionary in place, adding facts associated with
-        this instance.
-        Args:
-          facts (dictionary): Dictionary of facts.
-          all_answers: array of all the instantiated answers"""
-        pass
+            facts['where_history']['error'] = 'no_fb_countries';    
+        facts['where_history']['countrylist'] = countries
     
 
     def append_features(self,features,facts): 

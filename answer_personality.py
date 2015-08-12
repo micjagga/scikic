@@ -53,7 +53,7 @@ class MoviePersonality(ans.Answer):
         pass
 
     @classmethod
-    def pick_question(self,questions_asked):
+    def pick_question(self,questions_asked,facts,target):
         available_questions = range(10);
         for q in questions_asked:
             if q['dataset']=='personality':

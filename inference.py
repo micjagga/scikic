@@ -12,26 +12,10 @@ for mod in trimmedmods:
 import pymc as pm
 import numpy as np
 
-def do_inference(data):
-#data = data we have about the user
-#stored in an array of dictionaries:
-#each dictionary has four fields:
-#dataset, dataitem, detail and answer
-
-#Some datasets we won't have asked questions about as they don't need question/answer responses (such as the babynames dataset,
-#which just gets its 'name' value from the 'facts' structure).
-#We still need to add these to our 'data' array so that they get used.
-    c = [cls for cls in ans.Answer.__subclasses__()]
-    for cl in c:
-        cl.init_db() #normally should be started from an instance?? but we don't really mind.
-        dataitem, detail = cl.pick_question(data)
-        dataset = cl.dataset
-        if (dataitem=='None'):
-            item = {'dataset':dataset, 'dataitem':dataitem, 'detail':detail, 'answer':0} #no answer provided to this type of dataset
-            data.append(item)
-
+def process_answers(data,facts={}):
     #instantiate classes for each dataset we have
-    #put these instances in the 'answers' array
+    #put these instances in the 'answers' array which is
+    #returned. Also alter the facts variable inplace.
     answers = []
     for it,qa in enumerate(data):
         if 'answer' not in qa:
@@ -42,23 +26,47 @@ def do_inference(data):
         name = "item%d" % it
         answers.append(c[0](name,qa['dataitem'],qa['detail'],qa['answer']))
 
-    #There are now two dictionaries, facts and features.
-    # - Facts are detailed statements about a person from a very large dimensional space (e.g. precise address, name, date of birth, etc)
-    #which we know with some considerable certainty
-    #
-    # - Features are those things we know less about, or that we need to perform inference over. For example age, location,
-    #etc...
-    #
-    #TODO: Add some facts that we've not done (e.g. output area)?? (not sure we'll know that precisely, in the long-run).
-    #
-    #The facts are used by the append_features method to help generate a probability distribution. For example, if the person's
-    #name is in the facts dictionary as 'Robert', then if the NamesAnswer class is instantiated, it can then use that to produce
-    #a feature over a person's gender.
-    facts = {}
-    features = {}
     for a in answers:
         a.append_facts(facts, answers)
+    return answers
 
+def do_inference(data=[],facts={}):
+#data = data we have about the user stored in an array of dictionaries:
+#each dictionary has four fields: dataset, dataitem, detail and answer
+#
+#facts = dictionary of processed
+#data about the user.
+#
+#Note: There are two dictionaries, facts and features.
+# - Facts are detailed statements about a person from a very large dimensional space (e.g. precise address, name, date of birth, etc)
+#which we know with some considerable certainty
+#
+# - Features are those things we know less about, or that we need to perform inference over. For example age, location,
+#etc...
+#
+#TODO: Add some facts that we've not done (e.g. output area)?? (not sure we'll know that precisely, in the long-run).
+#
+#The facts are used by the append_features method to help generate a probability distribution. For example, if the person's
+#name is in the facts dictionary as 'Robert', then if the NamesAnswer class is instantiated, it can then use that to produce
+#a feature over a person's gender.
+
+     
+    #Some datasets we won't have asked questions about as they don't need question/answer responses (such as the babynames dataset,
+    #which just gets its 'name' value from the 'facts' structure).
+    #We still need to add these to our 'data' array so that they get used.
+    c = [cls for cls in ans.Answer.__subclasses__()]
+    for cl in c:
+        cl.init_db() #normally should be started from an instance?? but we don't really mind.
+        dataitem, detail = cl.pick_question(data,{},'')
+        dataset = cl.dataset
+        if (dataitem=='None'):
+            item = {'dataset':dataset, 'dataitem':dataitem, 'detail':detail, 'answer':0} #no answer provided to this type of dataset
+            data.append(item)
+
+    answers = process_answers(data,facts)
+
+    
+    features = {}
     for a in answers:
         a.append_features(features,facts)
 
@@ -95,6 +103,11 @@ def do_inference(data):
     insights = []
     for a in answers:
         insights.extend(a.insights(output, facts))
+
+    import sys
+    print >>sys.stderr, output
+    print >>sys.stderr, insights
+
     return output, facts, insights
 
 #Some datasets need to process an answer (for example lookup where a location is, etc). It's best to do this once, when you get
@@ -111,10 +124,23 @@ def process_answer(data):
 
 
 def pick_question(data):
+    #Generating a question requires a dictionary of 'previous_questions', 'facts' and 'target'. The 'previous_questions' is a list of dictionaries of previous questions.
     questions_asked = []
+    facts = {}
+    target = ''
+    if 'previous_questions' in data:
+        questions_asked = data['previous_questions']
+    if 'facts' in data: 
+        facts = data['facts']
+    if 'target' in data:
+        target = data['target']
+
+    if len(facts)==0: #TODO: This is going to be really slow but I've put it here for now...
+        process_answers(questions_asked, facts)
     questions_only_asked = []
-   
-    for qa in data:
+    
+    
+    for qa in questions_asked:
         #to make it easy to check through which questions we've asked, we make a string for each one.
         questionstring = "%s_%s_%s" % (qa['dataset'], qa['dataitem'], qa['detail'])
         questions_only_asked.append(questionstring) #this doesn't include the answer so we can look for if we've asked the question already.
@@ -122,7 +148,6 @@ def pick_question(data):
     found = False           #have we found a question?
     for counter in range(20):
 #        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset not in ['personality']] 
-#        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset not in ['census','facebook','movielens','personality']]
         c = [cls for cls in ans.Answer.__subclasses__()]
         cl = random.choice(c)
   #      print cl.dataset + "<br/>"
@@ -130,10 +155,10 @@ def pick_question(data):
 #            if random.random()<0.9: #discourage movielens questions, as they're of less use
 #                continue
         cl.init_db() #normally should be started from an instance?? but we don't really mind.
-        dataitem, detail = cl.pick_question(questions_asked)
-        dataset = cl.dataset
-    #    print dataset, dataitem, detail
-     #   print "<br/>----<br/>";
+        dataitem, detail = cl.pick_question(questions_asked,facts,target)
+        dataset = cl.dataset   
+
+
         if (dataitem=='None' or dataitem=='Skip'): #not a dataset that needs questions
             continue;
         question = "%s_%s_%s" % (dataset, dataitem, detail)

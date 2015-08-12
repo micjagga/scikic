@@ -204,7 +204,7 @@ class BabyNamesAnswer(ans.Answer):
         return "Some sort of census question..."
 
     @classmethod
-    def pick_question(self,questions_asked):
+    def pick_question(self,questions_asked,facts,target):
     	#return 'name', '' #could return None,None in future, depending on if we get name from facebook
         return 'None', 'None' #None string used to help database
 

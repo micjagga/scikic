@@ -184,7 +184,7 @@ class MovieAnswer(ans.Answer):
         seen = hf.true_string(self.answer);
         features[self.featurename]=pm.Categorical(self.featurename, self.get_pymc_function(features), value=seen, observed=True)
     @classmethod
-    def pick_question(self,questions_asked):
+    def pick_question(self,questions_asked,facts,target):
         #temporary list of films I'VE seen!
         films = [(2541, 'Cruel Intentions (1999)'),
          (969, 'African Queen, The (1951)'),
