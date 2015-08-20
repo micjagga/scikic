@@ -1,5 +1,6 @@
 import answer as ans
 import random
+import logging
 
 #import all answer_something.py classes
 import os
@@ -11,11 +12,25 @@ for mod in trimmedmods:
 
 import pymc as pm
 import numpy as np
+import config
+
+logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
+
+logging.info('-------')
+
+def logfacts(facts):
+    logging.info('   Facts:')
+    for f in facts:
+        logging.info('      %s: %s' % (f,facts[f]))
+ #       for fi in facts[f]:
+ #           logging.info('            >   %s: %s' % (fi, facts[f][fi]))
+    logging.info(' ');
 
 def process_answers(data,facts={}):
     #instantiate classes for each dataset we have
     #put these instances in the 'answers' array which is
     #returned. Also alter the facts variable inplace.
+    logging.info('process_answers (data has %d items, facts has %d items)' % (len(data),len(facts)))
     answers = []
     for it,qa in enumerate(data):
         if 'answer' not in qa:
@@ -24,10 +39,18 @@ def process_answers(data,facts={}):
         if len(c)==0:
             continue #don't know this sort of data: skip it
         name = "item%d" % it
+
+        tempans = str(qa['answer'])
+        if len(tempans)>15:
+            tempans=tempans[0:15]+'...'
+        logging.info('  adding %s [%15s] (%s,%s->%s)' % (name,qa['dataset'],qa['dataitem'],qa['detail'],tempans))
         answers.append(c[0](name,qa['dataitem'],qa['detail'],qa['answer']))
 
     for a in answers:
         a.append_facts(facts, answers)
+
+    logging.info('  facts has now %d items' % (len(facts)))
+    logfacts(facts)
     return answers
 
 def do_inference(data=[],facts={}):
@@ -49,7 +72,7 @@ def do_inference(data=[],facts={}):
 #The facts are used by the append_features method to help generate a probability distribution. For example, if the person's
 #name is in the facts dictionary as 'Robert', then if the NamesAnswer class is instantiated, it can then use that to produce
 #a feature over a person's gender.
-
+    logging.info('do_inference (data has %d items, facts has %d items)' % (len(data),len(facts)))
      
     #Some datasets we won't have asked questions about as they don't need question/answer responses (such as the babynames dataset,
     #which just gets its 'name' value from the 'facts' structure).
@@ -68,7 +91,13 @@ def do_inference(data=[],facts={}):
     
     features = {}
     for a in answers:
+        logging.info('   adding %s' % a.dataset)
         a.append_features(features,facts)
+
+
+    logging.info('   features has %d items' % (len(features)))
+    for f in features:
+        logging.info('      %s' % (f))
 
     model = pm.Model(features)
     mcmc = pm.MCMC(model)
@@ -113,18 +142,20 @@ def do_inference(data=[],facts={}):
 #Some datasets need to process an answer (for example lookup where a location is, etc). It's best to do this once, when you get
 #the user response, rather than repeatedly later, when you read it.
 def process_answer(data):
-        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset==data['dataset']]
-        if len(c)>0:
-            answer, detail = c[0].process_answer(data['dataitem'],data['detail'],data['answer'])
-            data['answer'] = answer
-            data['detail'] = detail
-            return data
-        else:
-            return data  #just return what we were given. "Unable to find specified dataset"
+    logging.info('process_answer (data has %d items)' % (len(data)))
+    c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset==data['dataset']]
+    if len(c)>0:
+        answer, detail = c[0].process_answer(data['dataitem'],data['detail'],data['answer'])
+        data['answer'] = answer
+        data['detail'] = detail
+        return data
+    else:
+        return data  #just return what we were given. "Unable to find specified dataset"
 
 
 def pick_question(data):
     #Generating a question requires a dictionary of 'previous_questions', 'facts' and 'target'. The 'previous_questions' is a list of dictionaries of previous questions.
+    logging.info('pick_question (data has %d items)' % (len(data)))
     questions_asked = []
     facts = {}
     target = ''
@@ -135,7 +166,8 @@ def pick_question(data):
     if 'target' in data:
         target = data['target']
 
-    if len(facts)==0: #TODO: This is going to be really slow but I've put it here for now...
+    #if len(facts)==0: #TODO: This is going to be really slow but I've put it here for now...
+    if len(questions_asked)>0:
         process_answers(questions_asked, facts)
     questions_only_asked = []
     
@@ -168,8 +200,10 @@ def pick_question(data):
             found = True
             break
     if not found:
-        return {'dataset':None, 'dataitem':None, 'detail':None, 'structure':None}
-    return {'dataset':dataset, 'dataitem':dataitem, 'detail':detail}
+        dataset = None
+        dataitem = None
+        detail = None
+    return {'question':{'dataset':dataset, 'dataitem':dataitem, 'detail':detail},'facts':facts}
 
 def get_question_string(data):
     c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset==data['dataset']]

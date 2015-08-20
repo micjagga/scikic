@@ -35,7 +35,7 @@ def add_location(facts, countries=None, cities=None, blocks=None, tracts=None, l
         if probabilities==None:
             probabilities = 1.0*np.ones(len(countries))/len(countries)
         for con,prob in zip(countries,probabilities):
-            facts['where']['country'].append({'item':con,'probability':prob})
+            facts['where']['country'].append({'item':parseCountry(con),'probability':prob})
         #TODO Set lat/long
         #TODO INTEGRATE WITH WHAT'S ALREADY SET!
 
@@ -62,7 +62,16 @@ def add_location(facts, countries=None, cities=None, blocks=None, tracts=None, l
         #TODO INTEGRATE WITH WHAT'S ALREADY SET!
 
 def parseCountry(text): #turns arbitrary strings of country names to country codes #TODO
-    return text
+    #could use from nltk.metrics.distance import edit_distance
+    #edit_distance('united kingdom','UNITED KINGDOM')
+    country = 'EARTH' #don't know!
+
+    #strings are ISO 3166 CODES
+    strings = {'gb':['united kingdom','uk','u.k.','g.b.','gb','great britain','gbr','england','scotland','wales','northern ireland','britain','united kingdom of great britain and northern ireland','united kingdom of great britain'], 'us':['united states','us','usa','united states of america','america','the states','us of a','u.s.','u.s.a.'], 'de':['germany','de','deu','deutsch','deutschland','federal republic of germany']}
+    for con in strings:
+        if text.lower() in strings[con]:
+            country = con
+    return country #e.g. will return 'gb'
 
 def displayCountry(code): #turns a country code back into a full name
     return code

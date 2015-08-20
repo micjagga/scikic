@@ -194,9 +194,10 @@ class BabyNamesAnswer(ans.Answer):
     #    male[:,1,1].argmax()
         if 'first_name' in facts:
             name = facts['first_name']
+            return ["You're called %s" % name]
         else:
-            name = '?????!';
-        return ["You're called %s" % name]
+            return []
+        
 
     def question_to_text(self):
         if (self.dataitem=='name'):

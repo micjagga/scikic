@@ -205,7 +205,7 @@ class PostalAnswer(ans.Answer):
             if country!=None:
                 if 'where' not in facts:
                     facts['where'] = {}
-                facts['where']['country'] = [{'item':country,'probability':1.}] #TODO WE NEED TO PARSE THE USER LABEL OF THE COUNTRY TO COUNTRY CODES
+                facts['where']['country'] = [{'item':country,'probability':1.}]
 
     def append_facts_zipcode(self,facts):       
             zipcode = self.answer;
@@ -254,7 +254,7 @@ class PostalAnswer(ans.Answer):
             if (oa != None):
                 facts['where']['ukcensus'] = [{'probability':1., 'level':'oa', 'item':oa}]
                 facts['where']['city'] = [{'item':(city,'uk'),'probability':1.}]
-            facts['where']['country'] = [{'item':'uk','probability':1.}]
+            facts['where']['country'] = [{'item':'gb','probability':1.}]
 
     @classmethod
     def pick_question(cls,questions_asked,facts,target):   
@@ -266,44 +266,14 @@ class PostalAnswer(ans.Answer):
                     if maxp<con['probability']:
                         maxp = con['probability']
                         country = con['item']       
-        if country=='uk':
+        if parseCountry(country)=='gb':
             return 'postcode', ''
        
-        if country=='us':
+        import sys
+        print >>sys.stderr, facts
+        print >>sys.stderr, country
+        print >>sys.stderr, parseCountry(country)
+        if parseCountry(country)=='us':
             return 'zipcode', ''
 
         return 'None', 'None' #we can't ask this yet.
-       
-
-'''    @classmethod
-    def pick_question(cls,questions_asked,facts,target):    
-        maxp = 0
-
-        #before we ask for a postcode/zipcode/etc we need to know which country they're in...
-        #we might have already asked, or can infer this already from other information
-
-        #we first check if we've asked for their country...
-        country = None
-        for q in questions_asked:
-            if q['dataset']=='postal':
-                if q['dataitem']=='country':
-                    country = parseCountry(q['answer'])
-
-        #if we've not, then we need to figure it from the facts dict.
-        if country==None:
-            if 'where' in facts:
-                if 'country' in facts['where']:
-                    for con in facts['where']['country']:
-                        if maxp<con['probability']:
-                            maxp = con['probability']
-                            country = con['item']      
-            if maxp<0.9: #if we're not sure about our country, we should ask that first.
-                return 'country',''
-
-        if country=='uk':
-            return 'postcode', ''
-       
-        if country=='us':
-            return 'zipcode', ''
-'''
-       

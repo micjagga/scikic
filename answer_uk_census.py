@@ -11,6 +11,10 @@ from StringIO import StringIO
 from zipfile import ZipFile
 from threading import Thread
 
+import logging
+import config
+logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
+
 #Some helpful functions
 def hasNumbers(strings):
     '''Returns true if any of the strings in the 'strings' array have a digit in them.'''
@@ -74,7 +78,7 @@ class UKCensusAnswer(ans.Answer):
         
         insightlist = []
         if 'factor_age' in inference_result:
-            msg = 'You are aged between %d and %d.\n<br />' % (inference_result['factor_age']['quartiles']['lower'],inference_result['factor_age']['quartiles']['upper'])
+            msg = 'You are aged between %d and %d.' % (inference_result['factor_age']['quartiles']['lower'],inference_result['factor_age']['quartiles']['upper'])
             insightlist.append(msg)
 
         if ('factor_gender' in inference_result):
@@ -94,7 +98,7 @@ class UKCensusAnswer(ans.Answer):
                 relmsg = ', '.join(listOfReligions[:-1]) + ' or ' + listOfReligions[-1]
             else:
                 relmsg = listOfReligions[0]
-            insightlist.append(" I think you are " + relmsg)
+            insightlist.append(" I think you are " + relmsg + ".")
 
         return insightlist
 
@@ -218,6 +222,10 @@ class UKCensusAnswer(ans.Answer):
 
     def calc_probs_age(self,facts):
         oas = self.get_list_of_oas(facts)
+        logging.info('calc_probs_age')
+        logging.info('  OAs:')
+        for oa in oas:
+            logging.info('      %s' % oa)
         threadData = []
         threads = []
         oas.append('K04000001') #last OA is whole of England+Wales
@@ -232,7 +240,7 @@ class UKCensusAnswer(ans.Answer):
             t.join()
 
         localAgeDists = [td[0] for td in threadData[:-1]]
-
+        logging.info('  localAgeDists has %d items' % len(localAgeDists))
         nationalAgeDist = threadData[-1][0]
 
         #we want p(postcode|age), which we assume is equal to p(output area|age)
@@ -299,7 +307,7 @@ class UKCensusAnswer(ans.Answer):
         if 'where' in facts:
             if 'country' in facts['where']:
                 for con in facts['where']['country']:
-                    if con['item'] == 'uk':
+                    if con['item'] == 'gb':
                         return con['probability']
         return 0 #if it's not been found
 
@@ -318,6 +326,7 @@ class UKCensusAnswer(ans.Answer):
 
         #if we're not in the uk then we just skip
         if self.prob_in_uk(facts)<0.01:
+            logging.info('      probably not in the UK, skipping')
             return
 
         self.calc_probs_age(facts)

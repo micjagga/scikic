@@ -10,6 +10,7 @@ import answer as ans
 import pickle
 import answer as ans
 import config
+from integrate_location import parseCountry
 
 from StringIO import StringIO
 from zipfile import ZipFile
@@ -482,8 +483,10 @@ class LikeLocationsAnswer(ans.Answer):
             countries.append((pl[item[0]],t))
         add_location(facts,countries=[pl[guesses[-1]]]) #add last country from the process as our guess #TODO We can do better (probabilistic)
         if len(countries)==0:
-            facts['where_history']['error'] = 'no_fb_countries';    
-        facts['where_history']['countrylist'] = countries
+            facts['where_history']['error'] = 'no_fb_countries';
+        facts['where_history']['countrylist'] = []
+        for con in countries:  
+             facts['where_history']['countrylist'].append(parseCountry(con))
     
 
     def append_features(self,features,facts): 

@@ -7,3 +7,4 @@ def true_string(st):
     if (st[0].upper()=='T'): #True,true,T,t
         return True
     return False #false,False,F,Wrong,Nope,No,(correct)
+
