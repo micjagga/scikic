@@ -47,7 +47,10 @@ def dict_to_array(data):
     if hasNumbers(labels): #automatically sorts labels containing numbers by the numerical value of the first number.
         numbers = []
         for lab in labels:
-            numbers.append(re.search(r'\d+', lab).group())
+            digits = re.search(r'\d+', lab)
+            if digits!=None:
+                digits = digits.group()
+            numbers.append(digits)
         numbers, labels, res = (list(t) for t in zip(*sorted(zip(numbers, labels, res))))  
     lower_labels.insert(0,labels)
     return np.array(res), lower_labels
@@ -152,6 +155,25 @@ class UKCensusAnswer(ans.Answer):
         returnList[0] = popages #now return via the argument so this can be called as a thread
 
     @classmethod
+    def getHouseholdDist(cls,geoArea,returnList):
+        """Gets the Household composition by age by sex; given the label of a particular geographical area"""
+        data, mat = cls.ONSapiQuery(geoArea,'LC1109EW')
+        arr,labs = dict_to_array(mat) #Convert the dictionary hierarchy to a numpy array 
+        #for dim in labs:
+        #    for i,l in enumerate(dim):
+        #        print i,l
+        #todo sort...
+        #order = [[i for i,l in enumerate(labs[2]) if l==r][0] for r in cls.???] #?
+        arr = np.array(arr) #convert to numpy array
+        #arr = arr[:,:,order] #put in correct order.
+        arr = arr * 1.0
+        for x in range(arr.shape[0]):
+            for y in range(arr.shape[1]):
+                arr[x,y,:] += 1.0
+                arr[x,y,:] = 1.0*arr[x,y,:] / np.sum(1.0*arr[x,y,:])
+        returnList[0] = arr #now return via the argument so this can be called as a thread
+
+    @classmethod
     def getReligionDist(cls,geoArea,returnList):
         """Gets the religion distribution given the label of a particular geographical area"""
         data,mat = cls.ONSapiQuery(geoArea,'LC2107EW')        #LC2107EW = religion by age, gender, etc
@@ -219,6 +241,28 @@ class UKCensusAnswer(ans.Answer):
         self.rel_probs = np.empty((len(localDists),shape[0],shape[1],shape[2]))
         for i,p in enumerate(localDists): 
             self.rel_probs[i,:,:,:] = p
+
+    def calc_probs_household(self,facts):
+        oas = self.get_list_of_oas(facts)
+        threadData = []
+        threads = []
+        for oa in oas:
+            data = [0]
+            threadData.append(data)
+            t = Thread(target=UKCensusAnswer.getHouseholdDist,args=(oa,data))
+            threads.append(t)
+            t.start()
+
+        for t in threads:
+            t.join()
+
+        localDists = [td[0] for td in threadData]
+
+        shape = localDists[0].shape
+        self.household_probs = np.empty((len(localDists),shape[0],shape[1],shape[2]))
+        for i,p in enumerate(localDists): 
+            self.household_probs[i,:,:,:] = p
+
 
     def calc_probs_age(self,facts):
         oas = self.get_list_of_oas(facts)
@@ -303,6 +347,26 @@ class UKCensusAnswer(ans.Answer):
             return pReligion[oa,gender,age_p]
         return givenReligion
     
+    def get_pymc_function_household(self,features):
+        probs = self.household_probs
+        @pm.deterministic    
+        def givenReligion(age=features['factor_age'],oa=features['oa'],gender=features['factor_gender']):
+            pHousehold = probs
+            #the household dataset is only split into a few bins of age, so handling that here:
+            if (age<16):
+                age_p = 0
+            elif (age<25):
+                age_p = 1
+            elif (age<35):
+                age_p = 2
+            elif (age<50):
+                age_p = 3
+            else:
+                age_p = 4
+            return pHousehold[oa,gender,age_p]
+        return givenReligion
+    
+
     def prob_in_uk(self,facts):
         if 'where' in facts:
             if 'country' in facts['where']:
@@ -331,6 +395,7 @@ class UKCensusAnswer(ans.Answer):
 
         self.calc_probs_age(facts)
         self.calc_probs_religion(facts)
+        self.calc_probs_household(facts)
         if not 'factor_age' in features:
             p = np.ones(101) #flat prior
             p = p/p.sum()
@@ -349,6 +414,7 @@ class UKCensusAnswer(ans.Answer):
 
         features[self.featurename+"_age"]=pm.Categorical(self.featurename+"_age", self.get_pymc_function_age(features), value=True, observed=True)
         features["religion"]=pm.Categorical("religion", self.get_pymc_function_religion(features)) #, value=True, observed=False)
+        features["household"]=pm.Categorical("household", self.get_pymc_function_household(features)) #, value=True, observed=False)
  
     @classmethod
     def pick_question(cls,questions_asked,facts,target):

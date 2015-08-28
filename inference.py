@@ -154,24 +154,28 @@ def process_answer(data):
 
 
 def pick_question(data):
-    #Generating a question requires a dictionary of 'previous_questions', 'facts' and 'target'. The 'previous_questions' is a list of dictionaries of previous questions.
-    logging.info('pick_question (data has %d items)' % (len(data)))
+    #Generating a question requires a dictionary of 'previous_questions', 'facts' and 'target'. The 'previous_questions' is a list of dictionaries
+    #of previous questions, that you want to avoid asking again.
+    #The 'unprocessed_questions' are questions that you've asked already and that haven't been incorporated into the 'facts' dictionary.
+
+    logging.info('pick_question')
     questions_asked = []
     facts = {}
     target = ''
     if 'previous_questions' in data:
         questions_asked = data['previous_questions']
+    if 'unprocessed_questions' in data:
+        unprocessed_questions = data['unprocessed_questions']
     if 'facts' in data: 
         facts = data['facts']
     if 'target' in data:
         target = data['target']
 
-    #if len(facts)==0: #TODO: This is going to be really slow but I've put it here for now...
-    if len(questions_asked)>0:
-        process_answers(questions_asked, facts)
+    if len(unprocessed_questions)>0: #add data from the questions asked to the facts dictionary
+        process_answers(unprocessed_questions, facts)
     questions_only_asked = []
     
-    
+    logging.info('    facts: %s' % facts)
     for qa in questions_asked:
         #to make it easy to check through which questions we've asked, we make a string for each one.
         questionstring = "%s_%s_%s" % (qa['dataset'], qa['dataitem'], qa['detail'])
@@ -189,20 +193,22 @@ def pick_question(data):
         cl.init_db() #normally should be started from an instance?? but we don't really mind.
         dataitem, detail = cl.pick_question(questions_asked,facts,target)
         dataset = cl.dataset   
-
-
         if (dataitem=='None' or dataitem=='Skip'): #not a dataset that needs questions
             continue;
         question = "%s_%s_%s" % (dataset, dataitem, detail)
         if (question in questions_only_asked): #duplicate of one we've already asked
             continue
         else:
+            logging.info('    found a question: %s, %s, %s' % (dataset,dataitem,detail))
             found = True
             break
+
     if not found:
+        logging.info('    not found a question')
         dataset = None
         dataitem = None
         detail = None
+    logging.info('    returning (%s)' % dataset)
     return {'question':{'dataset':dataset, 'dataitem':dataitem, 'detail':detail},'facts':facts}
 
 def get_question_string(data):

@@ -87,10 +87,10 @@ class GeoLocAnswer(ans.Answer):
                     json_loc = json.loads(raw_json)
                     #TODO: CACHE IN DB
                     return 'nearcity',json.dumps({'city':json_loc['city'],'country':json_loc['country_name']})
-                except urllib2.HTTPError:
+                except Exception: #urllib2.HTTPError: #lots of 
                     ipwrong = True #effectively it's wrong as we can't find out where they are.
-                except urllib2.URLError:#time out?
-                    ipwrong = True #effectively it's wrong as we can't find out where they are. 
+               # except urllib2.URLError:#time out?
+               #     ipwrong = True #effectively it's wrong as we can't find out where they are. 
             else:
                 ipwrong = True #we don't know their ip address, have to give up
            

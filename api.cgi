@@ -25,6 +25,11 @@ import cgi
 from sys import exit
 import inference
 
+import config
+import logging
+logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
+
+
 #checks data is a dictionary with correct fields.
 def check_format(item):
     if not isinstance(item,dict):
@@ -96,12 +101,20 @@ action = form['action']
 version = form['version']
 data = form['data']
 
+datamsg = str(data)
+if len(datamsg)>70:
+    datamsg = datamsg[0:70]+'...';
+logging.info('API Query [%s]: %s' % (action,datamsg))
+
 if (action=='question'):
     if not isinstance(data,dict):
-        print "Generating a question requires a dictionary of 'previous_questions', 'facts' and 'target'. The 'previous_questions' is a list of dictionaries of previous questions."
+        print "Generating a question requires a dictionary of 'previous_questions', 'unprocessed_questions', 'facts' and 'target'. The 'previous_questions' is a list of dictionaries of previous questions, that you want to avoid asking again. The 'unprocessed_questions' are questions that you've asked already and that haven't been incorporated into the 'facts' dictionary."
         exit()
     if 'previous_questions' in data:
         for it in data['previous_questions']:
+            check_format(it)
+    if 'unprocessed_questions' in data:
+        for it in data['unprocessed_questions']:
             check_format(it)
 
 if (action=='inference') or (action=='getfacts'):
@@ -140,10 +153,6 @@ if action=='question':
 if action=='questionstring':
     question_string = inference.get_question_string(data)
     print json.dumps(question_string)
-
-if action=='processanswer':
-    data = inference.process_answer(data)
-    print json.dumps(data)
 
 if action=='metadata':
     metadata = inference.get_meta_data(data)

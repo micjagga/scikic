@@ -46,7 +46,7 @@ class MoviePersonality(ans.Answer):
         
     def question_to_text(self):
         question_text = ['extraverted and enthusiastic','critical and quarrelsome', 'dependable and self-disciplined', 'anxious and easily upset', 'open to new experiences and complex','reserved and quiet', 'sympathetic and warm', 'disorganized and careless','calm and emotionally stable', 'conventional and uncreative'];
-        question_string = "You seem %s, do you agree somewhat with this?" % question_text[int(self.dataitem)]
+        question_string = "You seem %s, do you agree with this?" % question_text[int(self.dataitem)]
         return {'question':question_string,'type':'select','options':['Disagree strongly','Disagree moderately','Disagree a little','Neither agree nor disagree','Agree a little','Agree moderately','Agree strongly']}
 
     def append_features(self,features,facts): 

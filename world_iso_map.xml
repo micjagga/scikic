@@ -1,0 +1,1944 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<records>
+  <record>
+    <name>Afghanistan</name>
+    <name id="NAME_1">Afghanistan</name>
+    <name id="NAME_2">Afghanistan</name>
+    <code id="ISO 3">AFG</code>
+    <code id="ISO 2">AF</code>
+    <code id="GMI">AFG</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Albania</name>
+    <name id="NAME_1">Albania</name>
+    <name id="NAME_2">Albania</name>
+    <code id="ISO 3">ALB</code>
+    <code id="ISO 2">AL</code>
+    <code id="GMI">ALB</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Algeria</name>
+    <name id="NAME_1">Algeria</name>
+    <name id="NAME_2">Algeria</name>
+    <code id="ISO 3">DZA</code>
+    <code id="ISO 2">DZ</code>
+    <code id="GMI">DZA</code>
+    <parent>NorthAfrica</parent>
+  </record>
+  <record>
+    <name>Andorra</name>
+    <name id="NAME_1">Andorra</name>
+    <name id="NAME_2">Andorra</name>
+    <code id="ISO 3">AND</code>
+    <code id="ISO 2">AD</code>
+    <code id="GMI">AND</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Angola</name>
+    <name id="NAME_1">Angola</name>
+    <name id="NAME_2">Angola</name>
+    <code id="ISO 3">AGO</code>
+    <code id="ISO 2">AO</code>
+    <code id="GMI">AGO</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Antarctica</name>
+    <name id="NAME_1">Antarctica</name>
+    <name id="NAME_2">Antarctica</name>
+    <code id="ISO 3">ATA</code>
+    <code id="ISO 2">AQ</code>
+    <code id="GMI">ATA</code>
+    <parent>Antarctica</parent>
+  </record>
+  <record>
+    <name>Antigua and Barbuda</name>
+    <name id="NAME_1">Antigua and Barbuda</name>
+    <name id="NAME_2">Antigua and Barbuda</name>
+    <code id="ISO 3">ATG</code>
+    <code id="ISO 2">AG</code>
+    <code id="GMI">ATG</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Argentina</name>
+    <name id="NAME_1">Argentina</name>
+    <name id="NAME_2">Argentina</name>
+    <code id="ISO 3">ARG</code>
+    <code id="ISO 2">AR</code>
+    <code id="GMI">ARG</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Armenia</name>
+    <name id="NAME_1">Armenia</name>
+    <name id="NAME_2">Armenia</name>
+    <code id="ISO 3">ARM</code>
+    <code id="ISO 2">AM</code>
+    <code id="GMI">ARM</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Australia</name>
+    <name id="NAME_1">Australia</name>
+    <name id="NAME_2">Australia</name>
+    <code id="ISO 3">AUS</code>
+    <code id="ISO 2">AU</code>
+    <code id="GMI">AUS</code>
+    <parent>Australia</parent>
+  </record>
+  <record>
+    <name>Austria</name>
+    <name id="NAME_1">Austria</name>
+    <name id="NAME_2">Austria</name>
+    <code id="ISO 3">AUT</code>
+    <code id="ISO 2">AT</code>
+    <code id="GMI">AUT</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Azerbaijan</name>
+    <name id="NAME_1">Azerbaijan</name>
+    <name id="NAME_2">Azerbaijan</name>
+    <code id="ISO 3">AZE</code>
+    <code id="ISO 2">AZ</code>
+    <code id="GMI">AZE</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Bahamas, The</name>
+    <name id="NAME_1">Bahamas, The</name>
+    <name id="NAME_2">Bahamas</name>
+    <code id="ISO 3">BHS</code>
+    <code id="ISO 2">BS</code>
+    <code id="GMI">BHS</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Bahrain</name>
+    <name id="NAME_1">Bahrain</name>
+    <name id="NAME_2">Bahrain</name>
+    <code id="ISO 3">BHR</code>
+    <code id="ISO 2">BH</code>
+    <code id="GMI">BHR</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Bangladesh</name>
+    <name id="NAME_1">Bangladesh</name>
+    <name id="NAME_2">Bangladesh</name>
+    <code id="ISO 3">BGD</code>
+    <code id="ISO 2">BD</code>
+    <code id="GMI">BGD</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Barbados</name>
+    <name id="NAME_1">Barbados</name>
+    <name id="NAME_2">Barbados</name>
+    <code id="ISO 3">BRB</code>
+    <code id="ISO 2">BB</code>
+    <code id="GMI">BRB</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Belgium</name>
+    <name id="NAME_1">Belgium</name>
+    <name id="NAME_2">Belgium</name>
+    <code id="ISO 3">BEL</code>
+    <code id="ISO 2">BE</code>
+    <code id="GMI">BEL</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Belize</name>
+    <name id="NAME_1">Belize</name>
+    <name id="NAME_2">Belize</name>
+    <code id="ISO 3">BLZ</code>
+    <code id="ISO 2">BZ</code>
+    <code id="GMI">BLZ</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Benin</name>
+    <name id="NAME_1">Benin</name>
+    <name id="NAME_2">Benin</name>
+    <code id="ISO 3">BEN</code>
+    <code id="ISO 2">BJ</code>
+    <code id="GMI">BEN</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Bermuda</name>
+    <name id="NAME_1">Bermuda</name>
+    <name id="NAME_2">Bermuda</name>
+    <code id="ISO 3">BMU</code>
+    <code id="ISO 2">BM</code>
+    <code id="GMI">BMU</code>
+    <parent>North America</parent>
+  </record>
+  <record>
+    <name>Bhutan</name>
+    <name id="NAME_1">Bhutan</name>
+    <name id="NAME_2">Bhutan</name>
+    <code id="ISO 3">BTN</code>
+    <code id="ISO 2">BT</code>
+    <code id="GMI">BTN</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Bolivia</name>
+    <name id="NAME_1">Bolivia</name>
+    <name id="NAME_2">Bolivia</name>
+    <code id="ISO 3">BOL</code>
+    <code id="ISO 2">BO</code>
+    <code id="GMI">BOL</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Bosnia and Herzegovina</name>
+    <name id="NAME_1">Bosnia and Herzegovina</name>
+    <name id="NAME_2">Bosnia and Herzegovina</name>
+    <code id="ISO 3">BIH</code>
+    <code id="ISO 2">BA</code>
+    <code id="GMI">BIH</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Botswana</name>
+    <name id="NAME_1">Botswana</name>
+    <name id="NAME_2">Botswana</name>
+    <code id="ISO 3">BWA</code>
+    <code id="ISO 2">BW</code>
+    <code id="GMI">BWA</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Brazil</name>
+    <name id="NAME_1">Brazil</name>
+    <name id="NAME_2">Brazil</name>
+    <code id="ISO 3">BRA</code>
+    <code id="ISO 2">BR</code>
+    <code id="GMI">BRA</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Brunei</name>
+    <name id="NAME_1">Brunei</name>
+    <name id="NAME_2">Brunei Darussalam</name>
+    <code id="ISO 3">BRN</code>
+    <code id="ISO 2">BN</code>
+    <code id="GMI">BRN</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Bulgaria</name>
+    <name id="NAME_1">Bulgaria</name>
+    <name id="NAME_2">Bulgaria</name>
+    <code id="ISO 3">BGR</code>
+    <code id="ISO 2">BG</code>
+    <code id="GMI">BGR</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Burkina Faso</name>
+    <name id="NAME_1">Burkina Faso</name>
+    <name id="NAME_2">Burkina Faso</name>
+    <code id="ISO 3">BFA</code>
+    <code id="ISO 2">BF</code>
+    <code id="GMI">BFA</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Burundi</name>
+    <name id="NAME_1">Burundi</name>
+    <name id="NAME_2">Burundi</name>
+    <code id="ISO 3">BDI</code>
+    <code id="ISO 2">BI</code>
+    <code id="GMI">BDI</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Byelarus</name>
+    <name id="NAME_1">Byelarus</name>
+    <name id="NAME_2">Belarus</name>
+    <code id="ISO 3">BLR</code>
+    <code id="ISO 2">BY</code>
+    <code id="GMI">BLR</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Cambodia</name>
+    <name id="NAME_1">Cambodia</name>
+    <name id="NAME_2">Cambodia</name>
+    <code id="ISO 3">KHM</code>
+    <code id="ISO 2">KH</code>
+    <code id="GMI">KHM</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Cameroon</name>
+    <name id="NAME_1">Cameroon</name>
+    <name id="NAME_2">Cameroon</name>
+    <code id="ISO 3">CMR</code>
+    <code id="ISO 2">CM</code>
+    <code id="GMI">CMR</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Canada</name>
+    <name id="NAME_1">Canada</name>
+    <name id="NAME_2">Canada</name>
+    <code id="ISO 3">CAN</code>
+    <code id="ISO 2">CA</code>
+    <code id="GMI">CAN</code>
+    <parent>North America</parent>
+  </record>
+  <record>
+    <name>Cape Verde</name>
+    <name id="NAME_1">Cape Verde</name>
+    <name id="NAME_2">Cape Verde</name>
+    <code id="ISO 3">CPV</code>
+    <code id="ISO 2">CV</code>
+    <code id="GMI">CPV</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Central African Republic</name>
+    <name id="NAME_1">Central African Republic</name>
+    <name id="NAME_2">Central African Republic</name>
+    <code id="ISO 3">CAF</code>
+    <code id="ISO 2">CF</code>
+    <code id="GMI">CAF</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Chad</name>
+    <name id="NAME_1">Chad</name>
+    <name id="NAME_2">Chad</name>
+    <code id="ISO 3">TCD</code>
+    <code id="ISO 2">TD</code>
+    <code id="GMI">TCD</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Chile</name>
+    <name id="NAME_1">Chile</name>
+    <name id="NAME_2">Chile</name>
+    <code id="ISO 3">CHL</code>
+    <code id="ISO 2">CL</code>
+    <code id="GMI">CHL</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>China</name>
+    <name id="NAME_1">China</name>
+    <name id="NAME_2">China</name>
+    <code id="ISO 3">CHN</code>
+    <code id="ISO 2">CN</code>
+    <code id="GMI">CHN</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Colombia</name>
+    <name id="NAME_1">Colombia</name>
+    <name id="NAME_2">Colombia</name>
+    <code id="ISO 3">COL</code>
+    <code id="ISO 2">CO</code>
+    <code id="GMI">COL</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Comoros</name>
+    <name id="NAME_1">Comoros</name>
+    <name id="NAME_2">Comoros</name>
+    <code id="ISO 3">COM</code>
+    <code id="ISO 2">KM</code>
+    <code id="GMI">COM</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Congo</name>
+    <name id="NAME_1">Congo</name>
+    <name id="NAME_2">Congo</name>
+    <code id="ISO 3">COG</code>
+    <code id="ISO 2">CG</code>
+    <code id="GMI">COG</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Costa Rica</name>
+    <name id="NAME_1">Costa Rica</name>
+    <name id="NAME_2">Costa Rica</name>
+    <code id="ISO 3">CRI</code>
+    <code id="ISO 2">CR</code>
+    <code id="GMI">CRI</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Croatia</name>
+    <name id="NAME_1">Croatia</name>
+    <name id="NAME_2">Croatia</name>
+    <code id="ISO 3">HRV</code>
+    <code id="ISO 2">HR</code>
+    <code id="GMI">HRV</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Cuba</name>
+    <name id="NAME_1">Cuba</name>
+    <name id="NAME_2">Cuba</name>
+    <code id="ISO 3">CUB</code>
+    <code id="ISO 2">CU</code>
+    <code id="GMI">CUB</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Cyprus</name>
+    <name id="NAME_1">Cyprus</name>
+    <name id="NAME_2">Cyprus</name>
+    <code id="ISO 3">CYP</code>
+    <code id="ISO 2">CY</code>
+    <code id="GMI">CYP</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Czech Republic</name>
+    <name id="NAME_1">Czech Republic</name>
+    <name id="NAME_2">Czech Republic</name>
+    <code id="ISO 3">CZE</code>
+    <code id="ISO 2">CZ</code>
+    <code id="GMI">CZE</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Denmark</name>
+    <name id="NAME_1">Denmark</name>
+    <name id="NAME_2">Denmark</name>
+    <code id="ISO 3">DNK</code>
+    <code id="ISO 2">DK</code>
+    <code id="GMI">DNK</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Djibouti</name>
+    <name id="NAME_1">Djibouti</name>
+    <name id="NAME_2">Djibouti</name>
+    <code id="ISO 3">DJI</code>
+    <code id="ISO 2">DJ</code>
+    <code id="GMI">DJI</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Dominica</name>
+    <name id="NAME_1">Dominica</name>
+    <name id="NAME_2">Dominica</name>
+    <code id="ISO 3">DMA</code>
+    <code id="ISO 2">DM</code>
+    <code id="GMI">DMA</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Dominican Republic</name>
+    <name id="NAME_1">Dominican Republic</name>
+    <name id="NAME_2">Dominican Republic</name>
+    <code id="ISO 3">DOM</code>
+    <code id="ISO 2">DO</code>
+    <code id="GMI">DOM</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Ecuador</name>
+    <name id="NAME_1">Ecuador</name>
+    <name id="NAME_2">Ecuador</name>
+    <code id="ISO 3">ECU</code>
+    <code id="ISO 2">EC</code>
+    <code id="GMI">ECU</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Egypt</name>
+    <name id="NAME_1">Egypt</name>
+    <name id="NAME_2">Egypt</name>
+    <code id="ISO 3">EGY</code>
+    <code id="ISO 2">EG</code>
+    <code id="GMI">EGY</code>
+    <parent>NorthAfrica</parent>
+  </record>
+  <record>
+    <name>El Salvador</name>
+    <name id="NAME_1">El Salvador</name>
+    <name id="NAME_2">El Salvador</name>
+    <code id="ISO 3">SLV</code>
+    <code id="ISO 2">SV</code>
+    <code id="GMI">SLV</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Equatorial Guinea</name>
+    <name id="NAME_1">Equatorial Guinea</name>
+    <name id="NAME_2">Equatorial Guinea</name>
+    <code id="ISO 3">GNQ</code>
+    <code id="ISO 2">GQ</code>
+    <code id="GMI">GNQ</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Eritrea</name>
+    <name id="NAME_1">Eritrea</name>
+    <name id="NAME_2">Eritrea</name>
+    <code id="ISO 3">ERI</code>
+    <code id="ISO 2">ER</code>
+    <code id="GMI">ERI</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Estonia</name>
+    <name id="NAME_1">Estonia</name>
+    <name id="NAME_2">Estonia</name>
+    <code id="ISO 3">EST</code>
+    <code id="ISO 2">EE</code>
+    <code id="GMI">EST</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Ethiopia</name>
+    <name id="NAME_1">Ethiopia</name>
+    <name id="NAME_2">Ethiopia</name>
+    <code id="ISO 3">ETH</code>
+    <code id="ISO 2">ET</code>
+    <code id="GMI">ETH</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Falkland Islands (Islas Malvinas)</name>
+    <name id="NAME_1">Falkland Islands (Islas Malvinas)</name>
+    <name id="NAME_2">Falkland Islands (Malvinas)</name>
+    <code id="ISO 3">FLK</code>
+    <code id="ISO 2">FK</code>
+    <code id="GMI">FLK</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Faroe Islands</name>
+    <name id="NAME_1">Faroe Islands</name>
+    <name id="NAME_2">Faroe Islands</name>
+    <code id="ISO 3">FRO</code>
+    <code id="ISO 2">FO</code>
+    <code id="GMI">FRO</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Fiji</name>
+    <name id="NAME_1">Fiji</name>
+    <name id="NAME_2">Fiji</name>
+    <code id="ISO 3">FJI</code>
+    <code id="ISO 2">FJ</code>
+    <code id="GMI">FJI</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Finland</name>
+    <name id="NAME_1">Finland</name>
+    <name id="NAME_2">Finland</name>
+    <code id="ISO 3">FIN</code>
+    <code id="ISO 2">FI</code>
+    <code id="GMI">FIN</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>France</name>
+    <name id="NAME_1">France</name>
+    <name id="NAME_2">France</name>
+    <code id="ISO 3">FRA</code>
+    <code id="ISO 2">FR</code>
+    <code id="GMI">FRA</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>French Guiana</name>
+    <name id="NAME_1">French Guiana</name>
+    <name id="NAME_2">French Guiana</name>
+    <code id="ISO 3">GUF</code>
+    <code id="ISO 2">GF</code>
+    <code id="GMI">GUF</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>French Polynesia</name>
+    <name id="NAME_1">French Polynesia</name>
+    <name id="NAME_2">French Polynesia</name>
+    <code id="ISO 3">PYF</code>
+    <code id="ISO 2">PF</code>
+    <code id="GMI">PYF</code>
+    <parent>Pacific</parent>
+  </record>
+  <record>
+    <name>Gabon</name>
+    <name id="NAME_1">Gabon</name>
+    <name id="NAME_2">Gabon</name>
+    <code id="ISO 3">GAB</code>
+    <code id="ISO 2">GA</code>
+    <code id="GMI">GAB</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Gambia, The</name>
+    <name id="NAME_1">Gambia, The</name>
+    <name id="NAME_2">Gambia</name>
+    <code id="ISO 3">GMB</code>
+    <code id="ISO 2">GM</code>
+    <code id="GMI">GMB</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Gaza Strip</name>
+    <name id="NAME_1">Gaza Strip</name>
+    <name id="NAME_2">Palestine</name>
+    <name id="NAME_3">West Bank and Gaza</name>
+    <code id="ISO 3">PSE</code>
+    <code id="ISO 2">PS</code>
+    <code id="GMI">PSE</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Georgia</name>
+    <name id="NAME_1">Georgia</name>
+    <name id="NAME_2">Georgia</name>
+    <code id="ISO 3">GEO</code>
+    <code id="ISO 2">GE</code>
+    <code id="GMI">GEO</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Germany</name>
+    <name id="NAME_1">Germany</name>
+    <name id="NAME_2">Germany</name>
+    <code id="ISO 3">DEU</code>
+    <code id="ISO 2">DE</code>
+    <code id="GMI">DEU</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Ghana</name>
+    <name id="NAME_1">Ghana</name>
+    <name id="NAME_2">Ghana</name>
+    <code id="ISO 3">GHA</code>
+    <code id="ISO 2">GH</code>
+    <code id="GMI">GHA</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Greece</name>
+    <name id="NAME_1">Greece</name>
+    <name id="NAME_2">Greece</name>
+    <code id="ISO 3">GRC</code>
+    <code id="ISO 2">GR</code>
+    <code id="GMI">GRC</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Greenland</name>
+    <name id="NAME_1">Greenland</name>
+    <name id="NAME_2">Greenland</name>
+    <code id="ISO 3">GRL</code>
+    <code id="ISO 2">GL</code>
+    <code id="GMI">GRL</code>
+    <parent>North America</parent>
+  </record>
+  <record>
+    <name>Grenada</name>
+    <name id="NAME_1">Grenada</name>
+    <name id="NAME_2">Grenada</name>
+    <code id="ISO 3">GRD</code>
+    <code id="ISO 2">GD</code>
+    <code id="GMI">GRD</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Guadeloupe</name>
+    <name id="NAME_1">Guadeloupe</name>
+    <name id="NAME_2">Guadeloupe</name>
+    <code id="ISO 3">GLP</code>
+    <code id="ISO 2">GP</code>
+    <code id="GMI">GLP</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Guatemala</name>
+    <name id="NAME_1">Guatemala</name>
+    <name id="NAME_2">Guatemala</name>
+    <code id="ISO 3">GTM</code>
+    <code id="ISO 2">GT</code>
+    <code id="GMI">GTM</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Guinea</name>
+    <name id="NAME_1">Guinea</name>
+    <name id="NAME_2">Guinea</name>
+    <code id="ISO 3">GIN</code>
+    <code id="ISO 2">GN</code>
+    <code id="GMI">GIN</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Guinea-Bissau</name>
+    <name id="NAME_1">Guinea-Bissau</name>
+    <name id="NAME_2">Guinea-Bissau</name>
+    <code id="ISO 3">GNB</code>
+    <code id="ISO 2">GW</code>
+    <code id="GMI">GNB</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Guyana</name>
+    <name id="NAME_1">Guyana</name>
+    <name id="NAME_2">Guyana</name>
+    <code id="ISO 3">GUY</code>
+    <code id="ISO 2">GY</code>
+    <code id="GMI">GUY</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Haiti</name>
+    <name id="NAME_1">Haiti</name>
+    <name id="NAME_2">Haiti</name>
+    <code id="ISO 3">HTI</code>
+    <code id="ISO 2">HT</code>
+    <code id="GMI">HTI</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Honduras</name>
+    <name id="NAME_1">Honduras</name>
+    <name id="NAME_2">Honduras</name>
+    <code id="ISO 3">HND</code>
+    <code id="ISO 2">HN</code>
+    <code id="GMI">HND</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Hong Kong</name>
+    <name id="NAME_1"/>
+    <name id="NAME_2"/>
+    <code id="ISO 3">HKG</code>
+        <code id="GMI">HKG</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Hungary</name>
+    <name id="NAME_1">Hungary</name>
+    <name id="NAME_2">Hungary</name>
+    <code id="ISO 3">HUN</code>
+    <code id="ISO 2">HU</code>
+    <code id="GMI">HUN</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Iceland</name>
+    <name id="NAME_1">Iceland</name>
+    <name id="NAME_2">Iceland</name>
+    <code id="ISO 3">ISL</code>
+    <code id="ISO 2">IS</code>
+    <code id="GMI">ISL</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>India</name>
+    <name id="NAME_1">India</name>
+    <name id="NAME_2">India</name>
+    <code id="ISO 3">IND</code>
+    <code id="ISO 2">IN</code>
+    <code id="GMI">IND</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Indonesia</name>
+    <name id="NAME_1">Indonesia</name>
+    <name id="NAME_2">Indonesia</name>
+    <code id="ISO 3">IDN</code>
+    <code id="ISO 2">ID</code>
+    <code id="GMI">IDN</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Iran</name>
+    <name id="NAME_1">Iran</name>
+    <name id="NAME_2">Iran (Islamic Republic of)</name>
+    <code id="ISO 3">IRN</code>
+    <code id="ISO 2">IR</code>
+    <code id="GMI">IRN</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Iraq</name>
+    <name id="NAME_1">Iraq</name>
+    <name id="NAME_2">Iraq</name>
+    <code id="ISO 3">IRQ</code>
+    <code id="ISO 2">IQ</code>
+    <code id="GMI">IRQ</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Iraq-Saudi Arabia Neutral Zone</name>
+    <name id="NAME_1"/>
+    <name id="NAME_2"/>
+                <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Ireland</name>
+    <name id="NAME_1">Ireland</name>
+    <name id="NAME_2">Ireland</name>
+    <code id="ISO 3">IRL</code>
+    <code id="ISO 2">IE</code>
+    <code id="GMI">IRL</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Isle of Man</name>
+    <name id="NAME_1">Isle of Man</name>
+    <name id="NAME_2">Isle of Man</name>
+    <code id="ISO 3">IMY</code>
+        <code id="GMI">XIM</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Israel</name>
+    <name id="NAME_1">Israel</name>
+    <name id="NAME_2">Israel</name>
+    <code id="ISO 3">ISR</code>
+    <code id="ISO 2">IL</code>
+    <code id="GMI">ISR</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Italy</name>
+    <name id="NAME_1">Italy</name>
+    <name id="NAME_2">Italy</name>
+    <code id="ISO 3">ITA</code>
+    <code id="ISO 2">IT</code>
+    <code id="GMI">ITA</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Ivory Coast</name>
+    <name id="NAME_1">Cote d'Ivoire</name>
+    <name id="NAME_2">Côte d'Ivoire</name>
+    <code id="ISO 3">CIV</code>
+    <code id="ISO 2">CI</code>
+    <code id="GMI">CIV</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Jamaica</name>
+    <name id="NAME_1">Jamaica</name>
+    <name id="NAME_2">Jamaica</name>
+    <code id="ISO 3">JAM</code>
+    <code id="ISO 2">JM</code>
+    <code id="GMI">JAM</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Jan Mayen</name>
+    <name id="NAME_1">Jan Mayen</name>
+    <name id="NAME_2">Svalbard</name>
+    <code id="ISO 3">SJM</code>
+    <code id="ISO 2">SJ</code>
+    <code id="GMI">SJM</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Japan</name>
+    <name id="NAME_1">Japan</name>
+    <name id="NAME_2">Japan</name>
+    <code id="ISO 3">JPN</code>
+    <code id="ISO 2">JP</code>
+    <code id="GMI">JPN</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Jordan</name>
+    <name id="NAME_1">Jordan</name>
+    <name id="NAME_2">Jordan</name>
+    <code id="ISO 3">JOR</code>
+    <code id="ISO 2">JO</code>
+    <code id="GMI">JOR</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Kazakhstan</name>
+    <name id="NAME_1">Kazakhstan</name>
+    <name id="NAME_2">Kazakhstan</name>
+    <code id="ISO 3">KAZ</code>
+    <code id="ISO 2">KZ</code>
+    <code id="GMI">KAZ</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Kenya</name>
+    <name id="NAME_1">Kenya</name>
+    <name id="NAME_2">Kenya</name>
+    <code id="ISO 3">KEN</code>
+    <code id="ISO 2">KE</code>
+    <code id="GMI">KEN</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Kerguelen</name>
+    <name id="NAME_1"/>
+    <name id="NAME_2"/>
+                <parent>Antarctica</parent>
+  </record>
+  <record>
+    <name>Kiribati</name>
+    <name id="NAME_1">Kiribati</name>
+    <name id="NAME_2">Kiribati</name>
+    <code id="ISO 3">KIR</code>
+    <code id="ISO 2">KI</code>
+    <code id="GMI">KIR</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Korea, Peoples Republic of</name>
+    <name id="NAME_1">Korea, Peoples Republic of</name>
+    <name id="NAME_2">Korea, Democratic People's Republic of</name>
+    <name id="NAME_3">Korea Dem.</name>
+    <name id="NAME_4">North Korea</name>
+    <code id="ISO 3">PRK</code>
+    <code id="ISO 2">KP</code>
+    <code id="GMI">PRK</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Korea, Republic of</name>
+    <name id="NAME_1">Korea, Republic of</name>
+    <name id="NAME_2">Korea, Rep.</name>
+    <name id="NAME_4">South Korea</name>
+    <code id="ISO 3">KOR</code>
+    <code id="ISO 2">KR</code>
+    <code id="GMI">KOR</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Kuwait</name>
+    <name id="NAME_1">Kuwait</name>
+    <name id="NAME_2">Kuwait</name>
+    <code id="ISO 3">KWT</code>
+    <code id="ISO 2">KW</code>
+    <code id="GMI">KWT</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Kyrgyzstan</name>
+    <name id="NAME_1">Kyrgyz Republic</name>
+    <name id="NAME_2">Kyrgyzstan</name>
+    <code id="ISO 3">KGZ</code>
+    <code id="ISO 2">KG</code>
+    <code id="GMI">KGZ</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Laos</name>
+    <name id="NAME_1">Laos</name>
+    <name id="NAME_2">Lao People's Democratic Republic</name>
+     <name id="NAME_2">Lao PDR</name>
+    <code id="ISO 3">LAO</code>
+    <code id="ISO 2">LA</code>
+    <code id="GMI">LAO</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Latvia</name>
+    <name id="NAME_1">Latvia</name>
+    <name id="NAME_2">Latvia</name>
+    <code id="ISO 3">LVA</code>
+    <code id="ISO 2">LV</code>
+    <code id="GMI">LVA</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Lebanon</name>
+    <name id="NAME_1">Lebanon</name>
+    <name id="NAME_2">Lebanon</name>
+    <code id="ISO 3">LBN</code>
+    <code id="ISO 2">LB</code>
+    <code id="GMI">LBN</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Lesotho</name>
+    <name id="NAME_1">Lesotho</name>
+    <name id="NAME_2">Lesotho</name>
+    <code id="ISO 3">LSO</code>
+    <code id="ISO 2">LS</code>
+    <code id="GMI">LSO</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Liberia</name>
+    <name id="NAME_1">Liberia</name>
+    <name id="NAME_2">Liberia</name>
+    <code id="ISO 3">LBR</code>
+    <code id="ISO 2">LR</code>
+    <code id="GMI">LBR</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Libya</name>
+    <name id="NAME_1">Libya</name>
+    <name id="NAME_2">Libyan Arab Jamahiriya</name>
+    <code id="ISO 3">LBY</code>
+    <code id="ISO 2">LY</code>
+    <code id="GMI">LBY</code>
+    <parent>NorthAfrica</parent>
+  </record>
+  <record>
+    <name>Liechtenstein</name>
+    <name id="NAME_1">Liechtenstein</name>
+    <name id="NAME_2">Liechtenstein</name>
+    <code id="ISO 3">LIE</code>
+    <code id="ISO 2">LI</code>
+    <code id="GMI">LIE</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Lithuania</name>
+    <name id="NAME_1">Lithuania</name>
+    <name id="NAME_2">Lithuania</name>
+    <code id="ISO 3">LTU</code>
+    <code id="ISO 2">LT</code>
+    <code id="GMI">LTU</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Luxembourg</name>
+    <name id="NAME_1">Luxembourg</name>
+    <name id="NAME_2">Luxembourg</name>
+    <code id="ISO 3">LUX</code>
+    <code id="ISO 2">LU</code>
+    <code id="GMI">LUX</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Macau</name>
+    <name id="NAME_1">Macao</name>
+    <name id="NAME_2">Macao SAR China</name>
+    <code id="ISO 3">MAC</code>
+    <code id="GMI">MAC</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Macedonia</name>
+    <name id="NAME_1">Macedonia</name>
+    <name id="NAME_2">The former Yugoslav Republic of Macedonia</name>
+    <code id="ISO 3">MKD</code>
+    <code id="ISO 2">MK</code>
+    <code id="GMI">MKD</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Madagascar</name>
+    <name id="NAME_1">Madagascar</name>
+    <name id="NAME_2">Madagascar</name>
+    <code id="ISO 3">MDG</code>
+    <code id="ISO 2">MG</code>
+    <code id="GMI">MDG</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Malawi</name>
+    <name id="NAME_1">Malawi</name>
+    <name id="NAME_2">Malawi</name>
+    <code id="ISO 3">MWI</code>
+    <code id="ISO 2">MW</code>
+    <code id="GMI">MWI</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Malaysia</name>
+    <name id="NAME_1">Malaysia</name>
+    <name id="NAME_2">Malaysia</name>
+    <code id="ISO 3">MYS</code>
+    <code id="ISO 2">MY</code>
+    <code id="GMI">MYS</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Maldives</name>
+    <name id="NAME_1">Maldives</name>
+    <name id="NAME_2">Maldives</name>
+    <code id="ISO 3">MDV</code>
+    <code id="ISO 2">MV</code>
+    <code id="GMI">MDV</code>
+    <parent>Pacific</parent>
+  </record>
+  <record>
+    <name>Mali</name>
+    <name id="NAME_1">Mali</name>
+    <name id="NAME_2">Mali</name>
+    <code id="ISO 3">MLI</code>
+    <code id="ISO 2">ML</code>
+    <code id="GMI">MLI</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Malta</name>
+    <name id="NAME_1">Malta</name>
+    <name id="NAME_2">Malta</name>
+    <code id="ISO 3">MLT</code>
+    <code id="ISO 2">MT</code>
+    <code id="GMI">MLT</code>
+    <parent>Pacific</parent>
+  </record>
+  <record>
+    <name>Martinique</name>
+    <name id="NAME_1">Martinique</name>
+    <name id="NAME_2">Martinique</name>
+    <code id="ISO 3">MTQ</code>
+    <code id="ISO 2">MQ</code>
+    <code id="GMI">MTQ</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Mauritania</name>
+    <name id="NAME_1">Mauritania</name>
+    <name id="NAME_2">Mauritania</name>
+    <code id="ISO 3">MRT</code>
+    <code id="ISO 2">MR</code>
+    <code id="GMI">MRT</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Mauritius</name>
+    <name id="NAME_1">Mauritius</name>
+    <name id="NAME_2">Mauritius</name>
+    <code id="ISO 3">MUS</code>
+    <code id="ISO 2">MU</code>
+    <code id="GMI">MUS</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Mexico</name>
+    <name id="NAME_1">Mexico</name>
+    <name id="NAME_2">Mexico</name>
+    <code id="ISO 3">MEX</code>
+    <code id="ISO 2">MX</code>
+    <code id="GMI">MEX</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Moldova</name>
+    <name id="NAME_1">Moldova</name>
+    <name id="NAME_2">Republic of Moldova</name>
+    <code id="ISO 3">MDA</code>
+    <code id="ISO 2">MD</code>
+    <code id="GMI">MDA</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Monaco</name>
+    <name id="NAME_1">Monaco</name>
+    <name id="NAME_2">Monaco</name>
+    <code id="ISO 3">MCO</code>
+    <code id="ISO 2">MC</code>
+    <code id="GMI">MCO</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Mongolia</name>
+    <name id="NAME_1">Mongolia</name>
+    <name id="NAME_2">Mongolia</name>
+    <code id="ISO 3">MNG</code>
+    <code id="ISO 2">MN</code>
+    <code id="GMI">MNG</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Montenegro</name>
+    <name id="NAME_1">Montenegro</name>
+    <name id="NAME_2">Montenegro</name>
+    <code id="ISO 3">MNE</code>
+    <code id="ISO 2">ME</code>
+    <code id="GMI">MNE</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Morocco</name>
+    <name id="NAME_1">Morocco</name>
+    <name id="NAME_2">Morocco</name>
+    <code id="ISO 3">MAR</code>
+    <code id="ISO 2">MA</code>
+    <code id="GMI">MAR</code>
+    <parent>NorthAfrica</parent>
+  </record>
+  <record>
+    <name>Mozambique</name>
+    <name id="NAME_1">Mozambique</name>
+    <name id="NAME_2">Mozambique</name>
+    <code id="ISO 3">MOZ</code>
+    <code id="ISO 2">MZ</code>
+    <code id="GMI">MOZ</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Myanmar (Burma)</name>
+    <name id="NAME_1">Myanmar (Burma)</name>
+    <name id="NAME_2">Burma</name>
+    <code id="ISO 3">MMR</code>
+    <code id="ISO 2">MM</code>
+    <code id="GMI">MMR</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Namibia</name>
+    <name id="NAME_1">Namibia</name>
+    <name id="NAME_2">Namibia</name>
+    <code id="ISO 3">NAM</code>
+    <code id="ISO 2">NA</code>
+    <code id="GMI">NAM</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Nepal</name>
+    <name id="NAME_1">Nepal</name>
+    <name id="NAME_2">Nepal</name>
+    <code id="ISO 3">NPL</code>
+    <code id="ISO 2">NP</code>
+    <code id="GMI">NPL</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Netherlands</name>
+    <name id="NAME_1">Netherlands</name>
+    <name id="NAME_2">Netherlands</name>
+    <code id="ISO 3">NLD</code>
+    <code id="ISO 2">NL</code>
+    <code id="GMI">NLD</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>New Caledonia</name>
+    <name id="NAME_1">New Caledonia</name>
+    <name id="NAME_2">New Caledonia</name>
+    <code id="ISO 3">NCL</code>
+    <code id="ISO 2">NC</code>
+    <code id="GMI">NCL</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>New Zealand</name>
+    <name id="NAME_1">New Zealand</name>
+    <name id="NAME_2">New Zealand</name>
+    <code id="ISO 3">NZL</code>
+    <code id="ISO 2">NZ</code>
+    <code id="GMI">NZL</code>
+    <parent>Australia</parent>
+  </record>
+  <record>
+    <name>Nicaragua</name>
+    <name id="NAME_1">Nicaragua</name>
+    <name id="NAME_2">Nicaragua</name>
+    <code id="ISO 3">NIC</code>
+    <code id="ISO 2">NI</code>
+    <code id="GMI">NIC</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Niger</name>
+    <name id="NAME_1">Niger</name>
+    <name id="NAME_2">Niger</name>
+    <code id="ISO 3">NER</code>
+    <code id="ISO 2">NE</code>
+    <code id="GMI">NER</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Nigeria</name>
+    <name id="NAME_1">Nigeria</name>
+    <name id="NAME_2">Nigeria</name>
+    <code id="ISO 3">NGA</code>
+    <code id="ISO 2">NG</code>
+    <code id="GMI">NGA</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Northern Mariana Islands</name>
+    <name id="NAME_1">Northern Mariana Islands</name>
+    <name id="NAME_2">Northern Mariana Islands</name>
+    <code id="ISO 3">MNP</code>
+    <code id="ISO 2">MP</code>
+    <code id="GMI">MNP</code>
+    <parent>Pacific</parent>
+  </record>
+  <record>
+    <name>Norway</name>
+    <name id="NAME_1">Norway</name>
+    <name id="NAME_2">Norway</name>
+    <code id="ISO 3">NOR</code>
+    <code id="ISO 2">NO</code>
+    <code id="GMI">NOR</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Oman</name>
+    <name id="NAME_1">Oman</name>
+    <name id="NAME_2">Oman</name>
+    <code id="ISO 3">OMN</code>
+    <code id="ISO 2">OM</code>
+    <code id="GMI">OMN</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Pakistan</name>
+    <name id="NAME_1">Pakistan</name>
+    <name id="NAME_2">Pakistan</name>
+    <code id="ISO 3">PAK</code>
+    <code id="ISO 2">PK</code>
+    <code id="GMI">PAK</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Panama</name>
+    <name id="NAME_1">Panama</name>
+    <name id="NAME_2">Panama</name>
+    <code id="ISO 3">PAN</code>
+    <code id="ISO 2">PA</code>
+    <code id="GMI">PAN</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Papua New Guinea</name>
+    <name id="NAME_1">Papua New Guinea</name>
+    <name id="NAME_2">Papua New Guinea</name>
+    <code id="ISO 3">PNG</code>
+    <code id="ISO 2">PG</code>
+    <code id="GMI">PNG</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Paraguay</name>
+    <name id="NAME_1">Paraguay</name>
+    <name id="NAME_2">Paraguay</name>
+    <code id="ISO 3">PRY</code>
+    <code id="ISO 2">PY</code>
+    <code id="GMI">PRY</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Peru</name>
+    <name id="NAME_1">Peru</name>
+    <name id="NAME_2">Peru</name>
+    <code id="ISO 3">PER</code>
+    <code id="ISO 2">PE</code>
+    <code id="GMI">PER</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Philippines</name>
+    <name id="NAME_1">Philippines</name>
+    <name id="NAME_2">Philippines</name>
+    <code id="ISO 3">PHL</code>
+    <code id="ISO 2">PH</code>
+    <code id="GMI">PHL</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Poland</name>
+    <name id="NAME_1">Poland</name>
+    <name id="NAME_2">Poland</name>
+    <code id="ISO 3">POL</code>
+    <code id="ISO 2">PL</code>
+    <code id="GMI">POL</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Portugal</name>
+    <name id="NAME_1">Portugal</name>
+    <name id="NAME_2">Portugal</name>
+    <code id="ISO 3">PRT</code>
+    <code id="ISO 2">PT</code>
+    <code id="GMI">PRT</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Puerto Rico</name>
+    <name id="NAME_1">Puerto Rico</name>
+    <name id="NAME_2">Puerto Rico</name>
+    <code id="ISO 3">PRI</code>
+    <code id="ISO 2">PR</code>
+    <code id="GMI">PRI</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Qatar</name>
+    <name id="NAME_1">Qatar</name>
+    <name id="NAME_2">Qatar</name>
+    <code id="ISO 3">QAT</code>
+    <code id="ISO 2">QA</code>
+    <code id="GMI">QAT</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Reunion</name>
+    <name id="NAME_1">Reunion</name>
+    <name id="NAME_2">Reunion</name>
+    <code id="ISO 3">REU</code>
+    <code id="ISO 2">RE</code>
+    <code id="GMI">REU</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Romania</name>
+    <name id="NAME_1">Romania</name>
+    <name id="NAME_2">Romania</name>
+    <code id="ISO 3">ROU</code>
+    <code id="ISO 2">RO</code>
+    <code id="GMI">ROM</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Russia</name>
+    <name id="NAME_1">Russia</name>
+    <name id="NAME_2">Russia</name>
+    <code id="ISO 3">RUS</code>
+    <code id="ISO 2">RU</code>
+    <code id="GMI">RUS</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Rwanda</name>
+    <name id="NAME_1">Rwanda</name>
+    <name id="NAME_2">Rwanda</name>
+    <code id="ISO 3">RWA</code>
+    <code id="ISO 2">RW</code>
+    <code id="GMI">RWA</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>San Marino</name>
+    <name id="NAME_1">San Marino</name>
+    <name id="NAME_2">San Marino</name>
+    <code id="ISO 3">SMR</code>
+    <code id="ISO 2">SM</code>
+    <code id="GMI">SMR</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Sao Tome and Principe</name>
+    <name id="NAME_1">Sao Tome and Principe</name>
+    <name id="NAME_2">Sao Tome and Principe</name>
+    <code id="ISO 3">STP</code>
+    <code id="ISO 2">ST</code>
+    <code id="GMI">STP</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Saudi Arabia</name>
+    <name id="NAME_1">Saudi Arabia</name>
+    <name id="NAME_2">Saudi Arabia</name>
+    <code id="ISO 3">SAU</code>
+    <code id="ISO 2">SA</code>
+    <code id="GMI">SAU</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Senegal</name>
+    <name id="NAME_1">Senegal</name>
+    <name id="NAME_2">Senegal</name>
+    <code id="ISO 3">SEN</code>
+    <code id="ISO 2">SN</code>
+    <code id="GMI">SEN</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Seychelles</name>
+    <name id="NAME_1">Seychelles</name>
+    <name id="NAME_2">Seychelles</name>
+    <code id="ISO 3">SYC</code>
+    <code id="ISO 2">SC</code>
+    <code id="GMI">SYC</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Sierra Leone</name>
+    <name id="NAME_1">Sierra Leone</name>
+    <name id="NAME_2">Sierra Leone</name>
+    <code id="ISO 3">SLE</code>
+    <code id="ISO 2">SL</code>
+    <code id="GMI">SLE</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Singapore</name>
+    <name id="NAME_1">Singapore</name>
+    <name id="NAME_2">Singapore</name>
+    <code id="ISO 3">SGP</code>
+    <code id="ISO 2">SG</code>
+    <code id="GMI">SGP</code>
+    <parent>Pacific</parent>
+  </record>
+  <record>
+    <name>Slovakia</name>
+    <name id="NAME_1">Slovakia</name>
+    <name id="NAME_2">Slovakia</name>
+    <name id="NAME_2">Slovak Republic</name>
+    <code id="ISO 3">SVK</code>
+    <code id="ISO 2">SK</code>
+    <code id="GMI">SVK</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Slovenia</name>
+    <name id="NAME_1">Slovenia</name>
+    <name id="NAME_2">Slovenia</name>
+    <code id="ISO 3">SVN</code>
+    <code id="ISO 2">SI</code>
+    <code id="GMI">SVN</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Solomon Islands</name>
+    <name id="NAME_1">Solomon Islands</name>
+    <name id="NAME_2">Solomon Islands</name>
+    <code id="ISO 3">SLB</code>
+    <code id="ISO 2">SB</code>
+    <code id="GMI">SLB</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Somalia</name>
+    <name id="NAME_1">Somalia</name>
+    <name id="NAME_2">Somalia</name>
+    <code id="ISO 3">SOM</code>
+    <code id="ISO 2">SO</code>
+    <code id="GMI">SOM</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>South Africa</name>
+    <name id="NAME_1">South Africa</name>
+    <name id="NAME_2">South Africa</name>
+    <code id="ISO 3">ZAF</code>
+    <code id="ISO 2">ZA</code>
+    <code id="GMI">ZAF</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Spain</name>
+    <name id="NAME_1">Spain</name>
+    <name id="NAME_2">Spain</name>
+    <code id="ISO 3">ESP</code>
+    <code id="ISO 2">ES</code>
+    <code id="GMI">ESP</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Sri Lanka</name>
+    <name id="NAME_1">Sri Lanka</name>
+    <name id="NAME_2">Sri Lanka</name>
+    <code id="ISO 3">LKA</code>
+    <code id="ISO 2">LK</code>
+    <code id="GMI">LKA</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>St. Christopher-Nevis</name>
+    <name id="NAME_1"/>
+    <name id="NAME_2"/>
+                <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>St. Lucia</name>
+    <name id="NAME_1">St. Lucia</name>
+    <name id="NAME_2">Saint Lucia</name>
+    <code id="ISO 3">LCA</code>
+    <code id="ISO 2">LC</code>
+    <code id="GMI">LCA</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>St. Vincent and the Grenadines</name>
+    <name id="NAME_1">St. Vincent and the Grenadines</name>
+    <name id="NAME_2">Saint Vincent and the Grenadines</name>
+    <code id="ISO 3">VCT</code>
+    <code id="ISO 2">VC</code>
+    <code id="GMI">VCT</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Sudan</name>
+    <name id="NAME_1">Sudan</name>
+    <name id="NAME_2">Sudan</name>
+    <code id="ISO 3">SDN</code>
+    <code id="ISO 2">SD</code>
+    <code id="GMI">SDN</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Suriname</name>
+    <name id="NAME_1">Suriname</name>
+    <name id="NAME_2">Suriname</name>
+    <code id="ISO 3">SUR</code>
+    <code id="ISO 2">SR</code>
+    <code id="GMI">SUR</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Svalbard</name>
+    <name id="NAME_1">Svalbard</name>
+    <name id="NAME_2">Svalbard</name>
+            <code id="GMI">SJM</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Swaziland</name>
+    <name id="NAME_1">Swaziland</name>
+    <name id="NAME_2">Swaziland</name>
+    <code id="ISO 3">SWZ</code>
+    <code id="ISO 2">SZ</code>
+    <code id="GMI">SWZ</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Sweden</name>
+    <name id="NAME_1">Sweden</name>
+    <name id="NAME_2">Sweden</name>
+    <code id="ISO 3">SWE</code>
+    <code id="ISO 2">SE</code>
+    <code id="GMI">SWE</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Switzerland</name>
+    <name id="NAME_1">Switzerland</name>
+    <name id="NAME_2">Switzerland</name>
+    <code id="ISO 3">CHE</code>
+    <code id="ISO 2">CH</code>
+    <code id="GMI">CHE</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Syria</name>
+    <name id="NAME_1">Syria</name>
+    <name id="NAME_2">Syrian Arab Republic</name>
+    <code id="ISO 3">SYR</code>
+    <code id="ISO 2">SY</code>
+    <code id="GMI">SYR</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Taiwan</name>
+    <name id="NAME_1">Taiwan</name>
+    <name id="NAME_2">Taiwan</name>
+            <code id="GMI">TWN</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Tajikistan</name>
+    <name id="NAME_1">Tajikistan</name>
+    <name id="NAME_2">Tajikistan</name>
+    <code id="ISO 3">TJK</code>
+    <code id="ISO 2">TJ</code>
+    <code id="GMI">TJK</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Tanzania, United Republic of</name>
+    <name id="NAME_1">Tanzania, United Republic of</name>
+    <name id="NAME_2">United Republic of Tanzania</name>
+    <code id="ISO 3">TZA</code>
+    <code id="ISO 2">TZ</code>
+    <code id="GMI">TZA</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Thailand</name>
+    <name id="NAME_1">Thailand</name>
+    <name id="NAME_2">Thailand</name>
+    <code id="ISO 3">THA</code>
+    <code id="ISO 2">TH</code>
+    <code id="GMI">THA</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Timor-Leste</name>
+    <name id="NAME_1">Timor-Leste</name>
+    <name id="NAME_2">Timor-Leste</name>
+    <code id="ISO 3">TLS</code>
+    <code id="ISO 2">TL</code>
+    <code id="GMI">TLD</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Togo</name>
+    <name id="NAME_1">Togo</name>
+    <name id="NAME_2">Togo</name>
+    <code id="ISO 3">TGO</code>
+    <code id="ISO 2">TG</code>
+    <code id="GMI">TGO</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Tonga</name>
+    <name id="NAME_1">Tonga</name>
+    <name id="NAME_2">Tonga</name>
+    <code id="ISO 3">TON</code>
+    <code id="ISO 2">TO</code>
+    <code id="GMI">TON</code>
+    <parent>Pacific</parent>
+  </record>
+  <record>
+    <name>Trinidad and Tobago</name>
+    <name id="NAME_1">Trinidad and Tobago</name>
+    <name id="NAME_2">Trinidad and Tobago</name>
+    <code id="ISO 3">TTO</code>
+    <code id="ISO 2">TT</code>
+    <code id="GMI">TTO</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Tunisia</name>
+    <name id="NAME_1">Tunisia</name>
+    <name id="NAME_2">Tunisia</name>
+    <code id="ISO 3">TUN</code>
+    <code id="ISO 2">TN</code>
+    <code id="GMI">TUN</code>
+    <parent>NorthAfrica</parent>
+  </record>
+  <record>
+    <name>Turkey</name>
+    <name id="NAME_1">Turkey</name>
+    <name id="NAME_2">Turkey</name>
+    <code id="ISO 3">TUR</code>
+    <code id="ISO 2">TR</code>
+    <code id="GMI">TUR</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Turkmenistan</name>
+    <name id="NAME_1">Turkmenistan</name>
+    <name id="NAME_2">Turkmenistan</name>
+    <code id="ISO 3">TKM</code>
+    <code id="ISO 2">TM</code>
+    <code id="GMI">TKM</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Turks and Caicos Islands</name>
+    <name id="NAME_1">Turks and Caicos Islands</name>
+    <name id="NAME_2">Turks and Caicos Islands</name>
+    <code id="ISO 3">TCA</code>
+    <code id="ISO 2">TC</code>
+    <code id="GMI">TCA</code>
+    <parent>Caribbean</parent>
+  </record>
+  <record>
+    <name>Uganda</name>
+    <name id="NAME_1">Uganda</name>
+    <name id="NAME_2">Uganda</name>
+    <code id="ISO 3">UGA</code>
+    <code id="ISO 2">UG</code>
+    <code id="GMI">UGA</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Ukraine</name>
+    <name id="NAME_1">Ukraine</name>
+    <name id="NAME_2">Ukraine</name>
+    <code id="ISO 3">UKR</code>
+    <code id="ISO 2">UA</code>
+    <code id="GMI">UKR</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>United Arab Emirates</name>
+    <name id="NAME_1">United Arab Emirates</name>
+    <name id="NAME_2">United Arab Emirates</name>
+    <code id="ISO 3">ARE</code>
+    <code id="ISO 2">AE</code>
+    <code id="GMI">ARE</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>United Kingdom</name>
+    <name id="NAME_1">United Kingdom</name>
+    <name id="NAME_2">United Kingdom</name>
+    <code id="ISO 3">GBR</code>
+    <code id="ISO 2">GB</code>
+    <code id="GMI">GBR</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>United States</name>
+    <name id="NAME_1">United States</name>
+    <name id="NAME_2">United States</name>
+    <code id="ISO 3">USA</code>
+    <code id="ISO 2">US</code>
+    <code id="GMI">USA</code>
+    <parent>North America</parent>
+  </record>
+  <record>
+    <name>Uruguay</name>
+    <name id="NAME_1">Uruguay</name>
+    <name id="NAME_2">Uruguay</name>
+    <code id="ISO 3">URY</code>
+    <code id="ISO 2">UY</code>
+    <code id="GMI">URY</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Uzbekistan</name>
+    <name id="NAME_1">Uzbekistan</name>
+    <name id="NAME_2">Uzbekistan</name>
+    <code id="ISO 3">UZB</code>
+    <code id="ISO 2">UZ</code>
+    <code id="GMI">UZB</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Vanuatu</name>
+    <name id="NAME_1">Vanuatu</name>
+    <name id="NAME_2">Vanuatu</name>
+    <code id="ISO 3">VUT</code>
+    <code id="ISO 2">VU</code>
+    <code id="GMI">VUT</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Venezuela</name>
+    <name id="NAME_1">Venezuela</name>
+    <name id="NAME_2">Venezuela</name>
+    <code id="ISO 3">VEN</code>
+    <code id="ISO 2">VE</code>
+    <code id="GMI">VEN</code>
+    <parent>Latin America</parent>
+  </record>
+  <record>
+    <name>Vietnam</name>
+    <name id="NAME_1">Vietnam</name>
+    <name id="NAME_2">Viet Nam</name>
+    <code id="ISO 3">VNM</code>
+    <code id="ISO 2">VN</code>
+    <code id="GMI">VNM</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Western Sahara</name>
+    <name id="NAME_1">Western Sahara</name>
+    <name id="NAME_2">Western Sahara</name>
+    <code id="ISO 3">ESH</code>
+    <code id="ISO 2">EH</code>
+    <code id="GMI">ESH</code>
+    <parent>NorthAfrica</parent>
+  </record>
+  <record>
+    <name>Western Samoa</name>
+    <name id="NAME_1">Western Samoa</name>
+    <name id="NAME_2">Samoa</name>
+    <code id="ISO 3">WSM</code>
+    <code id="ISO 2">WS</code>
+    <code id="GMI">WSM</code>
+    <parent>Pacific</parent>
+  </record>
+  <record>
+    <name>Yemen</name>
+    <name id="NAME_1">Yemen</name>
+    <name id="NAME_2">Yemen</name>
+    <code id="ISO 3">YEM</code>
+    <code id="ISO 2">YE</code>
+    <code id="GMI">YEM</code>
+    <parent>Asia</parent>
+  </record>
+  <record>
+    <name>Yugoslavia</name>
+    <name id="NAME_1">Yugoslavia</name>
+    <name id="NAME_2">Serbia</name>
+    <code id="ISO 3">SRB</code>
+    <code id="ISO 2">RS</code>
+    <code id="GMI">YUG</code>
+    <parent>Europe</parent>
+  </record>
+  <record>
+    <name>Zaire</name>
+    <name id="NAME_1">Zaire</name>
+    <name id="NAME_2">Democratic Republic of the Congo</name>
+    <name id="NAME_2">Congo, Dem.</name>
+    <code id="ISO 3">COD</code>
+    <code id="ISO 2">CD</code>
+    <code id="GMI">ZAR</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Zambia</name>
+    <name id="NAME_1">Zambia</name>
+    <name id="NAME_2">Zambia</name>
+    <code id="ISO 3">ZMB</code>
+    <code id="ISO 2">ZM</code>
+    <code id="GMI">ZMB</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  <record>
+    <name>Zimbabwe</name>
+    <name id="NAME_1">Zimbabwe</name>
+    <name id="NAME_2">Zimbabwe</name>
+    <code id="ISO 3">ZWE</code>
+    <code id="ISO 2">ZW</code>
+    <code id="GMI">ZWE</code>
+    <parent>Sub Saharan Africa</parent>
+  </record>
+  
+  
+<record><name>Arab World</name><code>ARB</code></record>
+<record><name>East Asia &amp; Pacific (all income levels)</name><code>EAS</code></record>
+<record><name>East Asia &amp; Pacific (developing only)</name><code>EAP</code></record>
+<record><name>Euro area	</name><code>EMU</code></record>
+<record><name>Europe &amp; Central Asia (all income levels)</name><code>ECS</code></record>
+<record><name>Europe &amp; Central Asia (developing only)</name><code>ECA</code></record>
+<record><name>European Union</name><code>EUU</code></record>
+<record><name>Heavily indebted poor countries (HIPC)</name><code>HPC</code></record>
+<record><name>High income</name><code>HIC</code></record>
+<record><name>High income: nonOECD</name><code>NOC</code></record>
+<record><name>High income: OECD</name><code>OEC</code></record>
+<record><name>Latin America &amp; Caribbean (all income levels)</name><code>LCN</code></record>
+<record><name>Latin America &amp; Caribbean (developing only)</name><code>LAC</code></record>
+<record><name>Least developed countries: UN classification</name><code>LDC</code></record>
+<record><name>Low &amp; middle income</name><code>	LMY</code></record>
+<record><name>Low income</name><code>	LIC</code></record>
+<record><name>Lower middle income</name><code>	LMC</code></record>
+<record><name>Middle East &amp; North Africa (all income levels)</name><code>MEA</code></record>
+<record><name>Middle East &amp; North Africa (developing only)</name><code>MNA</code></record>
+<record><name>Middle income</name><code>MIC</code></record>
+<record><name>North America</name><code>NAC</code></record>
+<record><name>OECD members</name><code>	OED</code></record>
+<record><name>South Asia</name><code>	SAS</code></record>
+<record><name>Sub-Saharan Africa (all income levels)</name><code>SSF</code></record>
+<record><name>Sub-Saharan Africa (developing only)</name><code>	SSA</code></record>
+<record><name>Upper middle income</name><code>	UMC</code></record>
+<record><name>World</name><code>WLD</code></record>
+
+<record><name>Guam</name><code>GUM</code></record>
+<record><name>Faeroe Islands</name><code>FRO</code></record>
+<record><name>Aruba</name><code>ABW</code></record>
+<record><name>Channel Islands</name><code>CHI</code></record>
+<record><name>Cayman Islands</name><code>CYM</code></record>
+<record><name>Gibraltar</name><code>GIB</code></record>
+<record><name>Marshall Islands</name><code>MHL</code></record>
+<record><name>Mayotte</name><code>MYT</code></record>
+<record><name>Micronesia</name><name>Micronesia Fed Sts</name><code>FSM</code></record>
+<record><name>Palau</name><code>PLW</code></record>
+<record><name>St. Kitts and Nevis</name><name>Saint Kitts and Nevis</name><code>KNA</code></record>
+<record><name>Kosovo</name><code>KSV</code></record>s
+<record><name>Tuvalu</name><code>TUV</code></record>
+<record><name>American Samoa</name><code>ASM</code></record>
+<record><name>Virgin Islands (U.S.)</name><name>Virgin Islands</name><code>VIR</code></record>  
+<record><name>American Samoa</name><code>ASM</code></record>
+<record>
+	<name>Netherlands Antilles</name>
+	<code id="ISO 3">ANT</code>
+	<code id="ISO 2">AN</code>
+</record>
+</records>

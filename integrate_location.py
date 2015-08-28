@@ -64,7 +64,7 @@ def add_location(facts, countries=None, cities=None, blocks=None, tracts=None, l
 def parseCountry(text): #turns arbitrary strings of country names to country codes #TODO
     #could use from nltk.metrics.distance import edit_distance
     #edit_distance('united kingdom','UNITED KINGDOM')
-    country = 'EARTH' #don't know!
+    country = text; #'EARTH' #don't know!
 
     #strings are ISO 3166 CODES
     strings = {'gb':['united kingdom','uk','u.k.','g.b.','gb','great britain','gbr','england','scotland','wales','northern ireland','britain','united kingdom of great britain and northern ireland','united kingdom of great britain'], 'us':['united states','us','usa','united states of america','america','the states','us of a','u.s.','u.s.a.'], 'de':['germany','de','deu','deutsch','deutschland','federal republic of germany']}
