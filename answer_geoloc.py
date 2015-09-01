@@ -85,8 +85,11 @@ class GeoLocAnswer(ans.Answer):
                     raw_json = urllib2.urlopen(url,timeout=3).readline() #might throw an exception
                     data = {}
                     json_loc = json.loads(raw_json)
-                    #TODO: CACHE IN DB
-                    return 'nearcity',json.dumps({'city':json_loc['city'],'country':json_loc['country_name']})
+                    if len(json_loc['city'])<2: #if we can't really find our location from the ip address.
+                        ipwrong = True
+                    else:
+                        #TODO: CACHE IN DB
+                        return 'nearcity',json.dumps({'city':json_loc['city'],'country':json_loc['country_name']})
                 except Exception: #urllib2.HTTPError: #lots of 
                     ipwrong = True #effectively it's wrong as we can't find out where they are.
                # except urllib2.URLError:#time out?
