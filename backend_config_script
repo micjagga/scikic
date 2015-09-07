@@ -1,0 +1,73 @@
+#!/bin/bash
+
+#Run this on an AWS ubuntu instance, with a volume attached at /dev/xvdf
+
+#install software
+sudo apt-get -y install git
+sudo apt-get -y install apache2
+#allow cgi scripts to run (so we can use python)
+sudo a2enmod cgi
+sudo service apache2 restart
+
+#download inference engine + API from git repo
+mkdir ~/public_html
+chmod 775 public_html
+cd ~/public_html
+git clone https://github.com/scikic/scikic.git
+
+#add ~/public_html to configuration
+sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.backup
+sudo sed -e'/^<\/VirtualHost>/i \    <Directory \/home\/*\/public_html>\n    Options ExecCGI\n    AddHandler cgi-script .cgi\n    </Directory>' /etc/apache2/sites-available/000-default.conf > /tmp/000-default.conf
+sudo cp /tmp/000-default.conf /etc/apache2/sites-available/000-default.conf
+
+#subsitute:
+# DocumentRoot /var/www/html
+#with
+# DocumentRoot /home/ubuntu/public_html
+sudo sed "/DocumentRoot/s/.*/       DocumentRoot \/home\/ubuntu\/public_html/" /etc/apache2/sites-available/000-default.conf > /tmp/000-default.conf
+sudo cp /tmp/000-default.conf /etc/apache2/sites-available/000-default.conf
+
+#allow users to have their own pages (we're running it as a user, so we can use anaconda)
+cd /etc/apache2/mods-enabled
+sudo ln -s ../mods-available/userdir.load userdir.load
+sudo ln -s ../mods-available/userdir.conf userdir.conf
+sudo service apache2 restart
+
+#install anaconda (TODO: Anaconda might change version, update here).
+cd ~
+wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.2.0-Linux-x86_64.sh
+bash Anaconda-2.2.0-Linux-x86_64.sh
+
+#install conda modules
+conda install -y -c pymc pymc
+conda install -y -c https://conda.binstar.org/jjhelmus pyproj
+pip install overpy
+pip install pyshp
+sudo apt-get -y update
+sudo apt-get -y install libgeos-dev
+conda install -y geos
+conda install -y shapely
+
+#ensure location is available for data
+sudo mkfs -t ext4 /dev/xvdf
+sudo mkdir /mnt/api-data
+sudo mount /dev/xvdf /mnt/api-data/
+
+#create a folder for the inference system's files to go [IN FUTURE WE NEED TO USE AN AWS DATABASE SOLUTION?]
+cd /mnt/api-data
+sudo mkdir api_data
+(alter config.py to point at this location if necessary)
+
+#Make database folder writable for apache:
+sudo chmod 777 api_data
+
+#initialise the database (this will take a LONG time)
+cd ~/public_html/scikic
+python setup.py
+
+#Setup ssl - not required for backend servers (SSL stops at the load balancer)
+#sudo a2enmod ssl
+#sudo a2ensite default-ssl
+#sudo service apache2 restart
+
+
