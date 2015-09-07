@@ -108,52 +108,66 @@ logging.info('API Query [%s]: %s' % (action,datamsg))
 
 if (action=='question'):
     if not isinstance(data,dict):
-        print "Generating a question requires a dictionary of 'previous_questions', 'unprocessed_questions', 'facts' and 'target'. The 'previous_questions' is a list of dictionaries of previous questions, that you want to avoid asking again. The 'unprocessed_questions' are questions that you've asked already and that haven't been incorporated into the 'facts' dictionary."
+        print "Generating a question requires a dictionary of 'questions_asked', 'unprocessed_questions', 'facts' and 'target'. The 'questions_asked' is a list of dictionaries of previous questions, that you want to avoid asking again. The 'unprocessed_questions' are questions that you've asked already and that haven't been incorporated into the 'facts' dictionary."
         exit()
-    if 'previous_questions' in data:
-        for it in data['previous_questions']:
+    if 'questions_asked' in data:
+        for it in data['questions_asked']:
             check_format(it)
     if 'unprocessed_questions' in data:
         for it in data['unprocessed_questions']:
             check_format(it)
 
 if (action=='inference') or (action=='getfacts'):
-    if not isinstance(data,dict) or 'answers' not in data or 'facts' not in data:
-        print "Inference and getfacts require a dictionary of answers and facts."
-    if not isinstance(data['answers'],list) or not isinstance(data['facts'],dict):
-        print "Inference and getfacts require a dictionary of answers and facts. Answers should be a list. Facts should be a dictionary"
-        exit()
-    for it in data['answers']:
-        check_format(it)
+    pass #TODO sanitation
+#    if not isinstance(data,dict):
+#        print "Inference and getfacts require a dictionary of 'questions_asked', 'unprocessed_questions', 'facts'"
+#    if not isinstance(data['answers'],list) or not isinstance(data['facts'],dict):
+#        print "Inference and getfacts require a dictionary of answers and facts. Answers should be a list. Facts should be a dictionary"
+#        exit()
+#    for it in data['answers']:
+#        check_format(it)
 
 if (action=='questionstring'):
     check_format(data)
 
 if (action=='metadata'):
-    if 'dataset' not in data:
-        print "Metadata needs dataset to be specified."
-        exit()
+    pass
+#we'll say that no dataset specified, means all of them
+#    if 'dataset' not in data:
+#        print "Metadata needs dataset to be specified."
+#        exit()
 
+actiondone = False
 ##Do the actions....
 if action=='inference':
-    output, facts, insights = inference.do_inference(data['answers'],data['facts'])
+    actiondone = True
+    output, facts, insights = inference.do_inference(data)
     facts = recursive_numpy_array_removal(facts)
     print json.dumps({'features':output,'facts':facts,'insights':insights})
 
 if action=='getfacts':
+    actiondone = True
     facts = data['facts']
     inference.process_answers(data['answers'],facts)
     facts = recursive_numpy_array_removal(facts)
     print json.dumps({'facts':facts})
 
 if action=='question':
+    actiondone = True
     question = inference.pick_question(data)
     print json.dumps(question)
 
 if action=='questionstring':
+    actiondone = True
     question_string = inference.get_question_string(data)
     print json.dumps(question_string)
 
 if action=='metadata':
+    actiondone = True
     metadata = inference.get_meta_data(data)
     print json.dumps(metadata)
+
+logging.info('API Query complete [%s]' % (action,))
+
+if not actiondone:
+    print "This action is not available. Please use 'inference','getfacts','question','questionstring' or 'metadata'"

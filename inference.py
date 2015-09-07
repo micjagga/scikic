@@ -26,74 +26,69 @@ def logfacts(facts):
  #           logging.info('            >   %s: %s' % (fi, facts[f][fi]))
     logging.info(' ');
 
-def process_answers(data,facts={}):
+def process_answers(questions_asked=[],unprocessed_questions=[],facts={}):
+    # questions_asked - all the question/answer tuples that you want to add to the 'answers' list (of instantiated classes)
+    # unprocessed_questions - all the question/answer tuples that you still need to incorporate into the facts dictionary
+    # facts - the facts dictionary so far (altered in place)
+    #
     #instantiate classes for each dataset we have
     #put these instances in the 'answers' array which is
-    #returned. Also alter the facts variable inplace.
-    logging.info('process_answers (data has %d items, facts has %d items)' % (len(data),len(facts)))
+    #returned. Also alter the facts variable in place.
+
     answers = []
-    for it,qa in enumerate(data):
+    for it,qa in enumerate(questions_asked):
         if 'answer' not in qa:
             continue #this question doesn't have an answer
         c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset==qa['dataset']]
         if len(c)==0:
             continue #don't know this sort of data: skip it
         name = "item%d" % it
-
-        tempans = str(qa['answer'])
-        if len(tempans)>15:
-            tempans=tempans[0:15]+'...'
-        logging.info('  adding %s [%15s] (%s,%s->%s)' % (name,qa['dataset'],qa['dataitem'],qa['detail'],tempans))
-        answers.append(c[0](name,qa['dataitem'],qa['detail'],qa['answer']))
-
-    for a in answers:
-        a.append_facts(facts, answers)
-
-    logging.info('  facts has now %d items' % (len(facts)))
-    logfacts(facts)
+        new_answer = c[0](name,qa['dataitem'],qa['detail'],qa['answer'])
+        answers.append(new_answer)
+        if qa in unprocessed_questions:
+            logging.info("process_answers: adding facts from %s" % new_answer.dataset)
+            new_answer.append_facts(facts, answers)
     return answers
 
-def do_inference(data=[],facts={}):
-#data = data we have about the user stored in an array of dictionaries:
-#each dictionary has four fields: dataset, dataitem, detail and answer
+def do_inference(data):
+#parameters in data's dictionary:
+# 'questions_asked', 'unprocessed_questions', 'facts'
 #
-#facts = dictionary of processed
-#data about the user.
-#
-#Note: There are two dictionaries, facts and features.
-# - Facts are detailed statements about a person from a very large dimensional space (e.g. precise address, name, date of birth, etc)
-#which we know with some considerable certainty
-#
-# - Features are those things we know less about, or that we need to perform inference over. For example age, location,
-#etc...
-#
-#TODO: Add some facts that we've not done (e.g. output area)?? (not sure we'll know that precisely, in the long-run).
-#
-#The facts are used by the append_features method to help generate a probability distribution. For example, if the person's
-#name is in the facts dictionary as 'Robert', then if the NamesAnswer class is instantiated, it can then use that to produce
-#a feature over a person's gender.
-    logging.info('do_inference (data has %d items, facts has %d items)' % (len(data),len(facts)))
-     
+#we need to:
+#1. Add any other questions that are unprocessed (i.e don't have items added to the facts dictionary)
+#2. process the unprocessed questions,
+#   using:
+#3. 
+    questions_asked = []
+    unprocessed_questions = []
+    facts = {}
+
+    if 'questions_asked' in data:
+        questions_asked = data['questions_asked']
+    if 'unprocessed_questions' in data:
+        unprocessed_questions = data['unprocessed_questions']
+    if 'facts' in data: 
+        facts = data['facts']
+
     #Some datasets we won't have asked questions about as they don't need question/answer responses (such as the babynames dataset,
     #which just gets its 'name' value from the 'facts' structure).
-    #We still need to add these to our 'data' array so that they get used.
+    #We still need to add these to our 'unprocessed_questions' array so that they get used.
     c = [cls for cls in ans.Answer.__subclasses__()]
     for cl in c:
-        cl.init_db() #normally should be started from an instance?? but we don't really mind.
-        dataitem, detail = cl.pick_question(data,{},'')
+        cl.init_db() #(normally should be started from an instance, but we don't really mind).
+        dataitem, detail = cl.pick_question(questions_asked,facts,'')
         dataset = cl.dataset
         if (dataitem=='None'):
             item = {'dataset':dataset, 'dataitem':dataitem, 'detail':detail, 'answer':0} #no answer provided to this type of dataset
-            data.append(item)
+            unprocessed_questions.append(item)
+            questions_asked.append(item)
 
-    answers = process_answers(data,facts)
-
+    answers = process_answers(questions_asked,unprocessed_questions,facts)
     
     features = {}
     for a in answers:
         logging.info('   adding %s' % a.dataset)
         a.append_features(features,facts)
-
 
     logging.info('   features has %d items' % (len(features)))
     for f in features:
@@ -133,9 +128,6 @@ def do_inference(data=[],facts={}):
     for a in answers:
         insights.extend(a.insights(output, facts))
 
-    import sys
-    print >>sys.stderr, output
-    print >>sys.stderr, insights
 
     return output, facts, insights
 
@@ -154,16 +146,17 @@ def process_answer(data):
 
 
 def pick_question(data):
-    #Generating a question requires a dictionary of 'previous_questions', 'facts' and 'target'. The 'previous_questions' is a list of dictionaries
+    #Generating a question requires a dictionary of 'questions_asked', 'facts' and 'target'. The 'questions_asked' is a list of dictionaries
     #of previous questions, that you want to avoid asking again.
     #The 'unprocessed_questions' are questions that you've asked already and that haven't been incorporated into the 'facts' dictionary.
 
     logging.info('pick_question')
     questions_asked = []
+    unprocessed_questions = []
     facts = {}
     target = ''
-    if 'previous_questions' in data:
-        questions_asked = data['previous_questions']
+    if 'questions_asked' in data:
+        questions_asked = data['questions_asked']
     if 'unprocessed_questions' in data:
         unprocessed_questions = data['unprocessed_questions']
     if 'facts' in data: 
@@ -172,7 +165,7 @@ def pick_question(data):
         target = data['target']
 
     if len(unprocessed_questions)>0: #add data from the questions asked to the facts dictionary
-        process_answers(unprocessed_questions, facts)
+        process_answers(questions_asked,unprocessed_questions,facts)
     questions_only_asked = []
     
     logging.info('    facts: %s' % facts)
@@ -219,7 +212,13 @@ def get_question_string(data):
     return d.question_to_text()
 
 def get_meta_data(data):
-    c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset==data['dataset']]
-    if len(c)==0:
-        return "Don't know this type of data";
-    return c[0].metaData()
+    if 'dataset' in data:
+        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset==data['dataset']]
+        if len(c)==0:
+            return "Don't know this type of data";
+        return [c[0].metaData()]
+    else:
+        metaData = []
+        for c in ans.Answer.__subclasses__():
+            metaData.append(c.metaData())
+        return metaData
