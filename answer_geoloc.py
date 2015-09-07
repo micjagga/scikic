@@ -110,5 +110,9 @@ class GeoLocAnswer(ans.Answer):
      #   city_details['latitude'] = 53.383611
      #   city_details['longitude'] = -1.466944
 
+    @classmethod
+    def metaData(cls):
+        return {'citation':'The <a href="freegeoip.net">freegeoip.net</a> API'}
+
     
             

@@ -59,6 +59,11 @@ class FacebookAnswer(ans.Answer):
         if ('likes' in fb_data):
             facts['facebook_likes'] = fb_data['likes']
 
+
+    @classmethod
+    def metaData(cls):
+        return {'citation':'The <a href="facebook.com">facebook</a> graph API'}
+
     @classmethod
     def pick_question(self,questions_asked,facts,target):
         return 'Skip', 'None'       #we don't want to ask questions to get this data

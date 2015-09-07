@@ -14,7 +14,6 @@ import sqlalchemy as sa
 import pandas as pd
 import helper_functions as hf
 import config
-import sys
 import random
 
 from StringIO import StringIO
@@ -47,10 +46,13 @@ class MusicAnswer(ans.Answer):
             #facts['city'] maybe???
             #facts['country'] maaaaaybe?
 
-        if 'city' not in facts:
+        if 'where' not in facts:
             return []
-        if 'country' not in facts:
-            return []
+        else:
+            if 'city' not in facts['where']:
+                return []
+            if 'country' not in facts['where']:
+                return []
         
         event_names = []  
         event_datetimes = []
@@ -59,6 +61,7 @@ class MusicAnswer(ans.Answer):
         artist = self.answer
         artist = artist.replace(" ", "+")
         try: #Mike's change, to handle if a band doesn't exist
+#http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=Eels&limit=3&autocorrect=1&api_key=02c3301ab9e648c504edf4d7dc93c99b
             url_r = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=%s&limit=%i&autocorrect=1&api_key=02c3301ab9e648c504edf4d7dc93c99b" %(artist, limit)
             page_r = urllib2.urlopen(url_r)
             contents_r = str(page_r.read())
@@ -73,10 +76,16 @@ class MusicAnswer(ans.Answer):
         for artist in r_r.find('similarartists'):
             results_artist_name.append(artist.find('name').text)    
             results_artist_url.append(artist.find('url').text)
-       
+
         event_listings = []
+        new_events = []
         for artist in results_artist_name:
-             new_events = self.find_local_events(self.answer, facts['city'], facts['country'])
+             if 'where' in facts:
+                if 'city' in facts['where']:
+                    if len(facts['where']['city'])>0:
+                        city = facts['where']['city'][0]['item'][0]      #city is a tuple of (city,country)
+                        country = facts['where']['city'][0]['item'][1]
+                        new_events = self.find_local_events(self.answer, city, country)
              for event in new_events:
                  found = False
                  for e in event_listings:
@@ -103,7 +112,9 @@ class MusicAnswer(ans.Answer):
         try:
             url_e = "http://api.bandsintown.com/artists/%s/events/recommended?format=xml&app_id=scikic&api_version=2.0&location=%s,%s&callback=showEvents" %(artist_formatted, city, country)
             page_e = urllib2.urlopen(url_e)
-        except UnicodeEncodeError: #TODO Handle this
+        except: # UnicodeEncodeError, urllib2.HTTPError: #TODO Handle this
+            import sys
+            print >>sys.stderr, "answer_music, URL failed to open: %s" % url_e
             return []
         contents_e = str(page_e.read())   
         r_e = ET.fromstring(contents_e)
@@ -153,6 +164,10 @@ class MusicAnswer(ans.Answer):
       
     def append_features(self,features,facts): 
         pass
+
+    @classmethod
+    def metaData(cls):
+        return {'citation':'The <a href="bandsintown.com">bandsintown.com</a> API'}
 
     @classmethod
     def pick_question(self,questions_asked,facts,target):

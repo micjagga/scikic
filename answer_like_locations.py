@@ -89,19 +89,29 @@ class LikeLocationsAnswer(ans.Answer):
         ids = []
         for like in likes:
             ids.append(like['id'])
-        query = {}
-        query['access_token'] = '380462442159554|HQ4dVToLLzinNirZ_K3aw8Mju0Y'
+        query = {}              
+        query['access_token'] = '380462442159554|HQ4dVToLLzinNirZ_K3aw8Mju0Y' #TODO may need to be generated dynamically
+        batches = []
         batch = []
+        n = 0
         for pageid in ids:
             batch.append({'method':'GET', 'relative_url':str(pageid)})
-        query['batch'] = json.dumps(batch)
-        url = 'https://graph.facebook.com'
+            n += 1
+            if n>48:
+                batches.append(batch)
+                batch = []
+                n = 0
+        batches.append(batch)
+        results = []
+        for batch in batches:
+            query['batch'] = json.dumps(batch)
+            url = 'https://graph.facebook.com'
+            data = urllib.urlencode(query) #queries are not concurrent as facebook probably limits by app.            
+            req = urllib2.Request(url, data)
+            response = urllib2.urlopen(req)
+            the_page = response.read()
+            results.extend(json.loads(the_page))
 
-        data = urllib.urlencode(query)
-        req = urllib2.Request(url, data)
-        response = urllib2.urlopen(req)
-        the_page = response.read()
-        results = json.loads(the_page)
         for i,result in enumerate(results):
             likes[i]['found'] = False
             innerdata = json.loads(result['body'])
@@ -213,7 +223,12 @@ class LikeLocationsAnswer(ans.Answer):
         res = []
         placenames = [p[0] for p in LikeLocationsAnswer.placelist]
         import time
-        placetimes = [time.strptime(p['created_time'],'%Y-%m-%dT%H:%M:%S+0000')[0] for p in places]
+        placetimes = []
+        year = 0
+        for p in places:
+            if 'created_time' in p:
+                year = time.strptime(p['created_time'],'%Y-%m-%dT%H:%M:%S+0000')[0]
+            placetimes.append(year) #if it doesn't have the created_time item then it should use the year from the previous item. Not ideal TODO Fix this so it does something more sane.
         restime = []
         for p,t in zip(places,placetimes):
             if 'country' in p:
@@ -226,6 +241,7 @@ class LikeLocationsAnswer(ans.Answer):
         newlist = sorted(c, key=lambda k: -k[1]) 
         countries = []
 
+        
         for item in newlist:
             idx = (len(guesses) - 1) - guesses[::-1].index(item[0])            
             datetime = restime[idx]

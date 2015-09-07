@@ -273,3 +273,8 @@ class USCensusAnswer(ans.Answer):
     def pick_question(self,questions_asked,facts,target):
 	    return 'None','agegender'
 
+
+    @classmethod
+    def metaData(cls):
+        return {'citation':'The <a href="http://www.census.gov/developers/">US census bureau</a>'}
+

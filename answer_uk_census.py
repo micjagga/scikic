@@ -71,7 +71,7 @@ class UKCensusAnswer(ans.Answer):
 
     @classmethod
     def metaData(cls):
-        data = {'religions':cls.religions,'religion_text':cls.religion_text}
+        data = {'religions':cls.religions,'religion_text':cls.religion_text,'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
         return data
 
     def insights(self,inference_result,facts):
@@ -89,7 +89,32 @@ class UKCensusAnswer(ans.Answer):
                 insightlist.append('You are female')
             elif (inference_result['factor_gender']['quartiles']['mean']<0.1):
                 insightlist.append('You are male')
+    
+    
+#0 One family only: Cohabiting couple: All children non-dependent
+#1 One family only: Cohabiting couple: Dependent children
+#2 One family only: Cohabiting couple: No children <20%
+#3 One family only: Lone parent: All children non-dependent
+#4 One family only: Lone parent: Dependent children
+#5 One family only: Married or same-sex civil partnership couple: All children non-dependent
+#6 One family only: Married or same-sex civil partnership couple: Dependent children<<<<<<<<
+#7 One family only: Married or same-sex civil partnership couple: No children
+#8 One person household: Other <21%
+#9 Other household types: With dependent children
+#10 One family only: All aged 65 and over
+#11 One person household: Aged 65 and over
+#12 Other household types: Other (including all full-time students and all aged 65 and over)
 
+        if ('household' in inference_result):
+            household = inference_result['household']['distribution']
+            nochildren = household[2]+household[7]+household[8]+household[10]+household[11]+household[12]
+            if nochildren>0.7:
+                insightlist.append("You don't have children living at home")
+            if nochildren<0.3:
+                insightlist.append("You have children")
+            alone = household[3]+household[4]+household[8]+household[11]+household[12]
+            if alone<0.3:
+                insightlist.append("You are in a relationship and living with your partner/spouse.")
         if ('religion' in inference_result):
             rel = inference_result['religion']['distribution']
             listOfReligions = []
@@ -419,4 +444,6 @@ class UKCensusAnswer(ans.Answer):
     @classmethod
     def pick_question(cls,questions_asked,facts,target):
 	    return 'None','agegender'
+
+
 

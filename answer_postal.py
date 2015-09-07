@@ -193,7 +193,7 @@ class PostalAnswer(ans.Answer):
         if (self.dataitem=='zipcode'):
             return {'question':"What's your zip code?",'type':'text'}
         
-    def append_facts(self,facts,all_answers): #TODO Move all the census stuff into integrate_location maybe?
+    def append_facts(self,facts,all_answers): #TODO Move all the census stuff into integrate_location maybe?        
         if (self.answer==None):
             return #nothing to append
         if (self.dataitem=='postcode'):
@@ -240,7 +240,7 @@ class PostalAnswer(ans.Answer):
                 facts['where']['city'].append({'item':(city,'us'),'probability':p})
             facts['where']['country'] = [{'item':'us','probability':1.}]  #TODO Check what country names we should be using
 
-    def append_facts_postcode(self,facts):       
+    def append_facts_postcode(self,facts):                   
             postcode = PostalAnswer.adjustcode(self.answer);
 
             c_oa = PostalAnswer._geo.execute("SELECT oa11, geo.lsoa11 as lsoa, name, lat, long FROM geo, names WHERE pcd=? AND names.lsoa11=geo.lsoa11;",(postcode,));
@@ -268,12 +268,12 @@ class PostalAnswer(ans.Answer):
                         country = con['item']       
         if parseCountry(country)=='gb':
             return 'postcode', ''
-       
-        import sys
-        print >>sys.stderr, facts
-        print >>sys.stderr, country
-        print >>sys.stderr, parseCountry(country)
         if parseCountry(country)=='us':
             return 'zipcode', ''
 
         return 'None', 'None' #we can't ask this yet.
+
+
+    @classmethod
+    def metaData(cls):
+        return {'citation':'The <a href="https://geoportal.statistics.gov.uk">UK office of national statistics</a> (see <a href="http://www.ons.gov.uk/ons/guide-method/geography/products/census/lookup/other/index.html">details</a> and <a href="https://geoportal.statistics.gov.uk/geoportal/catalog/search/resource/details.page?uuid={A33B0569-97E2-4F44-836C-B656A6D082B6} ">information</a>) and the US zipcode data was from <a href="http://mcdc.missouri.edu">Missouri\'s Census Data Center.'}

@@ -23,7 +23,7 @@ class MovieAnswer(ans.Answer):
     #class database connections for movielens
     _movielens = None
     dataset = 'movielens';
-    
+  
 
     @classmethod
     def setup(cls,pathToData):
@@ -198,3 +198,6 @@ class MovieAnswer(ans.Answer):
         movie_name = films[filmn][1];
         return 'seen',movie_index
 
+    @classmethod
+    def metaData(cls):
+        return {'citation':'The <a href="http://files.grouplens.org/datasets/movielens">movielens</a> database'}

@@ -139,6 +139,7 @@ class Answer(object):
     
     @classmethod
     def metaData(cls):
+        #Returns a dictionary of metadata info and citations or references, for the sources of the data or questions, etc.
         return {}
 
     @classmethod
@@ -158,7 +159,6 @@ class Answer(object):
     #the question to provide additional information, or
     #reformat it into a standard format.
         return answer, detail;
-
 
 #helper functions
 

@@ -80,7 +80,6 @@ class BabyNamesAnswer(ans.Answer):
         ranks = {}
         ranks['boys'] = xd.parse(sheetname='Boys',header=0,skiprows=[0,1,2,4],skip_footer=2,index_col=0)
         ranks['girls'] = xd.parse(sheetname='Girls',header=0,skiprows=[0,1,2,4],skip_footer=2,index_col=0)
-
         #2. download recent data and put into pandas DF (requires construction of new headers)
         print "Downloading recent dataset"
         url = 'http://www.ons.gov.uk/ons/about-ons/business-transparency/freedom-of-information/what-can-i-request/published-ad-hoc-data/pop/august-2014/baby-names-1996-2013.xls'
@@ -299,3 +298,9 @@ class BabyNamesAnswer(ans.Answer):
         if self.featurename in features:
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
         features[self.featurename]=pm.Categorical(self.featurename, self.get_pymc_function(features), value=True, observed=True)
+
+
+    @classmethod
+    def metaData(cls):
+        return {'citation':'The ONS provide statistics on the distribution of the names of baby\'s in the UK: <a href="http://www.ons.gov.uk/ons/about-ons/business-transparency/freedom-of-information/what-can-i-request/published-ad-hoc-data/pop/august-2014/baby-names-1996-2013.xls">1996-2013</a> and <a href="http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/top-100-baby-names-historical-data.xls">1904-1994</a>.'}
+
