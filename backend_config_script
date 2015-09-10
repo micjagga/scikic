@@ -60,6 +60,8 @@ sudo mkdir api_data
 
 #Make database folder writable for apache:
 sudo chmod 777 api_data
+touch api_data/logging.log
+sudo chmod 666 api_data/logging.log
 
 #initialise the database (this will take a LONG time)
 cd ~/public_html/scikic
@@ -70,4 +72,7 @@ python setup.py
 #sudo a2ensite default-ssl
 #sudo service apache2 restart
 
-
+#set enviornment vars for apache user, so that it knows where the anaconda version of things is
+sudo sed -i '$aexport PATH=/home/ubuntu/anaconda/bin:$PATH' /etc/apache2/envvars
+sudo sed -i '$aexport NLTK_DATA=/home/ubuntu/api_data/nltk_data' /etc/apache2/envvars
+sudo service apache2 restart
