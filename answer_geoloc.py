@@ -28,11 +28,11 @@ class GeoLocAnswer(ans.Answer):
         
     def question_to_text(self):
     	if (self.dataitem=='nearcity'):
-            return {'question':"Is your home in or near %s, %s?" % (self.detail['city'], self.detail['country']),'type':'select','options':['yes','no','don\'t know']} 
+            return {'question':"Is your current home in or near %s, %s?" % (self.detail['city'], self.detail['country']),'type':'select','options':['yes','no','don\'t know']} 
         if (self.dataitem=='city'):
-            return {'question':"Which city or town are you in or near?", 'type':'text'}
+            return {'question':"Which city or town are you in or near now?", 'type':'text'}
         if (self.dataitem=='country'):
-            return {'question':"Which country are you in?",'type':'select','options':['United States','United Kingdom','Germany','Canada','France','Other']} 
+            return {'question':"Which country are you in now?",'type':'select','options':['United States','United Kingdom','Germany','Canada','France','Other']} 
 
     def append_facts(self,facts,all_answers):
         if 'where' not in facts:
