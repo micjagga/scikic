@@ -3,6 +3,7 @@
 #Run this on an AWS ubuntu instance, with a volume attached at /dev/xvdf
 
 #install software
+sudo apt-get update
 sudo apt-get -y install git
 sudo apt-get -y install apache2
 #allow cgi scripts to run (so we can use python)
