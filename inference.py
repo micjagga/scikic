@@ -185,7 +185,7 @@ def pick_question(data):
 #                continue
         cl.init_db() #normally should be started from an instance?? but we don't really mind.
         dataitem, detail = cl.pick_question(questions_asked,facts,target)
-        dataset = cl.dataset   
+        dataset = cl.dataset
         if (dataitem=='None' or dataitem=='Skip'): #not a dataset that needs questions
             continue;
         question = "%s_%s_%s" % (dataset, dataitem, detail)

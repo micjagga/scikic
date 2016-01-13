@@ -24,9 +24,9 @@ class Answer(object):
       p(A|B,C) #if A is a factor this is invalid.
       The features in this set are indicated by being prefixed with factor_.
       
-      Maybe: a prior on that feature could be added to a FeaturePriorAnswers class
+      Maybe: a prior on that feature could be added to a FeaturePriorAnswers class?
       
-    Feature Descriptions:
+    Some Feature Descriptions:
       factor_age - a categorical list of ages of 100 values, from 0 to 100.
          each value is that person's age, so 32 means their age is 32<=a<33.
          the last value means 100 or more.
@@ -98,7 +98,8 @@ class Answer(object):
 
         Args:
           facts (dictionary): Dictionary of facts.
-          all_answers: array of all the instantiated answers
+          all_answers: array of all the instantiated answers so far.
+		THIS PARAMETER IS DEPRECATED AND WILL IN THE FUTURE BE REMOVED
         
         Returns:
           Nothing - the dictionary is altered inplace.
@@ -132,7 +133,8 @@ class Answer(object):
         pass
 
     def insights(self,inference_result,facts):        
-        #returns a list of insights:
+        #returns a list of insight strings.
+	#parameters:
         # - inference_result: probability distributions of the features
         # - facts: a dictionary of 'facts' provided by the Answer classes        
         return []
@@ -147,7 +149,8 @@ class Answer(object):
         return 'None', 'None'
 #None = no question to ask the user, but we still want to call it before inference
 #Skip = no question to ask user, and we want to skip it when calling inference: It gets called separately (e.g. when jquery gets facebook info, etc)
-#Nones are not handled well when put into the database, using string instead
+#Nones are not handled well when put into the database, using string instead.
+#the second field is for the detail of the question (e.g. the id of the movie, etc).
 
 #TODO: Not currently used - delete?
     @classmethod

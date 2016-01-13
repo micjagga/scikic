@@ -19,6 +19,6 @@ class DirectAnswer(ans.Answer):
         
     def question_to_text(self):
     	if (self.dataitem=='age'):
-            return {'question':"I wonder if I was correct about your age. What is your actual age (if you don't mind me asking?)",'type':'text'} 
+            return {'question':"I wonder if I was correct about your age. What is your actual age (if you don't mind me asking)?)",'type':'text'} 
     	if (self.dataitem=='religion'):
             return {'question':"I wonder if I was correct about your religion. What religion (or none) do you identify as?",'type':'text'}
