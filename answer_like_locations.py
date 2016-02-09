@@ -178,11 +178,14 @@ class LikeLocationsAnswer(ans.Answer):
         wh = facts['where_history']
         if 'error' in wh:
             if wh['error']=='no_fb_likes':
-                return ["I can't tell which country you're in, just looking at your facebook likes, as I can't see your facebook likes!"]
+                return ["Note: I can't see your facebook likes."]
+                #return ["I can't tell which country you're in, just looking at your facebook likes, as I can't see your facebook likes!"]
             if wh['error']=='no_fb_countries':
-                return ["I can't tell which country you're in, just looking at your facebook likes."]
+                return ["Note: Your facebook likes don't reveal where you are very clearly."]
+                #return ["I can't tell which country you're in, just looking at your facebook likes."]
         if 'countrylist' not in wh:
-                return ["I can't tell which country you're in from your facebook likes, as I had an unexpected problem."]
+                return ["Note: I had an unexpected problem when looking at your facebook likes."]
+                #return ["I can't tell which country you're in from your facebook likes, as I had an unexpected problem."]
         countries = wh['countrylist']
 
         if len(countries)==1:

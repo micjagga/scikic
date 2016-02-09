@@ -69,6 +69,10 @@ class UKCensusAnswer(ans.Answer):
     religions = ['Christian','Buddhist','Hindu','Jewish','Muslim','Sikh','Other religion','No religion']
     religion_text = ['Christian','Buddhist','Hindu','Jewish','Muslim','Sikh','religious (but I do\'t know which)','of no religion']
 
+    transport = ['Taxi', 'Bicycle', 'On foot', 'Not in employment', 'Work mainly at or from home', 'Motorcycle, scooter or moped', 'Bus, minibus or coach', 'Train', 'Underground, metro, light rail, tram', 'Passenger in a car or van', 'Driving a car or van', 'Other method of travel to work']
+    transport_text = ['take a taxi to work', 'cycle to work', 'go to work on foot', 'not be in work', 'mainly work from home', 'use a motorcycle to get to work', 'take the bus to work', 'take the train to work', 'use an underground or tram to get to work', 'get a lift in a car to work', 'drive to work', 'use an unusual method of travel to get to work']
+
+
     @classmethod
     def metaData(cls):
         data = {'religions':cls.religions,'religion_text':cls.religion_text,'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
@@ -78,10 +82,19 @@ class UKCensusAnswer(ans.Answer):
         #returns a list of insights:
         # - inference_result: probability distributions of the features
         # - facts: a dictionary of 'facts' provided by the Answer classes      
+        if self.prob_in_uk(facts)<0.01:
+            return [] #we're not in the uk
         
         insightlist = []
         if 'factor_age' in inference_result:
-            msg = 'You are aged between %d and %d.' % (inference_result['factor_age']['quartiles']['lower'],inference_result['factor_age']['quartiles']['upper'])
+            lower = inference_result['factor_age']['quartiles']['lower']
+            upper = inference_result['factor_age']['quartiles']['upper']
+            if upper==lower: #if it's exact
+                msg = 'You are %d years old.' % lower
+                #compare to local area...
+                
+            else:
+                msg = 'You are aged between %d and %d.' % (lower,upper)
             insightlist.append(msg)
 
         if ('factor_gender' in inference_result):
@@ -128,6 +141,38 @@ class UKCensusAnswer(ans.Answer):
                 relmsg = listOfReligions[0]
             insightlist.append(" I think you are " + relmsg + ".")
 
+        ##Generate comparative insights...
+        popd = np.mean(self.popdensity)*100 #per hectare -> per sqr km
+        insightlist.append("Your neighbourhood has a population density of %d people per square kilometre, %0.1f times the average for England." % (round(popd),popd/413.0))
+        #oas = self.get_list_of_oas(facts)        
+        #localAgeDists = self.getDist(oas,UKCensusAnswer.getAgeDist) #TODO: We've already called this once. Need to cache. 
+        localAgeDists = self.localAgeDists
+        nationalAgeDist = self.nationalAgeDist
+        
+        oa_probs = [1.0] * len(localAgeDists)       
+        if 'where' in facts:
+            if 'ukcensus' in facts['where']:
+                oa_probs = [it['probability'] for it in facts['where']['ukcensus']] #get the list of OA probabilities
+
+        d = np.zeros(101)
+        for prob,dist in zip(localAgeDists,oa_probs):
+            d = d + (np.array(dist)*prob) / len(oa_probs)
+        halfway = np.sum(np.cumsum(d)<=np.sum(d)/2)
+        if (halfway<40):
+            insightlist.append('Half the people in your neighbourhood are younger than %d years old.' % halfway)
+        else:
+            insightlist.append('Half the people in your neighbourhood are older than %d years old.' % halfway)
+        national_traveltowork_probs = np.array([0.00335523,0.01853632,0.06921536,0.35500678,0.03459344,0.00520941,0.04740108,0.03333676,0.02501549,0.03300255,0.37115993,0.00416765]); #TODO Get this from the API
+        
+        #we need to roughly handle the smoothing so that rare modes don't get over represented
+        national_traveltowork_probs = national_traveltowork_probs + (1.0/200) 
+        national_traveltowork_probs = national_traveltowork_probs / np.sum(national_traveltowork_probs)
+        
+        localratios = self.traveltowork_probs/national_traveltowork_probs
+        maxnum = np.max(localratios)
+        trans_type = UKCensusAnswer.transport_text[np.argmax(localratios)]
+        insightlist.append('People in your area are %0.1f times more likely to %s than the national average.' % (maxnum, trans_type))
+      
         return insightlist
 
     @classmethod
@@ -144,22 +189,28 @@ class UKCensusAnswer(ans.Answer):
         root = ET.fromstring(xml_data);
         href = root[1][0][0].text #TODO: Need to get the path to the href using names not indices.
         url = urllib2.urlopen(href);
-        zipfile = ZipFile(StringIO(url.read()))
+        zipfile = ZipFile(StringIO(url.read()))    
         for filename in zipfile.namelist():
             if (filename[-3:]=='csv'):
                 data = pd.read_csv(zipfile.open(filename),skiprows=np.array(range(8)),skipfooter=1,header=0)
 
-
         #Gets it into a N-dimensional hierarchy of dictionaries
         values = data.ix[0,:]
         matrix = {}
-        for col,v in zip(data.columns,values):
-            c = col.split('~')
-            if (len(c)>1):
+        for col,v in zip(data.columns,values):            
+            c = col.split('~')            
+            
+            if (len(c)>=1):
+                if ('Geographic ID' in c[0]):
+                    continue
+                if ('Geographic Area' in c[0]):
+                    continue           
                 temp = matrix
                 for ix in range(len(c)):
+                   
                     if ('Total' in c[ix]):
                         break
+
                     if c[ix] in temp:
                         temp = temp[c[ix]]
                     else:
@@ -168,11 +219,12 @@ class UKCensusAnswer(ans.Answer):
                         else:
                             temp[c[ix]] = {}
                             temp = temp[c[ix]]
+                      
         return data, matrix
 
     @classmethod
     def getAgeDist(cls,geoArea,returnList):
-        """Gets the age distribution given the label of a particular geographical area"""
+        """Gets the age distribution given the label of a particular geographical area,"""
         data, matrix = cls.ONSapiQuery(geoArea,'QS103EW')        #QS103EW = age by year...
         data = data.T
         popages = data[0].values[3:]
@@ -184,19 +236,34 @@ class UKCensusAnswer(ans.Answer):
         """Gets the Household composition by age by sex; given the label of a particular geographical area"""
         data, mat = cls.ONSapiQuery(geoArea,'LC1109EW')
         arr,labs = dict_to_array(mat) #Convert the dictionary hierarchy to a numpy array 
-        #for dim in labs:
-        #    for i,l in enumerate(dim):
-        #        print i,l
         #todo sort...
         #order = [[i for i,l in enumerate(labs[2]) if l==r][0] for r in cls.???] #?
         arr = np.array(arr) #convert to numpy array
-        #arr = arr[:,:,order] #put in correct order.
         arr = arr * 1.0
         for x in range(arr.shape[0]):
             for y in range(arr.shape[1]):
                 arr[x,y,:] += 1.0
                 arr[x,y,:] = 1.0*arr[x,y,:] / np.sum(1.0*arr[x,y,:])
         returnList[0] = arr #now return via the argument so this can be called as a thread
+
+
+    @classmethod
+    def getTravelToWorkDist(cls,geoArea,returnList):
+        """Gets the way people travel to work; given the label of a particular geographical area"""
+        data, mat = cls.ONSapiQuery(geoArea,'QS701EW')
+        arr,labs = dict_to_array(mat) #Convert the dictionary hierarchy to a numpy array 
+        logging.info(arr)
+        logging.info(labs)
+        order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.transport] #sort by the order we want it in.
+        arr = np.array(arr) #convert to numpy array
+        arr = arr[order] 
+        arr = arr * 1.0        
+        logging.info("Get Travel to work distribution");
+        logging.info(arr)
+        arr += 1.0
+        arr = 1.0*arr / np.sum(1.0*arr)
+        returnList[0] = arr #now return via the argument so this can be called as a thread
+
 
     @classmethod
     def getReligionDist(cls,geoArea,returnList):
@@ -214,6 +281,11 @@ class UKCensusAnswer(ans.Answer):
         #gender is sorted by 'male', 'female', age by numerical-order and religion as specified in the cls.religions vector
         returnList[0] = arr #now return via the argument so this can be called as a thread
     
+    @classmethod
+    def getPopDensity(cls,geoArea,returnList):
+        data,mat = cls.ONSapiQuery(geoArea,'QS102EW')        #LC2107EW = religion by age, gender, etc            
+        returnList[0] = mat['Density (Persons per hectare)']
+        
     def __init__(self,name,dataitem,itemdetails,answer=None):
         """Constructor, instantiate an answer...
 
@@ -246,21 +318,30 @@ class UKCensusAnswer(ans.Answer):
         probs = probs/probs.sum() #shouldn't be necessary
         return probs
 
-    def calc_probs_religion(self,facts):
-        oas = self.get_list_of_oas(facts)
+    def getDist(self,oas,target):
+        """Get the distribution of something (depending on target) across the output areas passed"""
         threadData = []
         threads = []
         for oa in oas:
             data = [0]
             threadData.append(data)
-            t = Thread(target=UKCensusAnswer.getReligionDist,args=(oa,data))
+            t = Thread(target=target,args=(oa,data))
             threads.append(t)
             t.start()
-
         for t in threads:
             t.join()
-
-        localDists = [td[0] for td in threadData]
+       
+        return [td[0] for td in threadData]
+    
+    #this just gets any other census data we're interested in
+    def get_other_distributions(self,facts):
+        oas = self.get_list_of_oas(facts)
+        self.popdensity = self.getDist(oas,UKCensusAnswer.getPopDensity)
+     
+    def calc_probs_religion(self,facts):
+        #returns p(oa|religion)
+        oas = self.get_list_of_oas(facts)
+        localDists = self.getDist(oas,UKCensusAnswer.getReligionDist)
 
         shape = localDists[0].shape
         self.rel_probs = np.empty((len(localDists),shape[0],shape[1],shape[2]))
@@ -268,49 +349,36 @@ class UKCensusAnswer(ans.Answer):
             self.rel_probs[i,:,:,:] = p
 
     def calc_probs_household(self,facts):
+        #returns p(oa|household)
         oas = self.get_list_of_oas(facts)
-        threadData = []
-        threads = []
-        for oa in oas:
-            data = [0]
-            threadData.append(data)
-            t = Thread(target=UKCensusAnswer.getHouseholdDist,args=(oa,data))
-            threads.append(t)
-            t.start()
-
-        for t in threads:
-            t.join()
-
-        localDists = [td[0] for td in threadData]
+        localDists = self.getDist(oas,UKCensusAnswer.getHouseholdDist)
 
         shape = localDists[0].shape
         self.household_probs = np.empty((len(localDists),shape[0],shape[1],shape[2]))
         for i,p in enumerate(localDists): 
             self.household_probs[i,:,:,:] = p
 
+    def calc_probs_travelToWork(self,facts):
+        #returns p(oa|travelToWork)
+        oas = self.get_list_of_oas(facts)
+        localDists = self.getDist(oas,UKCensusAnswer.getTravelToWorkDist)
+       
+        shape = localDists[0].shape
+        self.traveltowork_probs = np.empty((len(localDists),shape[0]))
+        for i,p in enumerate(localDists): 
+            self.traveltowork_probs[i,:] = p
+
+
 
     def calc_probs_age(self,facts):
-        oas = self.get_list_of_oas(facts)
-        logging.info('calc_probs_age')
-        logging.info('  OAs:')
-        for oa in oas:
-            logging.info('      %s' % oa)
-        threadData = []
-        threads = []
+        oas = self.get_list_of_oas(facts)        
         oas.append('K04000001') #last OA is whole of England+Wales
-        for oa in oas:
-            data = [0]
-            threadData.append(data)
-            t = Thread(target=UKCensusAnswer.getAgeDist,args=(oa,data))
-            threads.append(t)
-            t.start()
-
-        for t in threads:
-            t.join()
-
-        localAgeDists = [td[0] for td in threadData[:-1]]
-        logging.info('  localAgeDists has %d items' % len(localAgeDists))
-        nationalAgeDist = threadData[-1][0]
+        data = self.getDist(oas,UKCensusAnswer.getAgeDist)
+        localAgeDists = data[:-1]
+        nationalAgeDist = data[-1]
+        
+        self.localAgeDists = localAgeDists
+        self.nationalAgeDist = nationalAgeDist
 
         #we want p(postcode|age), which we assume is equal to p(output area|age)
         #if n = number of people in output area
@@ -346,7 +414,7 @@ class UKCensusAnswer(ans.Answer):
         @pm.deterministic    
         def givenAgeGender(age=features['factor_age'],oa=features['oa']):
             pAgeGender = probs
-            return pAgeGender[age,oa]
+            return pAgeGender[age,oa] #P(oa|age)
         return givenAgeGender
 
     def get_pymc_function_religion(self,features):
@@ -369,7 +437,7 @@ class UKCensusAnswer(ans.Answer):
                 age_p = 5
             else:
                 age_p = 6
-            return pReligion[oa,gender,age_p]
+            return pReligion[oa,gender,age_p] #P(religion|oa,gender,age)
         return givenReligion
     
     def get_pymc_function_household(self,features):
@@ -388,7 +456,7 @@ class UKCensusAnswer(ans.Answer):
                 age_p = 3
             else:
                 age_p = 4
-            return pHousehold[oa,gender,age_p]
+            return pHousehold[oa,gender,age_p] #P(household|gender,age)
         return givenReligion
     
 
@@ -421,6 +489,9 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_age(facts)
         self.calc_probs_religion(facts)
         self.calc_probs_household(facts)
+        self.calc_probs_travelToWork(facts)
+        self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.
+        
         if not 'factor_age' in features:
             p = np.ones(101) #flat prior
             p = p/p.sum()

@@ -17,6 +17,11 @@ from zipfile import ZipFile
 import shutil
 from integrate_location import parseCountry
 
+import logging
+import config
+logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
+
+
 class PostalAnswer(ans.Answer):
     """Postal answer: handles getting the postcode or zipcode, or equivalent"""
 
@@ -125,7 +130,7 @@ class PostalAnswer(ans.Answer):
             print "State %s:" %state
             print "    Requesting processed CSV file"
             url = 'http://mcdc.missouri.edu/cgi-bin/broker?_PROGRAM=websas.geocorr12.sas&_SERVICE=bigtime&site=OSEDA%%2FMCDC%%2FUniv.+of+Missouri&state=%s&g1_=zcta5&g2_=bg&wtvar=pop10&nozerob=1&csvout=1&lstfmt=txt&namoptf=b&namoptr=b&title=s1&counties=&metros=&places=&distance=&y0lat=&x0long=&locname=&nrings=&r1=&r2=&r3=&r4=&r5=&r6=&r7=&r8=&r9=&r10=&lathi=&latlo=&longhi=&longlo=&_DEBUG=0' % (state)
-            html = urllib2.urlopen(url).read()    
+            html = urlopen.urllib2(url).read()    
             csvfile = re.findall('href="([^"]*)"',html)[0]
             csvfile = 'http://mcdc.missouri.edu' + csvfile
             print "    Downloading CSV file (%s)" % csvfile
@@ -158,7 +163,7 @@ class PostalAnswer(ans.Answer):
 
      
     @classmethod
-    def adjustcode(cls,postcode):
+    def adjustpostcode(cls,postcode):
         """Formats postcode into 7 character format, so "a1 2cd" becomes "A1  2CD" or "Gl54 1AB" becomes "GL541AB"."""
         postcode = postcode.upper()
         res = re.search('([A-Z]{1,2}[0-9]{1,2}) *([0-9][A-Z]{2})',postcode);
@@ -170,7 +175,17 @@ class PostalAnswer(ans.Answer):
             last = groups[1]
             middle = " "*(7-(len(first)+len(last)))
             return first+middle+last
-        return postcode #TODO can't understand it, just send it back, need to do something better, throw an exception?
+        return postcode 
+    
+    @classmethod
+    def adjustzipcode(cls,zipcode):
+        """Formats postcode into 5 numerical digits format, so "AZ 12345" becomes "12345"."""
+        res = re.search('[A-Z]* *([0-9]{5}) *',zipcode)
+        if (res==None):
+            return zipcode #TODO can't understand it, just send it back
+        groups = res.groups()
+        if len(groups)>0:
+            return groups[0]
     
     def __init__(self,name,dataitem,itemdetails,answer=None):
         """Constructor, instantiate an answer
@@ -207,14 +222,16 @@ class PostalAnswer(ans.Answer):
                     facts['where'] = {}
                 facts['where']['country'] = [{'item':country,'probability':1.}]
 
-    def append_facts_zipcode(self,facts):       
-            zipcode = self.answer;
+    def append_facts_zipcode(self,facts):   
+            zipcode = PostalAnswer.adjustzipcode(self.answer);    
             c_blockgroups = PostalAnswer._us_geo.execute("SELECT blockgroup, tract, county, state, cntyname, zipname, pop10, afact FROM us_geo WHERE zcta5=? LIMIT 999;",(zipcode,));
             block = None;
             if 'where' not in facts:
                 facts['where'] = {};            
             cities = {}
+            logging.info('Appending zipcode facts')
             for r in c_blockgroups:
+                logging.info(r[0])
                 blockgroup = r[0]
                 tract = r[1]
                 tract = tract[0:4]+tract[5:] #the database has the decimal point in the tract. This puts it into the 6digit form: 1234.01 -> 123401
@@ -241,7 +258,7 @@ class PostalAnswer(ans.Answer):
             facts['where']['country'] = [{'item':'us','probability':1.}]  #TODO Check what country names we should be using
 
     def append_facts_postcode(self,facts):                   
-            postcode = PostalAnswer.adjustcode(self.answer);
+            postcode = PostalAnswer.adjustpostcode(self.answer);
 
             c_oa = PostalAnswer._geo.execute("SELECT oa11, geo.lsoa11 as lsoa, name, lat, long FROM geo, names WHERE pcd=? AND names.lsoa11=geo.lsoa11;",(postcode,));
             oa = None;
@@ -249,11 +266,14 @@ class PostalAnswer(ans.Answer):
                 oa = r[0]
                 lsoa = r[1]
                 city = r[2]
+                lat = r[3]
+                lon = r[4]
             if 'where' not in facts:
                 facts['where'] = {};
             if (oa != None):
                 facts['where']['ukcensus'] = [{'probability':1., 'level':'oa', 'item':oa}]
                 facts['where']['city'] = [{'item':(city,'uk'),'probability':1.}]
+                facts['where']['latlong'] = [{'item':(lat,lon),'probability':1.}]
             facts['where']['country'] = [{'item':'gb','probability':1.}]
 
     @classmethod

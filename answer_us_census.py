@@ -15,6 +15,10 @@ from zipfile import ZipFile
 import csv
 from threading import Thread
 
+import logging
+import config
+logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
+
 #Some helpful functions
 def hasNumbers(strings):
     '''Returns true if any of the strings in the 'strings' array have a digit in them.'''
@@ -59,8 +63,38 @@ class USCensusAnswer(ans.Answer):
     _age_range = np.array([4,9,14,17,19,20,21,24,29,34,39,44,49,54,59,61,64,66,69,74,79,84])+1 #added one as the numbers here are the end of each range, not the start of each.
     _states = ['Mo29','Al01','Ak02','Az04','Ar05','Ca06','Co08','Ct09','De10','Dc11','Fl12','Ga13','Hi15','Id16','Il17','In18','Ia19','Ks20','Ky21','La22','Me23','Md24','Ma25','Mi26','Mn27','Ms28','Mt30','Ne31','Nv32','Nh33','Nj34','Nm35','Ny36','Nc37','Nd38','Oh39','Ok40','Or41','Pa42','Ri44','Sc45','Sd46','Tn47','Tx48','Ut49','Vt50','Va51','Wa53','Wv54','Wi55','Wy56']
     def insights(self,inference_result,facts):
-        return []
-
+    
+        if self.prob_in_us(facts)<0.01:
+            return [] #we're not in the uk
+            
+        insightslist = []
+        insightslist.append("US Census insights")
+        ages = np.zeros([2,23])
+        area_ratios = self.get_list_of_bg_probs(facts)
+        for i,ratio in enumerate(area_ratios):
+            #dist= np.sum(self.localAgeDists[i,0,:],0)
+            ages = ages + self.localAgeDists[i,0,:] * ratio
+           
+        ages_combined = np.sum(ages,0)
+        logging.info(ages)
+        gender_bias = (1.0*(ages[0,:]-ages[1,:])) #originally divided by the sum, but important to consider absolute values as the relative values can show spurious results with small numbers of people.
+        if (np.min(gender_bias)<-100):
+            idx = np.argmin(gender_bias)            
+            prop = ((1.0*(ages[1,idx]/ages[0,idx])))
+            odd_age = USCensusAnswer._age_range[idx]
+            insightslist.append('There are %d %% more women than men aged %d to %d living in your area.' % (prop, odd_age, odd_age+5))
+        if (np.max(gender_bias)>100):
+            idx = np.argmax(gender_bias)
+            prop = ((1.0*(ages[0,idx]/ages[1,idx])))
+            odd_age = USCensusAnswer._age_range[idx] #fix odd_age + 5...
+            insightslist.append('There are %0.1f times more men than women aged %d to %d living in your area.' % (prop, odd_age, odd_age+5))
+           
+        halfway = np.sum((np.cumsum(ages_combined)/np.sum(ages_combined))<0.5)
+        
+        insightslist.append(str(ages))
+        insightslist.append("Half the people in your area are under the age of %d" % (USCensusAnswer._age_range[halfway]))
+        return insightslist
+        
     @classmethod
     def USCensusApiQuery(cls,geoloc,variables):
         """Performs an API query to the US Census database, for the given location and variable 
@@ -188,7 +222,10 @@ class USCensusAnswer(ans.Answer):
         localAgeDists = np.array([td[0] for td in threadData[:-1]])
         nationalAgeDist = np.array(threadData[-1][0])
        
-
+       
+        self.localAgeDists = localAgeDists
+        self.nationalAgeDist = nationalAgeDist
+        
         #we want p(postcode|age), which we assume is equal to p(output area|age)
         #if n = number of people in output area
         #   N = number of people
@@ -276,5 +313,5 @@ class USCensusAnswer(ans.Answer):
 
     @classmethod
     def metaData(cls):
-        return {'citation':'The <a href="http://www.census.gov/developers/">US census bureau</a>'}
+        return {'citation':'The <a href="http://www.census.gov/developers/">US census bureau</a>. In particular the American Community Survey <a href="http://www.census.gov/data/developers/data-sets/acs-survey-5-year-data.html">5 year data</a>.'}
 

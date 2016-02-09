@@ -18,14 +18,16 @@ class LifestyleAnswer(ans.Answer):
     def init_db(cls):
         pass
 
-    def __init__(self,name,dataitem,movie,answer=None):
+    def __init__(self,name,dataitem,detail,answer=None):
         LifestyleAnswer.init_db()
         self.dataitem = dataitem
-        self.movie = movie
+        self.detail = detail
         self.answer = answer
         self.featurename = name
         
     def question_to_text(self):
+        if (self.dataitem=='workplace'):
+            return {'question':"Where do you work?",'type':'text'};
     	if (self.dataitem=='cats'):
             return {'question':"How many cats do you have?",'type':'text'};
     	if (self.dataitem=='guns'):
@@ -35,6 +37,6 @@ class LifestyleAnswer(ans.Answer):
         
     @classmethod
     def pick_question(self,questions_asked,facts,target):
-        dataitem = random.choice(['cats','guns','travel'])
+        dataitem = random.choice(['cats','guns','travel','workplace'])
         return dataitem,''
 

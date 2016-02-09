@@ -8,6 +8,12 @@ import sqlite3
 import answer as ans
 import json
 
+
+import logging
+import config
+logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
+
+
 from StringIO import StringIO
 from zipfile import ZipFile
 
@@ -33,6 +39,7 @@ class FacebookAnswer(ans.Answer):
         self.itemdetails = itemdetails #not sure this is used yet
         self.featurename = name
         self.answer = answer
+        
         if ((answer==None) or (len(answer)<2)):
             return
         try:

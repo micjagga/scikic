@@ -10,6 +10,13 @@ import pickle
 import answer as ans
 import config
      
+import json
+import logging
+import config
+logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
+
+
+
 from StringIO import StringIO
 from zipfile import ZipFile
 
@@ -193,7 +200,14 @@ class BabyNamesAnswer(ans.Answer):
     #    male[:,1,1].argmax()
         if 'first_name' in facts:
             name = facts['first_name']
-            return ["You're called %s" % name]
+            insightlist = []
+            insightlist.append("You're called %s" % name)
+            ages = self.probs[:,0,1]+self.probs[:,1,1]
+            ps = np.cumsum(ages)/np.sum(ages)
+            insightlist.append('People with your name are mostly aged between %d and %d' % (sum(ps<0.1), sum(ps<0.9)));
+            maxage = 2015-np.argmax(ps);
+            insightlist.append('Your name was most popular in about %d' % maxage);
+            return insightlist
         else:
             return []
         
@@ -201,7 +215,7 @@ class BabyNamesAnswer(ans.Answer):
     def question_to_text(self):
         if (self.dataitem=='name'):
             return "What's your name?"#TODO We don't need to ask a question, get it from Facts dictionary.
-        return "Some sort of census question..."
+        return "No question."
 
     @classmethod
     def pick_question(self,questions_asked,facts,target):
@@ -245,7 +259,9 @@ class BabyNamesAnswer(ans.Answer):
 
         p_male = ans.distribute_probs(p_male,ages)
         p_female = ans.distribute_probs(p_female,ages)
-
+        
+        
+        
         self.probs = np.zeros([101,2,2])
         self.probs[:,0,1] = p_male#*5000
         self.probs[:,0,0] = 1-p_male#*5000
