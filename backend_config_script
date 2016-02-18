@@ -29,6 +29,7 @@ source ~/.bashrc #load new env variables
 conda install -y -c pymc pymc
 conda install -y -c https://conda.binstar.org/jjhelmus pyproj
 pip install overpy
+pip install urlopen
 pip install pyshp
 sudo apt-get -y update
 sudo apt-get -y install libgeos-dev
