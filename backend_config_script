@@ -30,11 +30,17 @@ sudo apt-get -y install nginx
 #set up automatically starting, etc
 sudo cp ~/scikic/scikic.conf /etc/init
 sudo cp ~/scikic/nginx_default_conf /etc/nginx/sites-enabled/default
+sudo cp ~/scikic/gunicorn_scikic.py /etc/gunicorn.d/scikic.py
 
 #ensure location is available for data
 mkdir ~/api-data
 touch ~/api-data/logging.log
 touch ~/api-data/error.log
+
+sudo touch /var/log/nginx/scikic.log
+sudo chown ubuntu /var/log/nginx/scikic.log
+sudo chgrp ubuntu /var/log/nginx/scikic.log
+sudo service nginx restart
 
 #initialise the database (this will take a LONG time)
 cd ~/scikic
