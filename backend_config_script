@@ -1,6 +1,20 @@
 #!/bin/bash
 
-#Run this on an AWS ubuntu instance, with a volume attached at /dev/xvdf
+#Setting up backend:
+#
+#First:
+# Create ubuntu 14.04 instance
+# t2.medium
+# Protect against accidental termination
+# Size: 30Gb [just have it as one image, easier to manage]
+# Security group: Production backend
+# keyfile: m.t.smith@sheffield.ac.uk_scikic1.pem
+#
+# sudo apt-get update
+# sudo apt-get -y install git
+# git clone https://github.com/scikic/scikic.git
+# cd scikic
+# ./backend_config_script
 
 #install software (git will already be installed, to get this file)
 sudo apt-get update
@@ -26,6 +40,8 @@ conda install -y shapely
 #for hosting etc
 pip install gunicorn
 sudo apt-get -y install nginx
+sudo apt-get -y install gunicorn
+
 
 #set up automatically starting, etc
 sudo cp ~/scikic/scikic.conf /etc/init
@@ -40,6 +56,17 @@ touch ~/api-data/error.log
 sudo touch /var/log/nginx/scikic.log
 sudo chown ubuntu /var/log/nginx/scikic.log
 sudo chgrp ubuntu /var/log/nginx/scikic.log
+
+sudo touch /var/log/gunicorn/error.log
+sudo chown ubuntu /var/log/gunicorn/error.log
+sudo chgrp ubuntu /var/log/gunicorn/error.log
+
+sudo touch /var/log/gunicorn/access.log
+sudo chown ubuntu /var/log/gunicorn/access.log
+sudo chgrp ubuntu /var/log/gunicorn/access.log
+
+
+sudo start scikic
 sudo service nginx restart
 
 #initialise the database (this will take a LONG time)
