@@ -14,7 +14,7 @@ app = Flask(__name__)
 # TO DO, add error handlers http://flask.pocoo.org/docs/0.10/patterns/apierrors/
 # TO DO, stop errors showing up on client
 
-file_handler = FileHandler('/var/log/scikic/error.log')
+file_handler = FileHandler(config.pathToData+'error.log')
 file_handler.setLevel(logging.WARNING)
 app.logger.addHandler(file_handler)
 
