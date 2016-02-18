@@ -29,6 +29,8 @@ sudo apt-get -y install nginx
 
 #set up automatically starting, etc
 sudo cp ~/scikic/scikic.conf /etc/init
+sudo cp ~/scikic/nginx_default_conf /etc/nginx/sites-enabled/default
+
 #ensure location is available for data
 mkdir ~/api-data
 touch ~/api-data/logging.log
