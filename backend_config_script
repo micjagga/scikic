@@ -23,6 +23,12 @@ sudo apt-get -y install libopenblas-dev
 conda install -y geos
 conda install -y shapely
 
+#for hosting etc
+pip install gunicorn
+sudo apt-get -y install nginx
+
+#set up automatically starting, etc
+sudo cp ~/scikic/scikic.conf /etc/init
 #ensure location is available for data
 mkdir ~/api-data
 touch ~/api-data/logging.log
