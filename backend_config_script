@@ -11,18 +11,18 @@
 # keyfile: m.t.smith@sheffield.ac.uk_scikic1.pem
 
 #install git
-# sudo apt-get -y install git
+#  sudo apt-get -y install git
 #
 #install anaconda (TODO: Anaconda might change version, update here).
-# wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda-2.2.0-Linux-x86_64.sh
-# bash Anaconda-2.2.0-Linux-x86_64.sh
+#  wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.5.0-Linux-x86_64.sh
+#  bash Anaconda2-2.5.0-Linux-x86_64.sh
 #
 #LOG OUT AND LOG BACK IN! (so Anaconda's changes can take effect)
 #
 #install scikic
-# git clone https://github.com/scikic/scikic.git
-# cd scikic
-# ./backend_config_script
+#  git clone https://github.com/scikic/scikic.git
+#  cd scikic
+#  ./backend_config_script
 
 source ~/.bashrc #load new env variables
 #install conda modules
