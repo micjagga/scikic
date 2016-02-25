@@ -6,6 +6,7 @@ import numpy as np
 import logging
 from logging import FileHandler
 
+from psych.jsonExtractor import jsonExtractor
 
 from flask import request
 from flask import Flask
@@ -76,5 +77,22 @@ def route_metadata():
     metadata = inference.get_meta_data(data)
     return json.dumps(metadata)
 
-#if __name__ == '__main__':
-#    app.run(host='127.0.0.1', port=4000)
+@app.route('/psych', methods=['POST'])
+def route_psych(): 
+    data = parse_json(request.data)
+    if 'typelist' in data:
+        predictTypeList = data['typelist']
+    else:
+        predictTypeList = ['ope','con','ext','agr','neu'] 
+    
+    user_status = data['userstatus']
+    je = jsonExtractor()
+    jsonStr =  je.getJsonStr(user_status, predictTypeList)
+
+
+
+    metadata = inference.get_meta_data(data)
+    return json.dumps(metadata)
+    
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=4000)
