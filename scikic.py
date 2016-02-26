@@ -8,6 +8,7 @@ from logging import FileHandler
 
 from psych.jsonExtractor import jsonExtractor
 
+from flask import jsonify
 from flask import request
 from flask import Flask
 app = Flask(__name__)
@@ -19,15 +20,23 @@ file_handler = FileHandler(config.pathToData+'error.log')
 file_handler.setLevel(logging.WARNING)
 app.logger.addHandler(file_handler)
 
+
 def parse_json(data):
     try:
         out = json.loads(data)
     except ValueError:
-        print "Invalid JSON"
-        exit()
+        raise InvalidAPIUsage('Invalid json')
     except TypeError:
-        print "Missing API query JSON"
-        exit()
+        raise InvalidAPIUsage('Invalid json')
+        
+    if ('apikey' not in out):
+        raise InvalidAPIUsage('Missing apikey json parameter')
+        
+    if ('version' not in out):
+        raise InvalidAPIUsage('Missing version json parameter')
+        
+    if ('data' not in out):
+        raise InvalidAPIUsage('Missing data json parameter')
         
     apikey = out['apikey']
     version = out['version']
@@ -52,6 +61,27 @@ def recursive_numpy_array_removal(arr):
         return out
     return arr
 
+
+class InvalidAPIUsage(Exception):
+    status_code = 400
+    def __init__(self, message, status_code=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+
+
+    def to_dict(self):
+        rv = dict()
+        rv['message'] = self.message
+        return rv
+
+@app.errorhandler(InvalidAPIUsage)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
 @app.route('/', methods=['GET', 'POST'])
 def root():
     return "Root node"
@@ -70,7 +100,11 @@ def route_question():
     question = inference.pick_question(data)    
     question_string = inference.get_question_string(question['question'])
     return json.dumps({'question':question['question'], 'facts':question['facts'], 'question_string':question_string})
-  
+
+@app.route('/version', methods=['GET','POST'])
+def route_version():     
+    return json.dumps({'version':'1.0'})
+      
 @app.route('/metadata', methods=['POST'])
 def route_metadata(): 
     data = parse_json(request.data)  
@@ -85,14 +119,13 @@ def route_psych():
     else:
         predictTypeList = ['ope','con','ext','agr','neu'] 
     
+    if 'userstatus' not in data:
+        raise InvalidAPIUsage('psychometrics requires a "userstatus" parameter.')
+        
     user_status = data['userstatus']
     je = jsonExtractor()
-    jsonStr =  je.getJsonStr(user_status, predictTypeList)
-
-
-
-    metadata = inference.get_meta_data(data)
-    return json.dumps(metadata)
+    jsonStr = je.getJsonStr(user_status, predictTypeList)
+    return jsonStr
     
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=4000)
+    app.run(debug=False,host='0.0.0.0', port=4567)

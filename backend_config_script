@@ -23,6 +23,18 @@
 #  git clone https://github.com/scikic/scikic.git
 #  cd scikic
 #  ./backend_config_script
+#
+#Next configure AWS:
+#  find the instance and create an image (call it scikic_backend_image)
+#  In 'AMI's you'll see the new image
+#  next...
+#  Create Launch Configuration
+#    click 'My AMIs'
+#    select the image you just made
+#    choose t2.medium
+#    name "Scikic backend LC"
+#create a new autoscaling group that uses this Launch Configuration
+
 
 source ~/.bashrc #load new env variables
 #install conda modules
