@@ -1,0 +1,44 @@
+on load balancer:
+ - add listener to port 443 (TCP protocol) -> instance protocol TCP (port 443).
+
+sudo git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
+cd /opt/letsencrypt/
+sudo service nginx stop
+sudo ./letsencrypt-auto --standalone certonly -d api.scikic.org 
+sudo service nginx start
+
+on load balancer:
+ - remove listener on port 443 (TCP)
+ - add new HTTPS listener. Upload certificates from /etc/letsencrypt/live/api.scikic.org:
+    privkey.pem
+    cert.pem
+    chain.pem
+    
+installing aws cli
+ pip install awscli
+ [visit the IAM console: https://console.aws.amazon.com/iam/home?#home ]
+ 
+ IAM management -> Groups -> create admin. permissions: AdministratorAccess.
+ IAM management -> Users -> Create New Users -> msmith [get creditials] -> add them to the admin group.
+
+run
+  aws configure
+  [add credentials] [default region name eu-west-1]
+test
+  aws ec2 describe-instances
+
+cd ~  
+mkdir tempcerts
+sudo su
+cp /etc/letsencrypt/live/api.scikic.org/* /home/ubuntu/tempcerts
+exit
+cd /home/ubuntu/tempcerts
+sudo chmod 644 *
+
+aws iam upload-server-certificate --server-certificate-name scikic_cert1 --certificate-body file://cert.pem --private-key file://privkey.pem
+
+cd /home/ubuntu
+rm -rf tempcerts
+
+go to load balancer -> Actions edit listener -> SSL Cert -> Choose an existing... -> select the certificate we've just made.
+ 
