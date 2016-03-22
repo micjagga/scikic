@@ -5,10 +5,9 @@ import csv
 from numpy import log2
 from nltk import *
 from happierfuntokenizing_p2 import *
+from langdetect import detect
 
-import os
 
-TEST_FILENAME = os.path.join(os.path.dirname(__file__), 'test.txt')
 
 class TextProcessing(object):
     """
@@ -16,8 +15,8 @@ class TextProcessing(object):
     """
     
     def __init__(self):
-        word_dic_path = os.path.join(os.path.dirname(__file__), 'dic/dic_word.csv') # """./dic/dic_word.csv"""
-        topic_dic_path = os.path.join(os.path.dirname(__file__), 'dic/dic_topic.csv') #"""./dic/dic_topic.csv"""
+        word_dic_path = """./dic/dic_word.csv"""
+        topic_dic_path = """./dic/dic_topic.csv"""
         self.topic_num = 2000
         
         self.word_dic = self.loadDic(word_dic_path, 'word')
@@ -118,6 +117,12 @@ class TextProcessing(object):
         return dic
     
  
+    def languageDetection(self, s):
+        """ detect the language in string s """
+        lan = detect(s)
+        return lan
+        
+        
     def removeNonAscii(self,s): 
         """ remove non-ascii characters from text"""
         
@@ -143,5 +148,7 @@ class TextProcessing(object):
         s = startSpace.sub('',s)
         s = newlines.sub(' <NEWLINE> ',s)
         return s
+    
+     
     
  
