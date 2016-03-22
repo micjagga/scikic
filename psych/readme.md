@@ -3,6 +3,8 @@
 # install required python packages
 '''
 pip install numpy six dateutil pyparsing scipy nltk scikit-learn
+langdetect 1.0.5 https://pypi.python.org/pypi/langdetect
+flask https://pypi.python.org/pypi/Flask
 '''
 
 # file 
@@ -12,6 +14,7 @@ pip install numpy six dateutil pyparsing scipy nltk scikit-learn
 - Predictor.py: a Class of predictor which contains the train and test functions
 - TextProcessing.py: a Class of text related processing
 - happierfuntokenizing.py: a Class of text tokenizing
+
 '''
 
 # directory
