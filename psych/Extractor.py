@@ -31,9 +31,12 @@ class Extractor(object):
         Returns:
             jsonStr: a Json String, e.g., {"ope": 4.2, "neu": 2.31, "con": 3.09, "ext": 3.69, "agr": 3.08}  
         """
-        #Modified to handle the fact this isn't necessarily run in the psych folder.
-        path_to_psych = os.path.dirname(os.path.realpath(__file__))
-        model_path = os.path.join(path_to_psych,"""model/""")
+        
+        #hack to make this work from any directory.
+        import sys
+        sys.path.insert(1,os.path.dirname(__file__))
+        model_path =  os.path.join(os.path.dirname(__file__), """model/""")
+        
         data = OrderedDict()
         
         tp = TextProcessing()
@@ -61,10 +64,11 @@ class Extractor(object):
             66.06% means that the input score is higher than 66.06% of the scores of 3.1M users 
 
         """
-        #Modified to handle the fact this isn't necessarily run in the psych folder.        
-        path_to_psych = os.path.dirname(os.path.realpath(__file__))
-        root_path = os.path.join(path_to_psych,"""dic/""")        
-  
+        
+        import sys
+        sys.path.insert(1,os.path.dirname(__file__))
+        root_path =  os.path.join(os.path.dirname(__file__), """dic/""")
+        
    
         data = OrderedDict() 
         for k, v in score.items():

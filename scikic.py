@@ -6,7 +6,7 @@ import numpy as np
 import logging
 from logging import FileHandler
 
-from psych.jsonExtractor import jsonExtractor
+from psych.Extractor import Extractor
 
 from flask import jsonify
 from flask import request
@@ -123,9 +123,16 @@ def route_psych():
         raise InvalidAPIUsage('psychometrics requires a "userstatus" parameter.')
         
     user_status = data['userstatus']
-    je = jsonExtractor()
-    jsonStr = je.getJsonStr(user_status, predictTypeList)
-    return jsonStr
+    
+    ##Change to reflect update in Xingjie's code:
+    ext = Extractor()
+    lan = ext.isEnglish(user_status)
+    if lan == True:
+        score = ext.getScore(user_status, predictTypeList)
+        perc = ext.getPercentile(score)
+        return json.dumps({'scores':score, 'percentiles':perc})    
+    else:
+        raise InvalidAPIUsage('Language not English. Other languages not yet supported.')
     
 if __name__ == '__main__':
     app.run(debug=False,host='0.0.0.0', port=4567)
