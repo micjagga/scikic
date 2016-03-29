@@ -57,8 +57,8 @@ class jsonExtractor(object):
         Args:
             jsonScore: a json string which contains the big5 score
                      e.g., {"ope": 4.25, "con": 3.14, "ext": 3.58, "agr": 3.33, "neu": 2.22}
-        Return: a Json string, e.g., {"ope": -100%, "con": 0%, "ext": 100%, "agr": 100%, "neu": 0%}
-            80% means that the input score is higher than 80% of the scores of 3.1M users 
+        Return: a Json string, e.g., {"ope": 66.06, "ext": 48.35, "neu": 31.47, "agr": 24.57, "con": 29.8}
+            66.06% means that the input score is higher than 66.06% of the scores of 3.1M users 
 
         """
         
@@ -77,7 +77,16 @@ class jsonExtractor(object):
             
         jsonStr = json.dumps(data)
         return jsonStr
-            
+    
+    def getKeyWords(self, text, trait_list, N):
+        """ 
+        add later
+        
+        Args: 
+            text: input text
+            trait_list: trait needs to analysis, e.g., ['ope', 'ext']
+            N: number of words needs to return at most () 
+        """        
             
     def loadData(self,dataPath, skiprow, startCol):
         '''
