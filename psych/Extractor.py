@@ -1,4 +1,3 @@
-import json
 import numpy as np
 from scipy import stats
 import math
@@ -8,19 +7,19 @@ from TextProcessing import TextProcessing
 from collections import OrderedDict
 
 
-
 fullList = ['ope','con','ext','agr','neu'] 
-class jsonExtractor(object):
-    """ Json object related processes 
+class Extractor(object):
+    """ Wrapper, which manages the processing of the input data.
     
      Attributes:
          self.typeList: contains the big5 trait list which need to be returned
                    default: return all big5 traits
                    full list: ['ope','con','ext','agr','neu']
+
+     Notes:
+         this class and methods no longer use json objects, so I've changed the name of the class -- Mike.
     
     """
-    
-
     
     
     def getScore(self, text, typeList=['ope','con','ext','agr','neu']):
@@ -47,12 +46,11 @@ class jsonExtractor(object):
                 model = joblib.load(model_path+model_name)
                 y_pred = model.test(X)  
                 data[t] = y_pred[0]
-        
-        jsonStr = json.dumps(data)
-        return jsonStr
+
+        return data
     
     
-    def getPercentile(self, jsonScore):
+    def getPercentile(self, score):
         """ get the percentile of the big5 scores in a score list of about 3.1M users
         Args:
             jsonScore: a json string which contains the big5 score
@@ -66,7 +64,6 @@ class jsonExtractor(object):
   
    
         data = OrderedDict() 
-        score = json.loads(jsonScore)
         for k, v in score.items():
             dic_path = root_path+'percentile_'+k+'.csv'
             dic_data = self.loadData(dic_path, 1, 0)
@@ -75,8 +72,7 @@ class jsonExtractor(object):
             ind = self.find_nearestInd(dic_key,v)
             data[k] = round(dic_percent[ind], 2)
             
-        jsonStr = json.dumps(data)
-        return jsonStr
+        return data
     
     def getKeyWords(self, text, trait_list, N):
         """ 
