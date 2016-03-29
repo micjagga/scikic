@@ -9,10 +9,10 @@ import answer as ans
 import pickle
 import answer as ans
 import config
+import requests
      
 import json
 import logging
-import config
 logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
 
 
@@ -82,17 +82,34 @@ class BabyNamesAnswer(ans.Answer):
         #1. download historic data and put into a pandas dataframe
         print "Downloading historic dataset"
         url = 'http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/top-100-baby-names-historical-data.xls'
-        socket = urllib2.urlopen(url)
-        xd = pd.ExcelFile(socket)
+        #REPLACING THE URLLIB2 CALL WITH REQUESTS, AS URLLIB2 DOESN'T SEEM TO BE ABLE TO DO REDIRECTS
+        #socket = urllib2.urlopen(url)
+        #xd = pd.ExcelFile(socket)
+        r = requests.get(url,stream=True)
+        handle = open('/tmp/top-100-baby-names-historical-data.xls', 'wb')
+        for block in r.iter_content(1024):
+            handle.write(block)
+        handle.close()
+        xd = pd.ExcelFile('/tmp/top-100-baby-names-historical-data.xls')
+    
         ranks = {}
         ranks['boys'] = xd.parse(sheetname='Boys',header=0,skiprows=[0,1,2,4],skip_footer=2,index_col=0)
         ranks['girls'] = xd.parse(sheetname='Girls',header=0,skiprows=[0,1,2,4],skip_footer=2,index_col=0)
         #2. download recent data and put into pandas DF (requires construction of new headers)
         print "Downloading recent dataset"
         url = 'http://www.ons.gov.uk/ons/about-ons/business-transparency/freedom-of-information/what-can-i-request/published-ad-hoc-data/pop/august-2014/baby-names-1996-2013.xls'
-        socket = urllib2.urlopen(url)
+        #socket = urllib2.urlopen(url)
+        #xd = pd.ExcelFile(socket)
+        r = requests.get(url,stream=True)
+        handle = open('/tmp/baby-names-1996-2013.xls', 'wb')
+        for block in r.iter_content(1024):
+            handle.write(block)
+        handle.close()            
+        xd = pd.ExcelFile('/tmp/baby-names-1996-2013.xls')
 
-        xd = pd.ExcelFile(socket)
+
+        
+        
         sheet = {}
         sheet['boys'] = xd.parse(sheetname='Boys',skiprows=4, index_col=0,skip_footer=3,na_values=':')
         sheet['girls'] = xd.parse(sheetname='Girls',skiprows=4, index_col=0,skip_footer=3,na_values=':')
