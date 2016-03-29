@@ -43,6 +43,7 @@ conda install -y -c https://conda.binstar.org/jjhelmus pyproj
 pip install overpy
 pip install urlopen
 pip install pyshp
+pip install langdetect
 sudo apt-get -y update
 sudo apt-get -y install libgeos-dev
 sudo apt-get -y install libopenblas-dev
