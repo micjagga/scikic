@@ -15,8 +15,10 @@ class TextProcessing(object):
     """
     
     def __init__(self):
-        word_dic_path = """./dic/dic_word.csv"""
-        topic_dic_path = """./dic/dic_topic.csv"""
+        #Modified to handle the fact this isn't necessarily run in the psych folder.
+        path_to_psych = os.path.dirname(os.path.realpath(__file__))
+        word_dic_path = os.path.join(path_to_psych,"""dic/dic_word.csv""")
+        topic_dic_path = os.path.join(path_to_psych,"""dic/dic_topic.csv""")
         self.topic_num = 2000
         
         self.word_dic = self.loadDic(word_dic_path, 'word')

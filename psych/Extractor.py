@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import stats
 import math
+import os
 
 from sklearn.externals import joblib
 from TextProcessing import TextProcessing
@@ -30,8 +31,9 @@ class Extractor(object):
         Returns:
             jsonStr: a Json String, e.g., {"ope": 4.2, "neu": 2.31, "con": 3.09, "ext": 3.69, "agr": 3.08}  
         """
-        
-        model_path = """./model/"""
+        #Modified to handle the fact this isn't necessarily run in the psych folder.
+        path_to_psych = os.path.dirname(os.path.realpath(__file__))
+        model_path = os.path.join(path_to_psych,"""model/""")
         data = OrderedDict()
         
         tp = TextProcessing()
@@ -59,8 +61,9 @@ class Extractor(object):
             66.06% means that the input score is higher than 66.06% of the scores of 3.1M users 
 
         """
-        
-        root_path = """./dic/"""
+        #Modified to handle the fact this isn't necessarily run in the psych folder.        
+        path_to_psych = os.path.dirname(os.path.realpath(__file__))
+        root_path = os.path.join(path_to_psych,"""dic/""")        
   
    
         data = OrderedDict() 

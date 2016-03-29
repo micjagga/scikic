@@ -14,8 +14,6 @@ predictTypeList = ['ope','con','ext','agr','neu']
 msg = """The input is not English. Currently we only support English language."""
 
 ext = Extractor()
-
-
 lan = ext.isEnglish(user_status)
 if lan == True:
     score = ext.getScore(user_status, predictTypeList)
