@@ -159,20 +159,18 @@ class OSMAnswer(ans.Answer):
         
 
     def insights(self,inference_result,facts):
-        #returns a list of insights:
+        #returns a dictionary of insights:
         # - inference_result: probability distributions of the features
         # - facts: a dictionary of 'facts' provided by the Answer classes      
         
-        insightlist = []
-        insightlist.append("OSM Answer system online")
+        insights = {}
         ##Generate comparative insights...
         if 'where' in facts:
             if 'latlong' in facts['where']:
                 lat = facts['where']['latlong'][0]['item'][0]
                 lon = facts['where']['latlong'][0]['item'][1]
-                #insightlist.append([lat,lon])
                 
                 items = self.overpass_query(lat, lon ,0.1 ,'tourism', 'museum')
-                insightlist.append("There are %d museums in your town or area." % len(items))
-        return insightlist
+                insights['osm_museums'] = "There are %d museums in your town or area." % len(items)
+        return insights
 

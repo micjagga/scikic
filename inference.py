@@ -62,6 +62,7 @@ def do_inference(data):
     questions_asked = []
     unprocessed_questions = []
     facts = {}
+    datasets = None
 
     if 'questions_asked' in data:
         questions_asked = data['questions_asked']
@@ -69,12 +70,17 @@ def do_inference(data):
         unprocessed_questions = data['unprocessed_questions']
     if 'facts' in data: 
         facts = data['facts']
+    if 'datasets' in data:
+        datasets = data['datasets']
 
     #Some datasets we won't have asked questions about as they don't need question/answer responses (such as the babynames dataset,
     #which just gets its 'name' value from the 'facts' structure).
     #We still need to add these to our 'unprocessed_questions' array so that they get used.
     c = [cls for cls in ans.Answer.__subclasses__()]
     for cl in c:
+        if (datasets is not None): #allows us to only use a subset of classes if we wish
+            if cl.dataset not in datasets:
+                continue
         cl.init_db() #(normally should be started from an instance, but we don't really mind).
         dataitem, detail = cl.pick_question(questions_asked,facts,'')
         dataset = cl.dataset
@@ -124,10 +130,9 @@ def do_inference(data):
             mean += i*1.0*v
         output[o]['quartiles'] = {'lower':lower_range,'upper':upper_range,'mean':mean}
 
-    insights = []
+    insights = {}
     for a in answers:
-        insights.extend(a.insights(output, facts))
-
+        insights.update(a.insights(output, facts))
 
     return output, facts, insights
 

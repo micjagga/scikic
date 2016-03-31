@@ -35,7 +35,7 @@ class MusicAnswer(ans.Answer):
 
     def insights(self,inference_result,facts):  
         limit = 10      
-        #returns a list of insights:
+        #returns a dictionary of insights:
         # - inference_result: probability distributions of the features
         # - facts: a dictionary of 'facts' provided by the Answer classes
         ##location = facts['city'] #for example?
@@ -47,12 +47,12 @@ class MusicAnswer(ans.Answer):
             #facts['country'] maaaaaybe?
 
         if 'where' not in facts:
-            return []
+            return {'music_debug':'Location info missing from facts dictionary'}
         else:
             if 'city' not in facts['where']:
-                return []
+                return {'music_debug':'City info missing from facts dictionary'}
             if 'country' not in facts['where']:
-                return []
+                return {'music_debug':'Country info missing from facts dictionary'}
         
         event_names = []  
         event_datetimes = []
@@ -67,7 +67,7 @@ class MusicAnswer(ans.Answer):
             contents_r = str(page_r.read())
             r_r = ET.fromstring(contents_r)
         except urllib2.HTTPError:
-            return []
+            return {'music_debug':'Error accessing audioscrobbler'}
 
         global results_artist_name
         results_artist_name = []
@@ -100,11 +100,11 @@ class MusicAnswer(ans.Answer):
         if len(event_listings) == 0:
             if len(results_artist_name)>0:
                 x = random.randint(0,len(results_artist_name)-1)  
-                return ["Unfortunately there are no local events I think you'd like but why not give " + results_artist_name[x] + " a listen ?"]
+                return {'music_suggestion':"Unfortunately there are no local events I think you'd like but why not give " + results_artist_name[x] + " a listen ?"}
             else:
-                return []
+                return {}
         else:
-            return [self.output_events(event_listings, results_artist_name)]
+            return {'music_suggestion':self.output_events(event_listings, results_artist_name)}
 
     def find_local_events(self, artist, city, country):
         artist_formatted = artist.replace(" ", "%20")

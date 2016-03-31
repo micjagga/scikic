@@ -65,10 +65,10 @@ class USCensusAnswer(ans.Answer):
     def insights(self,inference_result,facts):
     
         if self.prob_in_us(facts)<0.01:
-            return [] #we're not in the uk
+            return {} #we're not in the uk
             
-        insightslist = []
-        insightslist.append("US Census insights")
+        insights = {}
+        insights['uscensus_debug'] = "US Census insights"
         ages = np.zeros([2,23])
         area_ratios = self.get_list_of_bg_probs(facts)
         for i,ratio in enumerate(area_ratios):
@@ -82,18 +82,18 @@ class USCensusAnswer(ans.Answer):
             idx = np.argmin(gender_bias)            
             prop = ((1.0*(ages[1,idx]/ages[0,idx])))
             odd_age = USCensusAnswer._age_range[idx]
-            insightslist.append('There are %d %% more women than men aged %d to %d living in your area.' % (prop, odd_age, odd_age+5))
+            insights['uscensus_genderratio'] = 'There are %d %% more women than men aged %d to %d living in your area.' % (prop, odd_age, odd_age+5)
         if (np.max(gender_bias)>100):
             idx = np.argmax(gender_bias)
             prop = ((1.0*(ages[0,idx]/ages[1,idx])))
             odd_age = USCensusAnswer._age_range[idx] #fix odd_age + 5...
-            insightslist.append('There are %0.1f times more men than women aged %d to %d living in your area.' % (prop, odd_age, odd_age+5))
+            insights['uscensus_genderratio'] = 'There are %0.1f times more men than women aged %d to %d living in your area.' % (prop, odd_age, odd_age+5)
            
         halfway = np.sum((np.cumsum(ages_combined)/np.sum(ages_combined))<0.5)
         
-        insightslist.append(str(ages))
-        insightslist.append("Half the people in your area are under the age of %d" % (USCensusAnswer._age_range[halfway]))
-        return insightslist
+        insights['uscensus_debug'] = str(ages)
+        insights['uscensus_popage'] = "Half the people in your area are under the age of %d" % (USCensusAnswer._age_range[halfway])
+        return insights
         
     @classmethod
     def USCensusApiQuery(cls,geoloc,variables):

@@ -209,7 +209,7 @@ class BabyNamesAnswer(ans.Answer):
         self.answer = answer
 
     def insights(self,inference_result,facts):
-        #returns a list of insights:
+        #returns a dictionary of insights:
         # - inference_result: probability distributions of the features
         # - facts: a dictionary of 'facts' provided by the Answer classes      
     #    female = self.probs[:,1,1]
@@ -217,16 +217,17 @@ class BabyNamesAnswer(ans.Answer):
     #    male[:,1,1].argmax()
         if 'first_name' in facts:
             name = facts['first_name']
-            insightlist = []
-            insightlist.append("You're called %s" % name)
+            insights = {} 
+            insights['babynames_name'] = "You're called %s" % name
             ages = self.probs[:,0,1]+self.probs[:,1,1]
-            ps = np.cumsum(ages)/np.sum(ages)
-            insightlist.append('People with your name are mostly aged between %d and %d' % (sum(ps<0.1), sum(ps<0.9)));
+            cum_ps = np.cumsum(ages)/np.sum(ages)
+            insights['babynames_age'] = 'People with your name are mostly aged between %d and %d' % (sum(cum_ps<0.1), sum(cum_ps<0.9))
+            ps = ages/np.sum(ages)
             maxage = 2015-np.argmax(ps);
-            insightlist.append('Your name was most popular in about %d' % maxage);
-            return insightlist
+            insights['babynames_pop'] = 'Your name was most popular in about %d' % maxage
+            return insights
         else:
-            return []
+            return {}
         
 
     def question_to_text(self):

@@ -166,26 +166,23 @@ class LikeLocationsAnswer(ans.Answer):
 
 
     def insights(self,inference_result,facts):
-        #returns a list of insights:
+        #returns a dictionary of insights:
         # - inference_result: probability distributions of the features
         # - facts: a dictionary of 'facts' provided by the Answer classes
         # return [self.get_places(facts['facebook_likes'])]
                    
 
         if 'where_history' not in facts:
-            return []
+            return {'like_locations_debug':"Note: FB where history missing from facts dictionary"}
 
         wh = facts['where_history']
         if 'error' in wh:
             if wh['error']=='no_fb_likes':
-                return ["Note: I can't see your facebook likes."]
-                #return ["I can't tell which country you're in, just looking at your facebook likes, as I can't see your facebook likes!"]
+                return {'like_locations_debug':"Note: I can't see your facebook likes."}
             if wh['error']=='no_fb_countries':
-                return ["Note: Your facebook likes don't reveal where you are very clearly."]
-                #return ["I can't tell which country you're in, just looking at your facebook likes."]
+                return {'like_locations_debug':"Note: Your facebook likes don't reveal where you are very clearly."}
         if 'countrylist' not in wh:
-                return ["Note: I had an unexpected problem when looking at your facebook likes."]
-                #return ["I can't tell which country you're in from your facebook likes, as I had an unexpected problem."]
+                return {'like_locations_debug':"Note: I had an unexpected problem when looking at your facebook likes."}
         countries = wh['countrylist']
 
         if len(countries)==1:
@@ -200,8 +197,7 @@ class LikeLocationsAnswer(ans.Answer):
                 msg +=", %s" % (con[0])
             if len(countries)>2:
                 msg += " and %s" % countries[-1][0]
-
-        return [msg]
+        return {'like_locations_lived':msg}
 
     def question_to_text(self):
         return "Doesn't need to ask questions."

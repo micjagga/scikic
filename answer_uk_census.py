@@ -79,30 +79,32 @@ class UKCensusAnswer(ans.Answer):
         return data
 
     def insights(self,inference_result,facts):
-        #returns a list of insights:
+        #returns a dictionary of insights:
         # - inference_result: probability distributions of the features
         # - facts: a dictionary of 'facts' provided by the Answer classes      
         if self.prob_in_uk(facts)<0.01:
-            return [] #we're not in the uk
+            return {} #we're not in the uk
         
-        insightlist = []
+        insights = {}
         if 'factor_age' in inference_result:
-            lower = inference_result['factor_age']['quartiles']['lower']
-            upper = inference_result['factor_age']['quartiles']['upper']
-            if upper==lower: #if it's exact
-                msg = 'You are %d years old.' % lower
-                #compare to local area...
-                
-            else:
-                msg = 'You are aged between %d and %d.' % (lower,upper)
-            insightlist.append(msg)
+            if 'age' not in facts: #there's nothing impressive about us guessing their exact age if we've already been told it.
+                lower = inference_result['factor_age']['quartiles']['lower']
+                upper = inference_result['factor_age']['quartiles']['upper']
+                if upper==lower: #if it's exact
+                    msg = 'You are %d years old.' % lower
+                    #compare to local area...
+                    
+                else:
+                    msg = 'You are aged between %d and %d.' % (lower,upper)
+                insights['ukcensus_ages'] = msg
 
         if ('factor_gender' in inference_result):
-            if (inference_result['factor_gender']['quartiles']['mean']>0.9):
-                insightlist.append('You are female')
-            elif (inference_result['factor_gender']['quartiles']['mean']<0.1):
-                insightlist.append('You are male')
-    
+            if 'gender' not in facts: #there's nothing impressive about reporting their gender if they've told us it already.
+                if (inference_result['factor_gender']['quartiles']['mean']>0.9):
+                    insights['ukcensus_gender'] = 'You are female'
+                elif (inference_result['factor_gender']['quartiles']['mean']<0.1):
+                    insights['ukcensus_gender'] = 'You are male'
+        
     
 #0 One family only: Cohabiting couple: All children non-dependent
 #1 One family only: Cohabiting couple: Dependent children
@@ -122,12 +124,12 @@ class UKCensusAnswer(ans.Answer):
             household = inference_result['household']['distribution']
             nochildren = household[2]+household[7]+household[8]+household[10]+household[11]+household[12]
             if nochildren>0.7:
-                insightlist.append("You don't have children living at home")
+                insights['ukcensus_household'] = "You don't have children living at home"
             if nochildren<0.3:
                 insightlist.append("You have children")
             alone = household[3]+household[4]+household[8]+household[11]+household[12]
             if alone<0.3:
-                insightlist.append("You are in a relationship and living with your partner/spouse.")
+                insights['ukcensus_household'] = "You are in a relationship and living with your partner/spouse."
         if ('religion' in inference_result):
             rel = inference_result['religion']['distribution']
             listOfReligions = []
@@ -139,11 +141,15 @@ class UKCensusAnswer(ans.Answer):
                 relmsg = ', '.join(listOfReligions[:-1]) + ' or ' + listOfReligions[-1]
             else:
                 relmsg = listOfReligions[0]
-            insightlist.append(" I think you are " + relmsg + ".")
+            insights['ukcensus_religion'] = " I think you are " + relmsg + "."
 
         ##Generate comparative insights...
         popd = np.mean(self.popdensity)*100 #per hectare -> per sqr km
-        insightlist.append("Your neighbourhood has a population density of %d people per square kilometre, %0.1f times the average for England." % (round(popd),popd/413.0))
+        ratio = popd/413.0
+        if (ratio>1.5):
+            insights['ukcensus_popdensity'] = "Your neighbourhood has a population density of %d people per square kilometre, %0.1f times the average for England." % (round(popd),ratio)
+        if (ratio<0.5):
+            insights['ukcensus_popdensity'] = "Your neighbourhood has a population density of %d people per square kilometre, 1/%0.0f the average for England." % (round(popd),1.0/ratio)
         #oas = self.get_list_of_oas(facts)        
         #localAgeDists = self.getDist(oas,UKCensusAnswer.getAgeDist) #TODO: We've already called this once. Need to cache. 
         localAgeDists = self.localAgeDists
@@ -157,11 +163,23 @@ class UKCensusAnswer(ans.Answer):
         d = np.zeros(101)
         for prob,dist in zip(localAgeDists,oa_probs):
             d = d + (np.array(dist)*prob) / len(oa_probs)
-        halfway = np.sum(np.cumsum(d)<=np.sum(d)/2)
-        if (halfway<40):
-            insightlist.append('Half the people in your neighbourhood are younger than %d years old.' % halfway)
-        else:
-            insightlist.append('Half the people in your neighbourhood are older than %d years old.' % halfway)
+        popage = None
+        if ('age' in facts): #if we know the person's age we'll give the stat in proportion to them...
+            age = facts['age']
+            prop_younger = 1.0*np.sum(d[0:age])/np.sum(d)
+            if prop_younger>0.5:
+                popage = "%d%% of people in your area are younger than you." % round(prop_younger*100)
+            else:
+                popage = "%d%% of people in your area are older than you." % round((1-prop_younger)*100)
+        else: #otherwise we'll give it wrt 'half'
+            halfway = np.sum(np.cumsum(d)<=np.sum(d)/2)
+            if (halfway<40):
+                popage = 'Half the people in your neighbourhood are younger than %d years old.' % halfway
+            else:
+                popage = 'Half the people in your neighbourhood are older than %d years old.' % halfway
+        if popage is not None:        
+            insights['ukcensus_popage'] = popage
+            
         national_traveltowork_probs = np.array([0.00335523,0.01853632,0.06921536,0.35500678,0.03459344,0.00520941,0.04740108,0.03333676,0.02501549,0.03300255,0.37115993,0.00416765]); #TODO Get this from the API
         
         #we need to roughly handle the smoothing so that rare modes don't get over represented
@@ -171,9 +189,9 @@ class UKCensusAnswer(ans.Answer):
         localratios = self.traveltowork_probs/national_traveltowork_probs
         maxnum = np.max(localratios)
         trans_type = UKCensusAnswer.transport_text[np.argmax(localratios)]
-        insightlist.append('People in your area are %0.1f times more likely to %s than the national average.' % (maxnum, trans_type))
-      
-        return insightlist
+        insights['ukcensus_traveltowork'] = 'People in your area are %0.0f times more likely to %s than the national average.' % (maxnum, trans_type)
+        
+        return insights
 
     @classmethod
     def ONSapiQuery(cls,geoArea, dataSet):

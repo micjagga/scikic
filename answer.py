@@ -133,11 +133,11 @@ class Answer(object):
         pass
 
     def insights(self,inference_result,facts):        
-        #returns a list of insight strings.
+        #returns a dictionary of insight strings.
 	#parameters:
         # - inference_result: probability distributions of the features
         # - facts: a dictionary of 'facts' provided by the Answer classes        
-        return []
+        return {}
     
     @classmethod
     def metaData(cls):

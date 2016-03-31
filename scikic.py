@@ -103,7 +103,7 @@ def route_question():
 
 @app.route('/version', methods=['GET','POST'])
 def route_version():     
-    return json.dumps({'version':'1.0'})
+    return json.dumps({'version':'3.0'})
       
 @app.route('/metadata', methods=['POST'])
 def route_metadata(): 
