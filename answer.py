@@ -178,11 +178,11 @@ def distribute_probs(p,j,spread=False):
             between 0-15, 16-24, 25-49, 50+
 	spread - default False. In the case where you're spreading the values over
 	    p(r|0<a<10) where a is the parameter, into, e.g. p(r=4|a) we can say that
-	    p(r|a=4) = p(r|0<a<10), unless we know something else.
+	    p(r|a=4) = p(r|0<a<10) [set it to FALSE], unless we know something else.
           however...
 	    if we're spreading p(0<a<10|r), then the probabilities will be divided
 	    (assuming a uniform distribution) equally over the values of a in the range.
-	    so p(a=4|r) = p(0<a<10|r)/10
+	    so p(a=4|r) = p(0<a<10|r)/10 [set it to TRUE]
         
     Returns:
         A numpy array of probabilities from 0 to 100.

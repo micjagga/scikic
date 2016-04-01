@@ -72,6 +72,12 @@ class UKCensusAnswer(ans.Answer):
     transport = ['Taxi', 'Bicycle', 'On foot', 'Not in employment', 'Work mainly at or from home', 'Motorcycle, scooter or moped', 'Bus, minibus or coach', 'Train', 'Underground, metro, light rail, tram', 'Passenger in a car or van', 'Driving a car or van', 'Other method of travel to work']
     transport_text = ['take a taxi to work', 'cycle to work', 'go to work on foot', 'not be in work', 'mainly work from home', 'use a motorcycle to get to work', 'take the bus to work', 'take the train to work', 'use an underground or tram to get to work', 'get a lift in a car to work', 'drive to work', 'use an unusual method of travel to get to work']
 
+    languages = ['African Language: Afrikaans', 'African Language: Akan', 'African Language: Amharic', 'African Language: Igbo', 'African Language: Krio', 'African Language: Lingala', 'African Language: Luganda', 'African Language: Shona', 'African Language: Somali', 'African Language: Swahili/Kiswahili', 'African Language: Tigrinya', 'African Language: Yoruba', 'Arabic', 'Caribbean Creole: Caribbean Creole (English-based)', 'East Asian Language: Cantonese Chinese', 'East Asian Language: Japanese', 'East Asian Language: Korean', 'East Asian Language: Malay', 'East Asian Language: Mandarin Chinese', 'East Asian Language: Tagalog/Filipino', 'East Asian Language: Thai', 'East Asian Language: Vietnamese', 'English (English or Welsh if in Wales)', 'French', 'Other European Language (EU): Bulgarian', 'Other European Language (EU): Czech', 'Other European Language (EU): Danish', 'Other European Language (EU): Dutch', 'Other European Language (EU): Estonian', 'Other European Language (EU): Finnish', 'Other European Language (EU): German', 'Other European Language (EU): Greek', 'Other European Language (EU): Hungarian', 'Other European Language (EU): Italian', 'Other European Language (EU): Latvian', 'Other European Language (EU): Lithuanian', 'Other European Language (EU): Maltese', 'Other European Language (EU): Polish', 'Other European Language (EU): Romanian', 'Other European Language (EU): Slovak', 'Other European Language (EU): Slovenian', 'Other European Language (EU): Swedish', 'Other European Language (non EU): Albanian', 'Other European Language (non EU): Serbian/Croatian/Bosnian', 'Other European Language (non EU): Ukrainian', 'Other European Language (non-national): Yiddish', 'Other UK language: Cornish', 'Other UK language: Gaelic (Irish)', 'Other UK language: Gaelic (Not otherwise specified)', 'Other UK language: Gaelic (Scottish)', 'Other UK language: Scots', 'Portuguese', 'Russian', 'Sign Language: Any Sign Communication System', 'South Asian Language: Bengali (with Sylheti and Chatgaya)', 'South Asian Language: Gujarati', 'South Asian Language: Hindi', 'South Asian Language: Malayalam', 'South Asian Language: Marathi', 'South Asian Language: Nepalese', 'South Asian Language: Pakistani Pahari (with Mirpuri and Potwari)', 'South Asian Language: Panjabi', 'South Asian Language: Sinhala', 'South Asian Language: Tamil', 'South Asian Language: Telugu', 'South Asian Language: Urdu', 'Spanish', 'Turkish', 'Welsh/Cymraeg (in England only)', 'West/Central Asian Language: Hebrew', 'West/Central Asian Language: Kurdish', 'West/Central Asian Language: Pashto', 'West/Central Asian Language: Persian/Farsi']
+  
+    languages_text = ['Afrikaans', 'Akan', 'Amharic', 'Igbo', 'Krio', 'Lingala', 'Luganda', 'Shona', 'Somali', 'Swahili', 'Tigrinya', 'Yoruba', 'Arabic', 'Caribbean Creole', 'Cantonese Chinese', 'Japanese', 'Korean', 'Malay', 'Mandarin Chinese', 'Tagalog/Filipino', 'Thai', 'Vietnamese', 'English', 'French', 'Bulgarian', 'Czech', 'Danish', 'Dutch', 'Estonian', 'Finnish', 'German', 'Greek', 'Hungarian', 'Italian', 'Latvian', 'Lithuanian', 'Maltese', 'Polish', 'Romanian', 'Slovak', 'Slovenian', 'Swedish', 'Albanian', 'Serbian, Croatian or Bosnian', 'Ukrainian', 'Cornish', 'Irish Gaelic', 'Gaelic', 'Scottish Gaelic', 'Scots', 'Portuguese', 'Russian', 'Sign Language', 'Bengali', 'Gujarati', 'Hindi', 'Malayalam', 'Marathi', 'Nepalese', 'Pakistani Pahari', 'Panjabi', 'Sinhala', 'Tamil', 'Telugu', 'Urdu', 'Spanish', 'Turkish', 'Welsh', 'Hebrew', 'Kurdish', 'Pashto', 'Farsi']
+    
+    ##todo find out hello in every langauge      
+    languages_hello = ['hallo']
 
     @classmethod
     def metaData(cls):
@@ -163,6 +169,7 @@ class UKCensusAnswer(ans.Answer):
         d = np.zeros(101)
         for prob,dist in zip(localAgeDists,oa_probs):
             d = d + (np.array(dist)*prob) / len(oa_probs)
+
         popage = None
         if ('age' in facts): #if we know the person's age we'll give the stat in proportion to them...
             age = facts['age']
@@ -191,6 +198,15 @@ class UKCensusAnswer(ans.Answer):
         trans_type = UKCensusAnswer.transport_text[np.argmax(localratios)]
         insights['ukcensus_traveltowork'] = 'People in your area are %0.0f times more likely to %s than the national average.' % (maxnum, trans_type)
         
+        logging.info(str(np.nonzero(np.array(self.languages))))
+        active_languages = [UKCensusAnswer.languages_text[i] for i in np.nonzero(np.array(self.languages))[1]]
+        langaugestring = ', '.join(active_languages[0:-1])
+        if (len(active_languages)>1):
+            langaugestring += ' and ' + active_languages[-1]
+        insights['ukcensus_languages'] = "Languages spoken in your area include " + langaugestring
+        logging.info(UKCensusAnswer.languages_text[np.argmax(self.languages)])
+        
+        
         return insights
 
     @classmethod
@@ -202,6 +218,7 @@ class UKCensusAnswer(ans.Answer):
         geographicalHierarchy = '2011STATH';
         url = ('%s%s/dwn.csv?context=Census&geog=%s&dm/%s=%s&totals=false&apikey=%s' % 
         (pathToONS,dataSet,geographicalHierarchy,geographicalHierarchy,geoArea,apiKey))
+        logging.info('Opening URL: %s' % url)
         response = urllib2.urlopen(url);
         xml_data = response.read();
         root = ET.fromstring(xml_data);
@@ -270,18 +287,13 @@ class UKCensusAnswer(ans.Answer):
         """Gets the way people travel to work; given the label of a particular geographical area"""
         data, mat = cls.ONSapiQuery(geoArea,'QS701EW')
         arr,labs = dict_to_array(mat) #Convert the dictionary hierarchy to a numpy array 
-        logging.info(arr)
-        logging.info(labs)
         order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.transport] #sort by the order we want it in.
         arr = np.array(arr) #convert to numpy array
         arr = arr[order] 
         arr = arr * 1.0        
-        logging.info("Get Travel to work distribution");
-        logging.info(arr)
         arr += 1.0
         arr = 1.0*arr / np.sum(1.0*arr)
         returnList[0] = arr #now return via the argument so this can be called as a thread
-
 
     @classmethod
     def getReligionDist(cls,geoArea,returnList):
@@ -303,6 +315,17 @@ class UKCensusAnswer(ans.Answer):
     def getPopDensity(cls,geoArea,returnList):
         data,mat = cls.ONSapiQuery(geoArea,'QS102EW')        #LC2107EW = religion by age, gender, etc            
         returnList[0] = mat['Density (Persons per hectare)']
+
+    @classmethod
+    def getLanguages(cls,geoArea,returnList):
+        data,mat = cls.ONSapiQuery(geoArea,'QS204EW')       
+        arr,labs = dict_to_array(mat)
+        order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.languages]
+        arr = np.array(arr) #convert to numpy array
+        arr = arr[order] #put in correct order.
+        arr = arr * 1.0
+        returnList[0] = arr
+     
         
     def __init__(self,name,dataitem,itemdetails,answer=None):
         """Constructor, instantiate an answer...
@@ -348,13 +371,15 @@ class UKCensusAnswer(ans.Answer):
             t.start()
         for t in threads:
             t.join()
-       
         return [td[0] for td in threadData]
     
     #this just gets any other census data we're interested in
     def get_other_distributions(self,facts):
         oas = self.get_list_of_oas(facts)
         self.popdensity = self.getDist(oas,UKCensusAnswer.getPopDensity)
+        self.languages = self.getDist(oas,UKCensusAnswer.getLanguages)
+
+
      
     def calc_probs_religion(self,facts):
         #returns p(oa|religion)

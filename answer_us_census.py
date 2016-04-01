@@ -65,16 +65,13 @@ class USCensusAnswer(ans.Answer):
     def insights(self,inference_result,facts):
     
         if self.prob_in_us(facts)<0.01:
-            return {} #we're not in the uk
+            return {} #we're not in the us
             
         insights = {}
-        insights['uscensus_debug'] = "US Census insights"
         ages = np.zeros([2,23])
         area_ratios = self.get_list_of_bg_probs(facts)
         for i,ratio in enumerate(area_ratios):
-            #dist= np.sum(self.localAgeDists[i,0,:],0)
-            ages = ages + self.localAgeDists[i,0,:] * ratio
-           
+            ages = ages + self.localAgeDists[i,0,:] * ratio 
         ages_combined = np.sum(ages,0)
         logging.info(ages)
         gender_bias = (1.0*(ages[0,:]-ages[1,:])) #originally divided by the sum, but important to consider absolute values as the relative values can show spurious results with small numbers of people.
@@ -89,10 +86,30 @@ class USCensusAnswer(ans.Answer):
             odd_age = USCensusAnswer._age_range[idx] #fix odd_age + 5...
             insights['uscensus_genderratio'] = 'There are %0.1f times more men than women aged %d to %d living in your area.' % (prop, odd_age, odd_age+5)
            
-        halfway = np.sum((np.cumsum(ages_combined)/np.sum(ages_combined))<0.5)
-        
-        insights['uscensus_debug'] = str(ages)
-        insights['uscensus_popage'] = "Half the people in your area are under the age of %d" % (USCensusAnswer._age_range[halfway])
+
+        d = ans.distribute_probs(ages_combined,USCensusAnswer._age_range,spread=True)
+        #TODO This code below is duplicated from uk_census, need to move it to a fn.
+        popage = None
+        if ('age' in facts): #if we know the person's age we'll give the stat in proportion to them...
+            age = facts['age']
+            prop_younger = 1.0*np.sum(d[0:age])/np.sum(d)
+            if prop_younger>0.5:
+                popage = "%d%% of people in your area are younger than you." % round(prop_younger*100)
+            else:
+                popage = "%d%% of people in your area are older than you." % round((1-prop_younger)*100)
+        else: #otherwise we'll give it wrt 'half'
+            halfway = np.sum(np.cumsum(d)<=np.sum(d)/2)
+            if (halfway<40):
+                popage = 'Half the people in your neighbourhood are younger than %d years old.' % halfway
+            else:
+                popage = 'Half the people in your neighbourhood are older than %d years old.' % halfway
+        if popage is not None:        
+            insights['uscensus_popage'] = popage
+       
+    
+        #insights['uscensus_debug_1'] = str(ages_combined.shape)
+        #halfway = np.sum((np.cumsum(ages_combined)/np.sum(ages_combined))<0.5)        
+        #insights['uscensus_popage_previous_version'] = "Half the people in your area are under the age of %d" % (USCensusAnswer._age_range[halfway])
         return insights
         
     @classmethod
