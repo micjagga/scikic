@@ -131,7 +131,7 @@ class USCensusAnswer(ans.Answer):
         langaugestring = ', '.join(active_languages[0:-1])
         if (len(active_languages)>1):
             langaugestring += ' and ' + active_languages[-1]
-        insights['ukcensus_languages'] = "Languages spoken in your area include " + langaugestring
+        insights['uscensus_languages'] = "Languages spoken in your area include " + langaugestring
         insights['uscensus_debug_languages'] = json.dumps(results)
         
         #insights['uscensus_debug_1'] = str(ages_combined.shape)
