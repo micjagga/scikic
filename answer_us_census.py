@@ -62,6 +62,16 @@ class USCensusAnswer(ans.Answer):
     dataset = 'uscensus';
     _age_range = np.array([4,9,14,17,19,20,21,24,29,34,39,44,49,54,59,61,64,66,69,74,79,84])+1 #added one as the numbers here are the end of each range, not the start of each.
     _states = ['Mo29','Al01','Ak02','Az04','Ar05','Ca06','Co08','Ct09','De10','Dc11','Fl12','Ga13','Hi15','Id16','Il17','In18','Ia19','Ks20','Ky21','La22','Me23','Md24','Ma25','Mi26','Mn27','Ms28','Mt30','Ne31','Nv32','Nh33','Nj34','Nm35','Ny36','Nc37','Nd38','Oh39','Ok40','Or41','Pa42','Ri44','Sc45','Sd46','Tn47','Tx48','Ut49','Vt50','Va51','Wa53','Wv54','Wi55','Wy56']
+    
+    #BEFORE MODIFICATION...
+    #language_codes = ['B16001_001E', 'B16001_003E', 'B16001_006E', 'B16001_009E', 'B16001_012E', 'B16001_015E', 'B16001_018E', 'B16001_021E', 'B16001_024E', 'B16001_027E', 'B16001_030E', 'B16001_033E', 'B16001_036E', 'B16001_039E', 'B16001_042E', 'B16001_045E', 'B16001_048E', 'B16001_051E', 'B16001_054E', 'B16001_057E', 'B16001_060E', 'B16001_063E', 'B16001_066E', 'B16001_069E', 'B16001_072E', 'B16001_075E', 'B16001_078E', 'B16001_081E', 'B16001_084E', 'B16001_087E', 'B16001_090E', 'B16001_093E', 'B16001_096E', 'B16001_099E', 'B16001_102E', 'B16001_105E', 'B16001_108E', 'B16001_111E', 'B16001_114E', 'B16001_117E']
+    #languages = ['Total', 'Spanish or Spanish Creole', 'French (incl. Patois, Cajun)', 'French Creole', 'Italian', 'Portuguese or Portuguese Creole', 'German', 'Yiddish', 'Other West Germanic languages', 'Scandinavian languages', 'Greek', 'Russian', 'Polish', 'Serbo-Croatian', 'Other Slavic languages', 'Armenian', 'Persian', 'Gujarati', 'Hindi', 'Urdu', 'Other Indic languages', 'Other Indo-European languages', 'Chinese', 'Japanese', 'Korean', 'Mon-Khmer, Cambodian', 'Hmong', 'Thai', 'Laotian', 'Vietnamese', 'Other Asian languages', 'Tagalog', 'Other Pacific Island languages', 'Navajo', 'Other Native North American languages', 'Hungarian', 'Arabic', 'Hebrew', 'African languages', 'Other and unspecified languages']
+    #B16001_001E = Total
+    
+    #this doesn't include English.
+    language_codes = ['B16001_003E', 'B16001_006E', 'B16001_009E', 'B16001_012E', 'B16001_015E', 'B16001_018E', 'B16001_021E', 'B16001_027E', 'B16001_030E', 'B16001_033E', 'B16001_036E', 'B16001_039E', 'B16001_045E', 'B16001_048E', 'B16001_051E', 'B16001_054E', 'B16001_057E', 'B16001_066E', 'B16001_069E', 'B16001_072E', 'B16001_075E', 'B16001_078E', 'B16001_081E', 'B16001_084E', 'B16001_087E', 'B16001_093E', 'B16001_099E', 'B16001_105E', 'B16001_108E', 'B16001_111E', 'B16001_114E']
+
+    languages = ['Spanish', 'French', 'French Creole', 'Italian', 'Portuguese or Portuguese Creole', 'German', 'Yiddish', 'a Scandinavian language', 'Greek', 'Russian', 'Polish', 'Serbo-Croatian', 'Armenian', 'Persian', 'Gujarati', 'Hindi', 'Urdu', 'Chinese', 'Japanese', 'Korean', 'Mon-Khmer, Cambodian', 'Hmong', 'Thai', 'Laotian', 'Vietnamese', 'Tagalog', 'Navajo', 'Hungarian', 'Arabic', 'Hebrew', 'an African language']
     def insights(self,inference_result,facts):
     
         if self.prob_in_us(facts)<0.01:
@@ -107,6 +117,23 @@ class USCensusAnswer(ans.Answer):
             insights['uscensus_popage'] = popage
        
     
+        #Get all languages
+        bgs = self.get_list_of_bgs(facts)
+        logging.info('GET ALL LANGUAGES')        
+        for bg in bgs:
+            logging.info(str(bg))
+            if (bg[3]!=None): #we need to reduce the resolution and recompute
+                bg[2] = [bg[2]]
+                bg[3] = None
+            results, geolocs = USCensusAnswer.USCensusApiQuery(bg,USCensusAnswer.language_codes)
+        lang_counts = results[0]
+        active_languages = [USCensusAnswer.languages[i] for i in np.nonzero(np.array(lang_counts))[0]]
+        langaugestring = ', '.join(active_languages[0:-1])
+        if (len(active_languages)>1):
+            langaugestring += ' and ' + active_languages[-1]
+        insights['ukcensus_languages'] = "Languages spoken in your area include " + langaugestring
+        insights['uscensus_debug_languages'] = json.dumps(results)
+        
         #insights['uscensus_debug_1'] = str(ages_combined.shape)
         #halfway = np.sum((np.cumsum(ages_combined)/np.sum(ages_combined))<0.5)        
         #insights['uscensus_popage_previous_version'] = "Half the people in your area are under the age of %d" % (USCensusAnswer._age_range[halfway])
@@ -114,6 +141,8 @@ class USCensusAnswer(ans.Answer):
         
     @classmethod
     def USCensusApiQuery(cls,geoloc,variables):
+        logging.info('GEOLOC')
+        logging.info(variables)
         """Performs an API query to the US Census database, for the given location and variable 
         (pass state,county,tract and blockgroups as strings and lists, in a list as geoloc)
         (where the last one known should be a list, e.g.):
@@ -132,6 +161,10 @@ class USCensusAnswer(ans.Answer):
 
         pass the list of queries in the second item
         
+        Another example, getting number of people who speak some languages:
+        >>> from answer_us_census import USCensusAnswer as a
+>>> a.USCensusApiQuery(['02','170',['000101','000102'],None],['B16001_001E', 'B16001_012E', 'B16001_018E', 'B16001_021E', 'B16001_030E', 'B16001_033E', 'B16001_036E', 'B16001_045E', 'B16001_048E', 'B16001_051E', 'B16001_054E', 'B16001_057E', 'B16001_066E', 'B16001_069E', 'B16001_072E', 'B16001_078E', 'B16001_081E', 'B16001_084E', 'B16001_087E', 'B16001_093E', 'B16001_099E', 'B16001_105E', 'B16001_108E', 'B16001_111E'])
+        
         #if the last not-none item in the geoloc is an empty list, then we'll return all the items...
         
         #!lengths of strings matter:
@@ -140,6 +173,8 @@ class USCensusAnswer(ans.Answer):
          tract = 6 chars
          blockgroup = 1 chars
          TODO Pad with zeros automatically
+         
+
         """
 
         pathToServer = 'http://api.census.gov/data/2011';
@@ -172,12 +207,17 @@ class USCensusAnswer(ans.Answer):
         if len(inlist)>0:
             inliststr = '&in='+inliststr
         url = '%s/acs5?get=%s&for=%s:*%s&key=%s' % (pathToServer,varlist,foritem,inliststr,apiKey) 
+        logging.info('Accessing URL: %s' % url)
         response = urllib2.urlopen(url);
         json_data = json.loads(response.read())
         data = []
         geos = []
         for place in json_data[1:]: #first item is the table headers
             vals = place[0:len(variables)]
+            if (len(vals)>0):
+                if vals[0]=='null':
+                    logging.info('Responses from US Census were null. It is likely that the data is not available at that resolution. URL called: %s' % url)
+                    raise ValueError('Responses from US Census were null. It is likely that the data is not available at that resolution')
             geo=place[len(variables):]
             if geoloc[hier]==None or (geo[hier] in geoloc[hier]) or geoloc[hier]==[]:
                 data.append([int(v) for v in vals])
@@ -187,14 +227,18 @@ class USCensusAnswer(ans.Answer):
     @classmethod
     def getAgeDist(cls,geoloc,returnList):
         """Gets the age distribution given a particular geographical area"""
-        male = ['B01001_003E','B01001_004E','B01001_005E','B01001_006E','B01001_007E','B01001_008E','B01001_009E','B01001_010E','B01001_011E','B01001_012E','B01001_013E','B01001_014E','B01001_015E','B01001_016E','B01001_017E','B01001_018E','B01001_019E','B01001_020E','B01001_021E','B01001_022E','B01001_023E','B01001_024E','B01001_025E']
-        female = ['B01001_027E','B01001_028E','B01001_029E','B01001_030E','B01001_031E','B01001_032E','B01001_033E','B01001_034E','B01001_035E','B01001_036E','B01001_037E','B01001_038E','B01001_039E','B01001_040E','B01001_041E','B01001_042E','B01001_043E','B01001_044E','B01001_045E','B01001_046E','B01001_047E','B01001_048E','B01001_049E']
-        variables = male[:]
-        variables.extend(female)       
-        results, geolocs = cls.USCensusApiQuery(geoloc,variables)
-        res = []
-        for place_result in results:
-            res.append(np.vstack([place_result[0:len(male)],place_result[len(male):]]))
+        try:         
+            male = ['B01001_003E','B01001_004E','B01001_005E','B01001_006E','B01001_007E','B01001_008E','B01001_009E','B01001_010E','B01001_011E','B01001_012E','B01001_013E','B01001_014E','B01001_015E','B01001_016E','B01001_017E','B01001_018E','B01001_019E','B01001_020E','B01001_021E','B01001_022E','B01001_023E','B01001_024E','B01001_025E']
+            female = ['B01001_027E','B01001_028E','B01001_029E','B01001_030E','B01001_031E','B01001_032E','B01001_033E','B01001_034E','B01001_035E','B01001_036E','B01001_037E','B01001_038E','B01001_039E','B01001_040E','B01001_041E','B01001_042E','B01001_043E','B01001_044E','B01001_045E','B01001_046E','B01001_047E','B01001_048E','B01001_049E']
+            variables = male[:]
+            variables.extend(female)   
+            results, geolocs = cls.USCensusApiQuery(geoloc,variables)        
+            res = []
+            for place_result in results:
+                res.append(np.vstack([place_result[0:len(male)],place_result[len(male):]]))
+        except e:
+            logging.info('Problem accessing US census: ')
+            logging.info(str(e))
         returnList[0] = res
 
     def __init__(self,name,dataitem,itemdetails,answer=None):
@@ -239,7 +283,6 @@ class USCensusAnswer(ans.Answer):
         localAgeDists = np.array([td[0] for td in threadData[:-1]])
         nationalAgeDist = np.array(threadData[-1][0])
        
-       
         self.localAgeDists = localAgeDists
         self.nationalAgeDist = nationalAgeDist
         
@@ -261,7 +304,6 @@ class USCensusAnswer(ans.Answer):
         #so localAgeDist/nationalAgeDist
 
         self.age_probs = np.zeros([101,len(localAgeDists),2])
-
 
         for i,dist in enumerate(localAgeDists):
             p = (0.0001+dist)/nationalAgeDist
