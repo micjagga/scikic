@@ -71,7 +71,7 @@ class USCensusAnswer(ans.Answer):
     #this doesn't include English.
     language_codes = ['B16001_003E', 'B16001_006E', 'B16001_009E', 'B16001_012E', 'B16001_015E', 'B16001_018E', 'B16001_021E', 'B16001_027E', 'B16001_030E', 'B16001_033E', 'B16001_036E', 'B16001_039E', 'B16001_045E', 'B16001_048E', 'B16001_051E', 'B16001_054E', 'B16001_057E', 'B16001_066E', 'B16001_069E', 'B16001_072E', 'B16001_075E', 'B16001_078E', 'B16001_081E', 'B16001_084E', 'B16001_087E', 'B16001_093E', 'B16001_099E', 'B16001_105E', 'B16001_108E', 'B16001_111E', 'B16001_114E']
 
-    languages = ['Spanish', 'French', 'French Creole', 'Italian', 'Portuguese or Portuguese Creole', 'German', 'Yiddish', 'a Scandinavian language', 'Greek', 'Russian', 'Polish', 'Serbo-Croatian', 'Armenian', 'Persian', 'Gujarati', 'Hindi', 'Urdu', 'Chinese', 'Japanese', 'Korean', 'Mon-Khmer, Cambodian', 'Hmong', 'Thai', 'Laotian', 'Vietnamese', 'Tagalog', 'Navajo', 'Hungarian', 'Arabic', 'Hebrew', 'an African language']
+    languages_text = ['Spanish', 'French', 'French Creole', 'Italian', 'Portuguese or Portuguese Creole', 'German', 'Yiddish', 'a Scandinavian language', 'Greek', 'Russian', 'Polish', 'Serbo-Croatian', 'Armenian', 'Persian', 'Gujarati', 'Hindi', 'Urdu', 'Chinese', 'Japanese', 'Korean', 'Mon-Khmer, Cambodian', 'Hmong', 'Thai', 'Laotian', 'Vietnamese', 'Tagalog', 'Navajo', 'Hungarian', 'Arabic', 'Hebrew', 'an African language']
     def insights(self,inference_result,facts):
     
         if self.prob_in_us(facts)<0.01:
@@ -127,7 +127,7 @@ class USCensusAnswer(ans.Answer):
                 bg[3] = None
             results, geolocs = USCensusAnswer.USCensusApiQuery(bg,USCensusAnswer.language_codes)
         lang_counts = results[0]
-        active_languages = [USCensusAnswer.languages[i] for i in np.nonzero(np.array(lang_counts))[0]]
+        active_languages = [USCensusAnswer.languages_text[i] for i in np.nonzero(np.array(lang_counts))[0]]
         langaugestring = ', '.join(active_languages[0:-1])
         if (len(active_languages)>1):
             langaugestring += ' and ' + active_languages[-1]
@@ -372,5 +372,9 @@ class USCensusAnswer(ans.Answer):
 
     @classmethod
     def metaData(cls):
-        return {'citation':'The <a href="http://www.census.gov/developers/">US census bureau</a>. In particular the American Community Survey <a href="http://www.census.gov/data/developers/data-sets/acs-survey-5-year-data.html">5 year data</a>.'}
+        return {'language_codes':cls.language_codes,
+                'languages_text':cls.languages_text,
+                '_age_range':cls._age_range.tolist(),
+                '_states':cls._states,
+                'citation':'The <a href="http://www.census.gov/developers/">US census bureau</a>. In particular the American Community Survey <a href="http://www.census.gov/data/developers/data-sets/acs-survey-5-year-data.html">5 year data</a>.'}
 

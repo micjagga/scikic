@@ -217,13 +217,16 @@ def get_question_string(data):
     return d.question_to_text()
 
 def get_meta_data(data):
+    metaData = []
+    dataset_list = []
     if 'dataset' in data:
-        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset==data['dataset']]
-        if len(c)==0:
+        classes = [cls for cls in ans.Answer.__subclasses__() if cls.dataset in data['dataset']]
+        if len(classes)==0:
             return "Don't know this type of data";
-        return [c[0].metaData()]
     else:
-        metaData = []
-        for c in ans.Answer.__subclasses__():
-            metaData.append(c.metaData())
-        return metaData
+        classes = ans.Answer.__subclasses__()
+    for c in classes:
+        meta = c.metaData() #data from this one class
+        meta['dataset'] = c.dataset #add the name of the dataset
+        metaData.append(meta)
+    return metaData

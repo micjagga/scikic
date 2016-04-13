@@ -76,12 +76,20 @@ class UKCensusAnswer(ans.Answer):
   
     languages_text = ['Afrikaans', 'Akan', 'Amharic', 'Igbo', 'Krio', 'Lingala', 'Luganda', 'Shona', 'Somali', 'Swahili', 'Tigrinya', 'Yoruba', 'Arabic', 'Caribbean Creole', 'Cantonese Chinese', 'Japanese', 'Korean', 'Malay', 'Mandarin Chinese', 'Tagalog/Filipino', 'Thai', 'Vietnamese', 'English', 'French', 'Bulgarian', 'Czech', 'Danish', 'Dutch', 'Estonian', 'Finnish', 'German', 'Greek', 'Hungarian', 'Italian', 'Latvian', 'Lithuanian', 'Maltese', 'Polish', 'Romanian', 'Slovak', 'Slovenian', 'Swedish', 'Albanian', 'Serbian, Croatian or Bosnian', 'Ukrainian', 'Yiddish', 'Cornish', 'Irish Gaelic', 'Gaelic', 'Scottish Gaelic', 'Scots', 'Portuguese', 'Russian', 'Sign Language', 'Bengali', 'Gujarati', 'Hindi', 'Malayalam', 'Marathi', 'Nepalese', 'Pakistani Pahari', 'Panjabi', 'Sinhala', 'Tamil', 'Telugu', 'Urdu', 'Spanish', 'Turkish', 'Welsh', 'Hebrew', 'Kurdish', 'Pashto', 'Farsi']
     
+    households_text = ['One family only: Cohabiting couple: All children non-dependent','One family only: Cohabiting couple: Dependent children','One family only: Cohabiting couple: No children','One family only: Lone parent: All children non-dependent','One family only: Lone parent: Dependent children','One family only: Married or same-sex civil partnership couple: All children non-dependent','One family only: Married or same-sex civil partnership couple: Dependent children','One family only: Married or same-sex civil partnership couple: No children','One person household: Other','Other household types: With dependent children','One family only: All aged 65 and over','One person household: Aged 65 and over','Other household types: Other (including all full-time students and all aged 65 and over)']
     ##todo find out hello in every langauge      
     languages_hello = ['hallo']
 
     @classmethod
     def metaData(cls):
-        data = {'religions':cls.religions,'religion_text':cls.religion_text,'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
+        data = {'religions':cls.religions,
+        'religion_text':cls.religion_text,
+        'transport':cls.transport,
+        'transport_text':cls.transport_text,
+        'languages':cls.languages,
+        'languages_text':cls.languages_text,
+        'households_text':cls.households_text,
+        'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
         return data
 
     def insights(self,inference_result,facts):
