@@ -230,7 +230,9 @@ class PostalAnswer(ans.Answer):
                 facts['where'] = {};            
             cities = {}
             logging.info('Appending zipcode facts')
+            no_bg = 0
             for r in c_blockgroups:
+                no_bg+=1
                 logging.info(r[0])
                 blockgroup = r[0]
                 tract = r[1]
@@ -249,7 +251,8 @@ class PostalAnswer(ans.Answer):
                 if 'uscensus' not in facts['where']:
                     facts['where']['uscensus'] = [];
                 facts['where']['uscensus'].append({'probability':afact, 'level':'blockgroup', 'item':[state,county,tract,blockgroup]})
-            
+            if no_bg==0:
+                logging.info('No block groups found for this zip code')
             if len(cities)>0:
                 facts['where']['city'] = []
             for city in cities:
@@ -262,7 +265,7 @@ class PostalAnswer(ans.Answer):
 
             c_oa = PostalAnswer._geo.execute("SELECT oa11, geo.lsoa11 as lsoa, name, lat, long FROM geo, names WHERE pcd=? AND names.lsoa11=geo.lsoa11;",(postcode,));
             oa = None;
-            for r in c_oa:
+            for r in c_oa: #TODO As we're only using this once, don't use a loop!
                 oa = r[0]
                 lsoa = r[1]
                 city = r[2]

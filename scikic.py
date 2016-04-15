@@ -13,6 +13,12 @@ from flask import request
 from flask import Flask
 app = Flask(__name__)
 
+#these three lines are for vasily's change
+from datetime import timedelta
+from flask import make_response, request, current_app
+from functools import update_wrapper
+
+
 # TO DO, add error handlers http://flask.pocoo.org/docs/0.10/patterns/apierrors/
 # TO DO, stop errors showing up on client
 
@@ -89,12 +95,61 @@ def root():
 @app.route('/inference', methods=['POST'])
 def route_inference():
     data = parse_json(request.data)
-    features, facts, insights = inference.do_inference(data)
+    features, facts, insights, relationships = inference.do_inference(data)
     facts = recursive_numpy_array_removal(facts)
-    output_string = json.dumps({'features':features,'facts':facts,'insights':insights})
+    output_string = json.dumps({'features':features,'facts':facts,'insights':insights,'relationships':relationships})
     return output_string
     
+
+
+#code from http://flask.pocoo.org/snippets/56/ to allow response to go to a different server
+#necessary as Vasily's code doesn't specify an origin, so we end up with FLASK not trusting it.
+def crossdomain(origin=None, methods=None, headers=None,
+                max_age=21600, attach_to_all=True,
+                automatic_options=True):
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, basestring):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, basestring):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        if methods is not None:
+            return methods
+
+        options_resp = current_app.make_default_options_response()
+        return options_resp.headers['allow']
+
+
+
+
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            if automatic_options and request.method == 'OPTIONS':
+                resp = current_app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+
+            h = resp.headers
+
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+    return decorator
+    
 @app.route('/question', methods=['POST'])
+@crossdomain(origin='*')
 def route_question():
     data = parse_json(request.data)
     question = inference.pick_question(data)    

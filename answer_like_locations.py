@@ -255,6 +255,3 @@ class LikeLocationsAnswer(ans.Answer):
         for con in countries:  
              facts['where_history']['countrylist'].append(con)
     
-
-    def append_features(self,features,facts): 
-        pass

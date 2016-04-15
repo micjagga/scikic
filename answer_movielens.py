@@ -158,7 +158,7 @@ class MovieAnswer(ans.Answer):
             return pSeen_AgeGender[age][gender]
         return seenGivenAgeGender
     
-    def append_features(self,features,facts): 
+    def append_features(self,features,facts,relationships):
         """Alters the features dictionary in place, adds:
          - age
          - gender
@@ -183,6 +183,10 @@ class MovieAnswer(ans.Answer):
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
         seen = hf.true_string(self.answer);
         features[self.featurename]=pm.Categorical(self.featurename, self.get_pymc_function(features), value=seen, observed=True)
+        relationships.append({'parent':'factor_gender', 'child':'movie '+self.movie})
+        relationships.append({'parent':'factor_age', 'child':'movie '+self.movie})
+        
+        
     @classmethod
     def pick_question(self,questions_asked,facts,target):
         #temporary list of films I'VE seen!

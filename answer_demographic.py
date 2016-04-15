@@ -42,7 +42,7 @@ class DemographicAnswer(ans.Answer):
             facts['gender'] = self.answer
 
     
-    def append_features(self,features,facts): 
+    def append_features(self,features,facts,relationships):
         #normally factor_age is a flat prior, but here we make it very non-flat, as we know the answer. Ideally we'd manipulate the other probability distributions to integrate out age, but that's quite tricky (programmatically).
         if ('age' in facts):
             if not 'factor_age' in features:    #TODO: We need to overwrite factor_age with this more certain distribution

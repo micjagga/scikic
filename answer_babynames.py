@@ -304,7 +304,7 @@ class BabyNamesAnswer(ans.Answer):
             return p[age][gender]
         return seenGivenAgeGender
     
-    def append_features(self,features,facts): 
+    def append_features(self,features,facts,relationships):
         """Alters the features dictionary in place, adds:
          - age
          - gender
@@ -333,6 +333,8 @@ class BabyNamesAnswer(ans.Answer):
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
         features[self.featurename]=pm.Categorical(self.featurename, self.get_pymc_function(features), value=True, observed=True)
 
+        relationships.append({'parent':'factor_gender', 'child':'name'})
+        relationships.append({'parent':'factor_age', 'child':'name'})
 
     @classmethod
     def metaData(cls):

@@ -162,8 +162,8 @@ class MusicAnswer(ans.Answer):
     def question_to_text(self):        
         return {'question':"What's your favourite band or artist? (be honest!)",'type':'text'} #TODO Rewrite
       
-    def append_features(self,features,facts): 
-        pass
+#    def append_features(self,features,facts): 
+#        pass
 
     @classmethod
     def metaData(cls):

@@ -109,7 +109,7 @@ class Answer(object):
         """
         pass
     
-    def append_features(self,features,facts):
+    def append_features(self,features,facts,relationships):
         """Alters the features dictionary in place, adding features associated with
         this instance.
 
@@ -123,7 +123,8 @@ class Answer(object):
         Args:
           features (dictionary): Dictionary of pyMC probability distributions.
           facts (dictionary): should already be populated with facts
-
+          relationships (list): a list of parent->child connections to build bayesian network graphics
+          
         Returns:
           Nothing - the dictionary is altered inplace.
           

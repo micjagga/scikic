@@ -60,7 +60,8 @@ def dict_to_array(data):
 
 class USCensusAnswer(ans.Answer):
     dataset = 'uscensus';
-    _age_range = np.array([4,9,14,17,19,20,21,24,29,34,39,44,49,54,59,61,64,66,69,74,79,84])+1 #added one as the numbers here are the end of each range, not the start of each.
+    _age_range = np.array([4,9,14,17,19,20,21,24,29,34,39,44,49,54,59,61,64,66,69,74,79,84,100])+1 #added one as the numbers here are the end of each range, not the start of each.
+    #TODO Hacked this a little by adding the '100' at the end, but this is because there's an additional item, 'over 84' that's not covered, I think. TODO
     _states = ['Mo29','Al01','Ak02','Az04','Ar05','Ca06','Co08','Ct09','De10','Dc11','Fl12','Ga13','Hi15','Id16','Il17','In18','Ia19','Ks20','Ky21','La22','Me23','Md24','Ma25','Mi26','Mn27','Ms28','Mt30','Ne31','Nv32','Nh33','Nj34','Nm35','Ny36','Nc37','Nd38','Oh39','Ok40','Or41','Pa42','Ri44','Sc45','Sd46','Tn47','Tx48','Ut49','Vt50','Va51','Wa53','Wv54','Wi55','Wy56']
     
     #BEFORE MODIFICATION...
@@ -85,16 +86,20 @@ class USCensusAnswer(ans.Answer):
         ages_combined = np.sum(ages,0)
         logging.info(ages)
         gender_bias = (1.0*(ages[0,:]-ages[1,:])) #originally divided by the sum, but important to consider absolute values as the relative values can show spurious results with small numbers of people.
-        if (np.min(gender_bias)<-100):
+        logging.info('gender bias')
+        logging.info(gender_bias)
+        if (np.min(gender_bias)<-50):
             idx = np.argmin(gender_bias)            
             prop = ((1.0*(ages[1,idx]/ages[0,idx])))
-            odd_age = USCensusAnswer._age_range[idx]
-            insights['uscensus_genderratio'] = 'There are %d %% more women than men aged %d to %d living in your area.' % (prop, odd_age, odd_age+5)
-        if (np.max(gender_bias)>100):
+            if (prop>1.1): #otherwise it's unremarkable
+                odd_age = USCensusAnswer._age_range[idx]
+                insights['uscensus_genderratio'] = 'There are %d%% more women than men aged %d to %d living in your area.' % (round((prop-1)*100), odd_age, odd_age+5)
+        if (np.max(gender_bias)>50):
             idx = np.argmax(gender_bias)
             prop = ((1.0*(ages[0,idx]/ages[1,idx])))
-            odd_age = USCensusAnswer._age_range[idx] #fix odd_age + 5...
-            insights['uscensus_genderratio'] = 'There are %0.1f times more men than women aged %d to %d living in your area.' % (prop, odd_age, odd_age+5)
+            if (prop>1.1): #otherwise it's unremarkable
+                odd_age = USCensusAnswer._age_range[idx] #fix odd_age + 5...
+                insights['uscensus_genderratio'] = 'There are %d%% more men than women aged %d to %d living in your area.' % (round((prop-1)*100), odd_age, odd_age+5)
            
 
         d = ans.distribute_probs(ages_combined,USCensusAnswer._age_range,spread=True)
@@ -132,6 +137,7 @@ class USCensusAnswer(ans.Answer):
         if (len(active_languages)>1):
             langaugestring += ' and ' + active_languages[-1]
         insights['uscensus_languages'] = "Languages spoken in your area include " + langaugestring
+        insights['uscensus_language_list'] = lang_counts
         insights['uscensus_debug_languages'] = json.dumps(results)
         
         #insights['uscensus_debug_1'] = str(ages_combined.shape)
@@ -335,7 +341,7 @@ class USCensusAnswer(ans.Answer):
                         return con['probability']
         return 0 #if it's not been found
 
-    def append_features(self,features,facts): 
+    def append_features(self,features,facts,relationships):
         """Alters the features dictionary in place, adds:
          - age
          - gender
@@ -364,6 +370,9 @@ class USCensusAnswer(ans.Answer):
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename+"_age");
         
         features[self.featurename+"_age"]=pm.Categorical(self.featurename+"_age", self.get_pymc_function_age(features), value=True, observed=True)
+        
+        relationship = {'parent':'factor_age', 'child':'bg'}
+        relationships.append(relationship)        
 
     @classmethod
     def pick_question(self,questions_asked,facts,target):

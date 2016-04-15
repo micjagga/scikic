@@ -92,9 +92,10 @@ def do_inference(data):
     answers = process_answers(questions_asked,unprocessed_questions,facts)
     
     features = {}
+    relationships = []
     for a in answers:
         logging.info('   adding %s' % a.dataset)
-        a.append_features(features,facts)
+        a.append_features(features,facts,relationships)
 
     logging.info('   features has %d items' % (len(features)))
     for f in features:
@@ -114,11 +115,12 @@ def do_inference(data):
             count = 1.0*count/count.sum() #normalise
             output[feature] = {'distribution':count.tolist()}
         except KeyError:
-            pass #we silently discard features we can't get a trace on, as these are the observed features.
+            output[feature] = {'distribution':[1]}
+            #pass #we silently discard features we can't get a trace on, as these are the observed features.
 
     answer_range = {}
     for o in output:
-        vals = output[o]['distribution']
+        vals = output[o]['distribution']        
         tally = 0
         mean = 0
         for i,v in enumerate(vals):
@@ -134,7 +136,7 @@ def do_inference(data):
     for a in answers:
         insights.update(a.insights(output, facts))
 
-    return output, facts, insights
+    return output, facts, insights, relationships
 
 #Some datasets need to process an answer (for example lookup where a location is, etc). It's best to do this once, when you get
 #the user response, rather than repeatedly later, when you read it.

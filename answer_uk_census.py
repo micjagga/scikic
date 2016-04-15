@@ -11,6 +11,8 @@ from StringIO import StringIO
 from zipfile import ZipFile
 from threading import Thread
 
+import json
+
 import logging
 import config
 logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
@@ -74,9 +76,11 @@ class UKCensusAnswer(ans.Answer):
 
     languages = ['African Language: Afrikaans', 'African Language: Akan', 'African Language: Amharic', 'African Language: Igbo', 'African Language: Krio', 'African Language: Lingala', 'African Language: Luganda', 'African Language: Shona', 'African Language: Somali', 'African Language: Swahili/Kiswahili', 'African Language: Tigrinya', 'African Language: Yoruba', 'Arabic', 'Caribbean Creole: Caribbean Creole (English-based)', 'East Asian Language: Cantonese Chinese', 'East Asian Language: Japanese', 'East Asian Language: Korean', 'East Asian Language: Malay', 'East Asian Language: Mandarin Chinese', 'East Asian Language: Tagalog/Filipino', 'East Asian Language: Thai', 'East Asian Language: Vietnamese', 'English (English or Welsh if in Wales)', 'French', 'Other European Language (EU): Bulgarian', 'Other European Language (EU): Czech', 'Other European Language (EU): Danish', 'Other European Language (EU): Dutch', 'Other European Language (EU): Estonian', 'Other European Language (EU): Finnish', 'Other European Language (EU): German', 'Other European Language (EU): Greek', 'Other European Language (EU): Hungarian', 'Other European Language (EU): Italian', 'Other European Language (EU): Latvian', 'Other European Language (EU): Lithuanian', 'Other European Language (EU): Maltese', 'Other European Language (EU): Polish', 'Other European Language (EU): Romanian', 'Other European Language (EU): Slovak', 'Other European Language (EU): Slovenian', 'Other European Language (EU): Swedish', 'Other European Language (non EU): Albanian', 'Other European Language (non EU): Serbian/Croatian/Bosnian', 'Other European Language (non EU): Ukrainian', 'Other European Language (non-national): Yiddish', 'Other UK language: Cornish', 'Other UK language: Gaelic (Irish)', 'Other UK language: Gaelic (Not otherwise specified)', 'Other UK language: Gaelic (Scottish)', 'Other UK language: Scots', 'Portuguese', 'Russian', 'Sign Language: Any Sign Communication System', 'South Asian Language: Bengali (with Sylheti and Chatgaya)', 'South Asian Language: Gujarati', 'South Asian Language: Hindi', 'South Asian Language: Malayalam', 'South Asian Language: Marathi', 'South Asian Language: Nepalese', 'South Asian Language: Pakistani Pahari (with Mirpuri and Potwari)', 'South Asian Language: Panjabi', 'South Asian Language: Sinhala', 'South Asian Language: Tamil', 'South Asian Language: Telugu', 'South Asian Language: Urdu', 'Spanish', 'Turkish', 'Welsh/Cymraeg (in England only)', 'West/Central Asian Language: Hebrew', 'West/Central Asian Language: Kurdish', 'West/Central Asian Language: Pashto', 'West/Central Asian Language: Persian/Farsi']
   
-    languages_text = ['Afrikaans', 'Akan', 'Amharic', 'Igbo', 'Krio', 'Lingala', 'Luganda', 'Shona', 'Somali', 'Swahili', 'Tigrinya', 'Yoruba', 'Arabic', 'Caribbean Creole', 'Cantonese Chinese', 'Japanese', 'Korean', 'Malay', 'Mandarin Chinese', 'Tagalog/Filipino', 'Thai', 'Vietnamese', 'English', 'French', 'Bulgarian', 'Czech', 'Danish', 'Dutch', 'Estonian', 'Finnish', 'German', 'Greek', 'Hungarian', 'Italian', 'Latvian', 'Lithuanian', 'Maltese', 'Polish', 'Romanian', 'Slovak', 'Slovenian', 'Swedish', 'Albanian', 'Serbian, Croatian or Bosnian', 'Ukrainian', 'Yiddish', 'Cornish', 'Irish Gaelic', 'Gaelic', 'Scottish Gaelic', 'Scots', 'Portuguese', 'Russian', 'Sign Language', 'Bengali', 'Gujarati', 'Hindi', 'Malayalam', 'Marathi', 'Nepalese', 'Pakistani Pahari', 'Panjabi', 'Sinhala', 'Tamil', 'Telugu', 'Urdu', 'Spanish', 'Turkish', 'Welsh', 'Hebrew', 'Kurdish', 'Pashto', 'Farsi']
+    languages_text = ['Afrikaans', 'Akan', 'Amharic', 'Igbo', 'Krio', 'Lingala', 'Luganda', 'Shona', 'Somali', 'Swahili', 'Tigrinya', 'Yoruba', 'Arabic', 'Caribbean Creole', 'Cantonese Chinese', 'Japanese', 'Korean', 'Malay', 'Mandarin Chinese', 'Tagalog/Filipino', 'Thai', 'Vietnamese', 'English', 'French', 'Bulgarian', 'Czech', 'Danish', 'Dutch', 'Estonian', 'Finnish', 'German', 'Greek', 'Hungarian', 'Italian', 'Latvian', 'Lithuanian', 'Maltese', 'Polish', 'Romanian', 'Slovak', 'Slovenian', 'Swedish', 'Albanian', 'Serbian, Croatian or Bosnian', 'Ukrainian', 'Yiddish', 'Cornish', 'Irish Gaelic', 'Gaelic', 'Scottish Gaelic', 'Scots', 'Portuguese', 'Russian', 'Sign Language', 'Bengali', 'Gujarati', 'Hindi', 'Malayalam', 'Marathi', 'Nepalese', 'Pakistani Pahari', 'Punjabi', 'Sinhala', 'Tamil', 'Telugu', 'Urdu', 'Spanish', 'Turkish', 'Welsh', 'Hebrew', 'Kurdish', 'Pashto', 'Farsi']
     
-    households_text = ['One family only: Cohabiting couple: All children non-dependent','One family only: Cohabiting couple: Dependent children','One family only: Cohabiting couple: No children','One family only: Lone parent: All children non-dependent','One family only: Lone parent: Dependent children','One family only: Married or same-sex civil partnership couple: All children non-dependent','One family only: Married or same-sex civil partnership couple: Dependent children','One family only: Married or same-sex civil partnership couple: No children','One person household: Other','Other household types: With dependent children','One family only: All aged 65 and over','One person household: Aged 65 and over','Other household types: Other (including all full-time students and all aged 65 and over)']
+    households_text = ['Cohabiting couple (children have left home)','Cohabiting couple with children','Cohabiting couple, without children','Single person (children have left home)','Lone parent','Married couple (children have left home)','Married couple with children','Married couple, without children','Single person','Other households, with children','Retired couple','Retired single person','Students and retired']
+    
+    households_census_labels = ['One family only: Cohabiting couple: All children non-dependent','One family only: Cohabiting couple: Dependent children','One family only: Cohabiting couple: No children','One family only: Lone parent: All children non-dependent','One family only: Lone parent: Dependent children','One family only: Married or same-sex civil partnership couple: All children non-dependent','One family only: Married or same-sex civil partnership couple: Dependent children','One family only: Married or same-sex civil partnership couple: No children','One person household: Other','Other household types: With dependent children','One family only: All aged 65 and over','One person household: Aged 65 and over','Other household types: Other (including all full-time students and all aged 65 and over)']
     ##todo find out hello in every langauge      
     languages_hello = ['hallo']
 
@@ -89,6 +93,7 @@ class UKCensusAnswer(ans.Answer):
         'languages':cls.languages,
         'languages_text':cls.languages_text,
         'households_text':cls.households_text,
+        'households_census_labels':cls.households_census_labels,
         'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
         return data
 
@@ -140,14 +145,18 @@ class UKCensusAnswer(ans.Answer):
             if nochildren>0.7:
                 insights['ukcensus_household'] = "You don't have children living at home"
             if nochildren<0.3:
-                insightlist.append("You have children")
+                insights['ukcensus_household'] = "You have children"
             alone = household[3]+household[4]+household[8]+household[11]+household[12]
             if alone<0.3:
                 insights['ukcensus_household'] = "You are in a relationship and living with your partner/spouse."
+            #TODO Check if the calc_probs_household method is always called.
+            
+            insights['ukcensus_household_list'] = (np.sum(self.households[0],(0,1))/10.0).tolist()
+            logging.info(self.households)
+        
         if ('religion' in inference_result):
             rel = inference_result['religion']['distribution']
             listOfReligions = []
-            import numpy as np
             for ratio,name in zip(rel,UKCensusAnswer.religion_text):
                 if (ratio>0.17):
                     listOfReligions.append(name)
@@ -213,7 +222,7 @@ class UKCensusAnswer(ans.Answer):
             langaugestring += ' and ' + active_languages[-1]
         insights['ukcensus_languages'] = "Languages spoken in your area include " + langaugestring
         logging.info(UKCensusAnswer.languages_text[np.argmax(self.languages)])
-        
+        insights['ukcensus_language_list'] = self.languages[0].tolist()
         
         return insights
 
@@ -283,7 +292,7 @@ class UKCensusAnswer(ans.Answer):
         #order = [[i for i,l in enumerate(labs[2]) if l==r][0] for r in cls.???] #?
         arr = np.array(arr) #convert to numpy array
         arr = arr * 1.0
-        for x in range(arr.shape[0]):
+        for x in range(arr.shape[0]): #this finds the probability of being a particular household type given their age and sex.
             for y in range(arr.shape[1]):
                 arr[x,y,:] += 1.0
                 arr[x,y,:] = 1.0*arr[x,y,:] / np.sum(1.0*arr[x,y,:])
@@ -402,11 +411,11 @@ class UKCensusAnswer(ans.Answer):
     def calc_probs_household(self,facts):
         #returns p(oa|household)
         oas = self.get_list_of_oas(facts)
-        localDists = self.getDist(oas,UKCensusAnswer.getHouseholdDist)
+        self.households = self.getDist(oas,UKCensusAnswer.getHouseholdDist)
 
-        shape = localDists[0].shape
-        self.household_probs = np.empty((len(localDists),shape[0],shape[1],shape[2]))
-        for i,p in enumerate(localDists): 
+        shape = self.households[0].shape
+        self.household_probs = np.empty((len(self.households),shape[0],shape[1],shape[2]))
+        for i,p in enumerate(self.households): 
             self.household_probs[i,:,:,:] = p
 
     def calc_probs_travelToWork(self,facts):
@@ -519,7 +528,7 @@ class UKCensusAnswer(ans.Answer):
                         return con['probability']
         return 0 #if it's not been found
 
-    def append_features(self,features,facts): 
+    def append_features(self,features,facts,relationships):
         """Alters the features dictionary in place, adds:
          - age
          - gender
@@ -562,6 +571,11 @@ class UKCensusAnswer(ans.Answer):
         features[self.featurename+"_age"]=pm.Categorical(self.featurename+"_age", self.get_pymc_function_age(features), value=True, observed=True)
         features["religion"]=pm.Categorical("religion", self.get_pymc_function_religion(features)) #, value=True, observed=False)
         features["household"]=pm.Categorical("household", self.get_pymc_function_household(features)) #, value=True, observed=False)
+        
+        relationships.append({'parent':'factor_age', 'child':'oa'})
+        relationships.append({'parent':'factor_gender', 'child':'oa'})
+        relationships.append({'parent':'religion', 'child':'oa'})
+        relationships.append({'parent':'household', 'child':'oa'})
  
     @classmethod
     def pick_question(cls,questions_asked,facts,target):
