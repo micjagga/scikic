@@ -19,6 +19,9 @@ import logging
 import config
 logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
 
+#US ACS5 variables are listed here:
+#http://api.census.gov/data/2014/acs5/variables.html
+
 #Some helpful functions
 def hasNumbers(strings):
     '''Returns true if any of the strings in the 'strings' array have a digit in them.'''
@@ -73,6 +76,17 @@ class USCensusAnswer(ans.Answer):
     language_codes = ['B16001_003E', 'B16001_006E', 'B16001_009E', 'B16001_012E', 'B16001_015E', 'B16001_018E', 'B16001_021E', 'B16001_027E', 'B16001_030E', 'B16001_033E', 'B16001_036E', 'B16001_039E', 'B16001_045E', 'B16001_048E', 'B16001_051E', 'B16001_054E', 'B16001_057E', 'B16001_066E', 'B16001_069E', 'B16001_072E', 'B16001_075E', 'B16001_078E', 'B16001_081E', 'B16001_084E', 'B16001_087E', 'B16001_093E', 'B16001_099E', 'B16001_105E', 'B16001_108E', 'B16001_111E', 'B16001_114E']
 
     languages_text = ['Spanish', 'French', 'French Creole', 'Italian', 'Portuguese or Portuguese Creole', 'German', 'Yiddish', 'a Scandinavian language', 'Greek', 'Russian', 'Polish', 'Serbo-Croatian', 'Armenian', 'Persian', 'Gujarati', 'Hindi', 'Urdu', 'Chinese', 'Japanese', 'Korean', 'Mon-Khmer, Cambodian', 'Hmong', 'Thai', 'Laotian', 'Vietnamese', 'Tagalog', 'Navajo', 'Hungarian', 'Arabic', 'Hebrew', 'an African language']
+    
+    birthplace_codes = ['B05002_003E','B05002_005E','B05002_006E','B05002_007E','B05002_008E','B05002_013E']
+    
+    birthplace_text = ['Born in state of residence','Born in other state in Northeast US','Born in other state in Midwest US','Born in other state in South US','Born in other state in West US','Born outside the US']
+    
+    
+    households_codes = ['B11001_002E','B11001_003E','B11001_004E','B11001_005E',
+    'B11001_006E','B11001_007E','B11001_008E','B11001_009E']
+    
+    households_text = ['All family household','Married couple','Other family household','Single dad','Single mum','Non-family household','Single person','Shared property']
+    
     def insights(self,inference_result,facts):
     
         if self.prob_in_us(facts)<0.01:
@@ -125,7 +139,7 @@ class USCensusAnswer(ans.Answer):
         #Get all languages
         bgs = self.get_list_of_bgs(facts)
         logging.info('GET ALL LANGUAGES')        
-        for bg in bgs:
+        for bg in bgs: #TODO!!! THIS MAKES NO SENSE! WE'RE ONLY GETTING A RESEULT FOR THE LAST BG!
             logging.info(str(bg))
             if (bg[3]!=None): #we need to reduce the resolution and recompute
                 bg[2] = [bg[2]]
@@ -140,7 +154,19 @@ class USCensusAnswer(ans.Answer):
         insights['uscensus_language_list'] = lang_counts
         insights['uscensus_debug_languages'] = json.dumps(results)
         
-        #insights['uscensus_debug_1'] = str(ages_combined.shape)
+        #Birthplaces....
+        results, geolocs = USCensusAnswer.USCensusApiQuery(bg,USCensusAnswer.birthplace_codes)
+        birthplace_counts = results[0]
+        
+        birthplace_percs = np.round(100.0 * np.array(birthplace_counts) / np.sum(birthplace_counts))
+        insights['uscensus_birthplace'] = "%d%% of people in your neighbourhood were born in your state." % birthplace_percs[0]
+        insights['uscensus_birthplace_list'] = birthplace_counts
+     
+        #households....
+        results, geolocs = USCensusAnswer.USCensusApiQuery(bg,USCensusAnswer.households_codes)
+        households_counts = results[0]
+        insights['uscensus_households_list'] = households_counts    
+    
         #halfway = np.sum((np.cumsum(ages_combined)/np.sum(ages_combined))<0.5)        
         #insights['uscensus_popage_previous_version'] = "Half the people in your area are under the age of %d" % (USCensusAnswer._age_range[halfway])
         return insights
@@ -383,6 +409,10 @@ class USCensusAnswer(ans.Answer):
     def metaData(cls):
         return {'language_codes':cls.language_codes,
                 'languages_text':cls.languages_text,
+                'birthplace_codes':cls.birthplace_codes,
+                'birthplace_text':cls.birthplace_text,
+                'households_codes':cls.households_codes,
+                'households_text':cls.households_text,
                 '_age_range':cls._age_range.tolist(),
                 '_states':cls._states,
                 'citation':'The <a href="http://www.census.gov/developers/">US census bureau</a>. In particular the American Community Survey <a href="http://www.census.gov/data/developers/data-sets/acs-survey-5-year-data.html">5 year data</a>.'}

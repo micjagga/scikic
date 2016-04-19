@@ -71,6 +71,9 @@ class UKCensusAnswer(ans.Answer):
     religions = ['Christian','Buddhist','Hindu','Jewish','Muslim','Sikh','Other religion','No religion']
     religion_text = ['Christian','Buddhist','Hindu','Jewish','Muslim','Sikh','religious (but I do\'t know which)','of no religion']
 
+    countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
+    
+
     transport = ['Taxi', 'Bicycle', 'On foot', 'Not in employment', 'Work mainly at or from home', 'Motorcycle, scooter or moped', 'Bus, minibus or coach', 'Train', 'Underground, metro, light rail, tram', 'Passenger in a car or van', 'Driving a car or van', 'Other method of travel to work']
     transport_text = ['take a taxi to work', 'cycle to work', 'go to work on foot', 'not be in work', 'mainly work from home', 'use a motorcycle to get to work', 'take the bus to work', 'take the train to work', 'use an underground or tram to get to work', 'get a lift in a car to work', 'drive to work', 'use an unusual method of travel to get to work']
 
@@ -94,6 +97,7 @@ class UKCensusAnswer(ans.Answer):
         'languages_text':cls.languages_text,
         'households_text':cls.households_text,
         'households_census_labels':cls.households_census_labels,
+        'countryofbirth_labels':cls.countryofbirth_labels,
         'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
         return data
 
@@ -215,7 +219,16 @@ class UKCensusAnswer(ans.Answer):
         trans_type = UKCensusAnswer.transport_text[np.argmax(localratios)]
         insights['ukcensus_traveltowork'] = 'People in your area are %0.0f times more likely to %s than the national average.' % (maxnum, trans_type)
         
-        logging.info(str(np.nonzero(np.array(self.languages))))
+        logging.info('self.countryofbirth')
+        insights['ukcensus_note'] = 'The probabilities provided by the insights have had smoothing/regularisation done to them to avoid p=0 scenarios.'
+        cob = self.countryofbirth[0]
+        logging.info(cob)   
+        logging.info(self.traveltowork_probs) 
+        insights['ukcensus_countryofbirth'] = '%d%% of the people who live in your area were born in England, %d%% in Wales, Scotland and Northern Ireland. %d%% were born elsewhere in the EU while %d%% were from outside the EU.' % (round(cob[0]*100.0), round((cob[2]+cob[4]+cob[6])*100.0), round((cob[1]+cob[7]+cob[8])*100.0), round(cob[3]*100))
+        insights['ukcensus_countryofbirth_list'] = cob.tolist()
+        
+          #  countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
+        
         active_languages = [UKCensusAnswer.languages_text[i] for i in np.nonzero(np.array(self.languages))[1]]
         langaugestring = ', '.join(active_languages[0:-1])
         if (len(active_languages)>1):
@@ -313,6 +326,19 @@ class UKCensusAnswer(ans.Answer):
         returnList[0] = arr #now return via the argument so this can be called as a thread
 
     @classmethod
+    def getCountryOfBirth(cls,geoArea,returnList):
+        """Gets the country of birth for an Output Area"""
+        data, mat = cls.ONSapiQuery(geoArea,'KS204EW')
+        arr,labs = dict_to_array(mat) #Convert the dictionary hierarchy to a numpy array        
+        order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.countryofbirth_labels] #sort by the order we want it in.
+        arr = np.array(arr) #convert to numpy array
+        arr = arr[order]
+        arr = arr * 1.0        
+        arr += 1.0
+        arr = 1.0*arr / np.sum(1.0*arr)
+        returnList[0] = arr #now return via the argument so this can be called as a thread        
+
+    @classmethod
     def getReligionDist(cls,geoArea,returnList):
         """Gets the religion distribution given the label of a particular geographical area"""
         data,mat = cls.ONSapiQuery(geoArea,'LC2107EW')        #LC2107EW = religion by age, gender, etc
@@ -394,8 +420,7 @@ class UKCensusAnswer(ans.Answer):
     def get_other_distributions(self,facts):
         oas = self.get_list_of_oas(facts)
         self.popdensity = self.getDist(oas,UKCensusAnswer.getPopDensity)
-        self.languages = self.getDist(oas,UKCensusAnswer.getLanguages)
-
+        self.languages = self.getDist(oas,UKCensusAnswer.getLanguages)        
 
      
     def calc_probs_religion(self,facts):
@@ -428,6 +453,15 @@ class UKCensusAnswer(ans.Answer):
         for i,p in enumerate(localDists): 
             self.traveltowork_probs[i,:] = p
 
+    def calc_probs_countryOfBirth(self,facts): #not actually called as only used for insights... TODO Delete?
+        #returns p(oa|countryOfBirth)
+        oas = self.get_list_of_oas(facts)
+        localDists = self.getDist(oas,UKCensusAnswer.getCountryOfBirth)
+       
+        shape = localDists[0].shape
+        self.countryofbirth = np.empty((len(localDists),shape[0]))
+        for i,p in enumerate(localDists): 
+            self.countryofbirth[i,:] = p
 
 
     def calc_probs_age(self,facts):
@@ -503,7 +537,7 @@ class UKCensusAnswer(ans.Answer):
     def get_pymc_function_household(self,features):
         probs = self.household_probs
         @pm.deterministic    
-        def givenReligion(age=features['factor_age'],oa=features['oa'],gender=features['factor_gender']):
+        def givenHousehold(age=features['factor_age'],oa=features['oa'],gender=features['factor_gender']):
             pHousehold = probs
             #the household dataset is only split into a few bins of age, so handling that here:
             if (age<16):
@@ -517,9 +551,8 @@ class UKCensusAnswer(ans.Answer):
             else:
                 age_p = 4
             return pHousehold[oa,gender,age_p] #P(household|gender,age)
-        return givenReligion
+        return givenHousehold
     
-
     def prob_in_uk(self,facts):
         if 'where' in facts:
             if 'country' in facts['where']:
@@ -549,8 +582,9 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_age(facts)
         self.calc_probs_religion(facts)
         self.calc_probs_household(facts)
-        self.calc_probs_travelToWork(facts)
-        self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.
+        self.calc_probs_travelToWork(facts)        
+        self.calc_probs_countryOfBirth(facts)        
+        self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.        
         
         if not 'factor_age' in features:
             p = np.ones(101) #flat prior
