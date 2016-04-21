@@ -42,7 +42,7 @@ class DemographicAnswer(ans.Answer):
             facts['gender'] = self.answer
 
     
-    def append_features(self,features,facts,relationships):
+    def append_features(self,features,facts,relationships,descriptions):
         #normally factor_age is a flat prior, but here we make it very non-flat, as we know the answer. Ideally we'd manipulate the other probability distributions to integrate out age, but that's quite tricky (programmatically).
         if ('age' in facts):
             if not 'factor_age' in features:    #TODO: We need to overwrite factor_age with this more certain distribution
@@ -64,6 +64,9 @@ class DemographicAnswer(ans.Answer):
                     ratio = [0.5,0.5] #don't know what to do, as the census etc doesn't have data for this situation.
                 features['factor_gender'] = pm.Categorical('factor_gender',np.array(ratio)); #male, female...
       
+        descriptions['factor_age'] = {'desc':'Your age'}
+        descriptions['factor_gender'] = {'desc':'Your gender'}      
+        
     @classmethod
     def pick_question(self,questions_asked,facts,target):
         dataitem = random.choice(['age','gender'])

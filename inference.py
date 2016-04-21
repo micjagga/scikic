@@ -93,9 +93,10 @@ def do_inference(data):
     
     features = {}
     relationships = []
+    descriptions = {}
     for a in answers:
         logging.info('   adding %s' % a.dataset)
-        a.append_features(features,facts,relationships)
+        a.append_features(features,facts,relationships,descriptions)
 
     logging.info('   features has %d items' % (len(features)))
     for f in features:
@@ -103,7 +104,7 @@ def do_inference(data):
 
     model = pm.Model(features)
     mcmc = pm.MCMC(model)
-    mcmc.sample(10000,1000,4,progress_bar=False)
+    mcmc.sample(50000,1000,4,progress_bar=False)
     output = {}
 
     for feature in features:
@@ -136,7 +137,7 @@ def do_inference(data):
     for a in answers:
         insights.update(a.insights(output, facts))
 
-    return output, facts, insights, relationships
+    return output, facts, insights, relationships, descriptions
 
 #Some datasets need to process an answer (for example lookup where a location is, etc). It's best to do this once, when you get
 #the user response, rather than repeatedly later, when you read it.
@@ -182,7 +183,7 @@ def pick_question(data):
         questions_only_asked.append(questionstring) #this doesn't include the answer so we can look for if we've asked the question already.
 
     found = False           #have we found a question?
-    for counter in range(20):
+    for counter in range(200): #skip though everything until we find one...
 #        c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset not in ['personality']] 
         c = [cls for cls in ans.Answer.__subclasses__()]
         cl = random.choice(c)

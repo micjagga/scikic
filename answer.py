@@ -109,7 +109,7 @@ class Answer(object):
         """
         pass
     
-    def append_features(self,features,facts,relationships):
+    def append_features(self,features,facts,relationships,descriptions):
         """Alters the features dictionary in place, adding features associated with
         this instance.
 

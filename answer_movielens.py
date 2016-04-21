@@ -92,7 +92,7 @@ class MovieAnswer(ans.Answer):
         self.dataitem = dataitem
         self.movie = movie
         self.answer = answer
-        self.featurename = name
+        self.featurename = str('movie_'+dataitem+'_'+self.get_movie_name(movie))
         
     def question_to_text(self):
         m = self.get_movie_name(self.movie)
@@ -158,7 +158,7 @@ class MovieAnswer(ans.Answer):
             return pSeen_AgeGender[age][gender]
         return seenGivenAgeGender
     
-    def append_features(self,features,facts,relationships):
+    def append_features(self,features,facts,relationships,descriptions):
         """Alters the features dictionary in place, adds:
          - age
          - gender
@@ -183,9 +183,12 @@ class MovieAnswer(ans.Answer):
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
         seen = hf.true_string(self.answer);
         features[self.featurename]=pm.Categorical(self.featurename, self.get_pymc_function(features), value=seen, observed=True)
-        relationships.append({'parent':'factor_gender', 'child':'movie '+self.movie})
-        relationships.append({'parent':'factor_age', 'child':'movie '+self.movie})
+        relationships.append({'parent':'factor_gender', 'child':self.featurename})
+        relationships.append({'parent':'factor_age', 'child':self.featurename})
         
+        descriptions["factor_gender"] = {'desc':'Your gender'}
+        descriptions["factor_age"] = {'desc':'Your age'}        
+        descriptions[self.featurename] = {'desc':'Probability of being in this blockgroup given other features'}                
         
     @classmethod
     def pick_question(self,questions_asked,facts,target):

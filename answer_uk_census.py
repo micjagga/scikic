@@ -506,7 +506,7 @@ class UKCensusAnswer(ans.Answer):
         """
         probs = self.age_probs
         @pm.deterministic    
-        def givenAgeGender(age=features['factor_age'],oa=features['oa']):
+        def givenAgeGender(age=features['factor_age'],oa=features['outputarea']):
             pAgeGender = probs
             return pAgeGender[age,oa] #P(oa|age)
         return givenAgeGender
@@ -514,7 +514,7 @@ class UKCensusAnswer(ans.Answer):
     def get_pymc_function_religion(self,features):
         probs = self.rel_probs
         @pm.deterministic    
-        def givenReligion(age=features['factor_age'],oa=features['oa'],gender=features['factor_gender']):
+        def givenReligion(age=features['factor_age'],oa=features['outputarea'],gender=features['factor_gender']):
             pReligion = probs
             #the religion dataset is only split into a few bins of age, so handling that here:
             if (age<16):
@@ -537,7 +537,7 @@ class UKCensusAnswer(ans.Answer):
     def get_pymc_function_household(self,features):
         probs = self.household_probs
         @pm.deterministic    
-        def givenHousehold(age=features['factor_age'],oa=features['oa'],gender=features['factor_gender']):
+        def givenHousehold(age=features['factor_age'],oa=features['outputarea'],gender=features['factor_gender']):
             pHousehold = probs
             #the household dataset is only split into a few bins of age, so handling that here:
             if (age<16):
@@ -561,7 +561,7 @@ class UKCensusAnswer(ans.Answer):
                         return con['probability']
         return 0 #if it's not been found
 
-    def append_features(self,features,facts,relationships):
+    def append_features(self,features,facts,relationships,descriptions):
         """Alters the features dictionary in place, adds:
          - age
          - gender
@@ -593,23 +593,30 @@ class UKCensusAnswer(ans.Answer):
         if not 'factor_gender' in features:
             p = np.array([.5,.5]) #approx flat            
             features['factor_gender'] = pm.Categorical('factor_gender',p);
-        if not 'oa' in features:
+        if not 'outputarea' in features:
             probs = self.get_list_of_oa_probs(facts)
-            features['oa'] = pm.Categorical('oa',probs); #if we don't have the ukcensus array then we just have a probability of one for one output area
+            features['outputarea'] = pm.Categorical('outputarea',probs); #if we don't have the ukcensus array then we just have a probability of one for one output area
 
         if self.featurename+"_age" in features:
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename+"_age");
         if "religion" in features:
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % "religion");
 
-        features[self.featurename+"_age"]=pm.Categorical(self.featurename+"_age", self.get_pymc_function_age(features), value=True, observed=True)
+        features[self.featurename+"_age"]=pm.Categorical(self.featurename+"_outputarea", self.get_pymc_function_age(features), value=True, observed=True)
         features["religion"]=pm.Categorical("religion", self.get_pymc_function_religion(features)) #, value=True, observed=False)
         features["household"]=pm.Categorical("household", self.get_pymc_function_household(features)) #, value=True, observed=False)
         
-        relationships.append({'parent':'factor_age', 'child':'oa'})
-        relationships.append({'parent':'factor_gender', 'child':'oa'})
-        relationships.append({'parent':'religion', 'child':'oa'})
-        relationships.append({'parent':'household', 'child':'oa'})
+        relationships.append({'parent':'factor_age', 'child':'outputarea'})
+        relationships.append({'parent':'factor_gender', 'child':'outputarea'})
+        relationships.append({'parent':'religion', 'child':'outputarea'})
+        relationships.append({'parent':'household', 'child':'outputarea'})
+        
+        descriptions['factor_age'] = {'desc':'Your age'}
+        descriptions['factor_gender'] = {'desc':'Your gender'}
+        descriptions['religion'] = {'desc':'Your religion'}
+        descriptions['household'] = {'desc':'Your household composition'}
+        descriptions['outputarea'] = {'desc':'Your geographic location'}        
+        descriptions[self.featurename+"_outputarea"] = {'desc':'Probability of being in this output area given your features'}  #TODO Figure this out
  
     @classmethod
     def pick_question(cls,questions_asked,facts,target):

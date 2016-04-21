@@ -203,9 +203,10 @@ class BabyNamesAnswer(ans.Answer):
           itemdetails: Details about the item, not really used.
           answer (default None): The name of the person
         """
+        logging.info('Instantiating babynames')
         self.dataitem = dataitem
         self.itemdetails = itemdetails
-        self.featurename = name
+        self.featurename = 'first_name' #overridden
         self.answer = answer
 
     def insights(self,inference_result,facts):
@@ -232,7 +233,7 @@ class BabyNamesAnswer(ans.Answer):
 
     def question_to_text(self):
         if (self.dataitem=='name'):
-            return "What's your name?"#TODO We don't need to ask a question, get it from Facts dictionary.
+            return {'question':"What's your name?",'type':'text'} #"What's your name?"#TODO We don't need to ask a question, get it from Facts dictionary.
         return "No question."
 
     @classmethod
@@ -285,7 +286,12 @@ class BabyNamesAnswer(ans.Answer):
         self.probs[:,0,0] = 1-p_male#*5000
         self.probs[:,1,1] = p_female#*5000
         self.probs[:,1,0] = 1-p_female#*5000
-
+        
+        logging.info('***************************************')
+        logging.info(self.probs)
+        logging.info('***************************************')
+        
+        
     def get_pymc_function(self,features):
         """Returns a function for use with the pyMC module:
           - p(name|age,gender)
@@ -304,7 +310,7 @@ class BabyNamesAnswer(ans.Answer):
             return p[age][gender]
         return seenGivenAgeGender
     
-    def append_features(self,features,facts,relationships):
+    def append_features(self,features,facts,relationships,descriptions):
         """Alters the features dictionary in place, adds:
          - age
          - gender
@@ -318,6 +324,10 @@ class BabyNamesAnswer(ans.Answer):
           DuplicateFeatureException: If an identically named feature already exists that clashes with this instance
         """
         #age: 0-100
+        
+        if 'first_name' not in facts: #we don't know their first name
+            return
+        logging.info('Appending babynames features')
         if 'first_name' in facts:
             self.answer = facts['first_name']
         else:
@@ -333,8 +343,8 @@ class BabyNamesAnswer(ans.Answer):
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
         features[self.featurename]=pm.Categorical(self.featurename, self.get_pymc_function(features), value=True, observed=True)
 
-        relationships.append({'parent':'factor_gender', 'child':'name'})
-        relationships.append({'parent':'factor_age', 'child':'name'})
+        relationships.append({'parent':'factor_gender', 'child':'first_name'})
+        relationships.append({'parent':'factor_age', 'child':'first_name'})
 
     @classmethod
     def metaData(cls):

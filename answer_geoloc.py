@@ -63,9 +63,6 @@ class GeoLocAnswer(ans.Answer):
                 facts['guess_loc']['ip_wrong'] = True
 
 
-#    def append_features(self,features,facts): 
-#        #this class doesn't directly create features. For example the census class will do this.
-#        pass
 
     @classmethod
     def pick_question(cls,questions_asked,facts,target):      

@@ -27,6 +27,48 @@ file_handler.setLevel(logging.WARNING)
 app.logger.addHandler(file_handler)
 
 
+#code from http://flask.pocoo.org/snippets/56/ to allow response to go to a different server
+#necessary as Vasily's code doesn't specify an origin, so we end up with FLASK not trusting it.
+def crossdomain(origin=None, methods=None, headers=None,
+                max_age=21600, attach_to_all=True,
+                automatic_options=True):
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, basestring):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, basestring):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        if methods is not None:
+            return methods
+        options_resp = current_app.make_default_options_response()
+        return options_resp.headers['allow']
+
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            if automatic_options and request.method == 'OPTIONS':
+                resp = current_app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+            h = resp.headers
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+    return decorator
+    
+    
+    
+
 def parse_json(data):
     try:
         out = json.loads(data)
@@ -89,64 +131,21 @@ def handle_invalid_usage(error):
     return response
 
 @app.route('/', methods=['GET', 'POST'])
+@crossdomain(origin='*')
 def root():
     return "Root node"
     
 @app.route('/inference', methods=['POST'])
+@crossdomain(origin='*')
 def route_inference():
     data = parse_json(request.data)
-    features, facts, insights, relationships = inference.do_inference(data)
+    features, facts, insights, relationships, descriptions = inference.do_inference(data)
     facts = recursive_numpy_array_removal(facts)
-    output_string = json.dumps({'features':features,'facts':facts,'insights':insights,'relationships':relationships})
+    output_string = json.dumps({'features':features,'facts':facts,'insights':insights,'relationships':relationships,'feature_descriptions':descriptions})
     return output_string
     
 
 
-#code from http://flask.pocoo.org/snippets/56/ to allow response to go to a different server
-#necessary as Vasily's code doesn't specify an origin, so we end up with FLASK not trusting it.
-def crossdomain(origin=None, methods=None, headers=None,
-                max_age=21600, attach_to_all=True,
-                automatic_options=True):
-    if methods is not None:
-        methods = ', '.join(sorted(x.upper() for x in methods))
-    if headers is not None and not isinstance(headers, basestring):
-        headers = ', '.join(x.upper() for x in headers)
-    if not isinstance(origin, basestring):
-        origin = ', '.join(origin)
-    if isinstance(max_age, timedelta):
-        max_age = max_age.total_seconds()
-
-    def get_methods():
-        if methods is not None:
-            return methods
-
-        options_resp = current_app.make_default_options_response()
-        return options_resp.headers['allow']
-
-
-
-
-    def decorator(f):
-        def wrapped_function(*args, **kwargs):
-            if automatic_options and request.method == 'OPTIONS':
-                resp = current_app.make_default_options_response()
-            else:
-                resp = make_response(f(*args, **kwargs))
-            if not attach_to_all and request.method != 'OPTIONS':
-                return resp
-
-            h = resp.headers
-
-            h['Access-Control-Allow-Origin'] = origin
-            h['Access-Control-Allow-Methods'] = get_methods()
-            h['Access-Control-Max-Age'] = str(max_age)
-            if headers is not None:
-                h['Access-Control-Allow-Headers'] = headers
-            return resp
-
-        f.provide_automatic_options = False
-        return update_wrapper(wrapped_function, f)
-    return decorator
     
 @app.route('/question', methods=['POST'])
 @crossdomain(origin='*')
@@ -157,16 +156,19 @@ def route_question():
     return json.dumps({'question':question['question'], 'facts':question['facts'], 'question_string':question_string})
 
 @app.route('/version', methods=['GET','POST'])
+@crossdomain(origin='*')
 def route_version():     
     return json.dumps({'version':'3.0'})
       
 @app.route('/metadata', methods=['POST'])
+@crossdomain(origin='*')
 def route_metadata(): 
     data = parse_json(request.data)  
     metadata = inference.get_meta_data(data)
     return json.dumps(metadata)
 
 @app.route('/psych', methods=['POST'])
+@crossdomain(origin='*')
 def route_psych(): 
     data = parse_json(request.data)
     if 'typelist' in data:

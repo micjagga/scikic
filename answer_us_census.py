@@ -73,9 +73,9 @@ class USCensusAnswer(ans.Answer):
     #B16001_001E = Total
     
     #this doesn't include English.
-    language_codes = ['B16001_003E', 'B16001_006E', 'B16001_009E', 'B16001_012E', 'B16001_015E', 'B16001_018E', 'B16001_021E', 'B16001_027E', 'B16001_030E', 'B16001_033E', 'B16001_036E', 'B16001_039E', 'B16001_045E', 'B16001_048E', 'B16001_051E', 'B16001_054E', 'B16001_057E', 'B16001_066E', 'B16001_069E', 'B16001_072E', 'B16001_075E', 'B16001_078E', 'B16001_081E', 'B16001_084E', 'B16001_087E', 'B16001_093E', 'B16001_099E', 'B16001_105E', 'B16001_108E', 'B16001_111E', 'B16001_114E']
+    language_codes = ['B16001_002E', 'B16001_003E', 'B16001_006E', 'B16001_009E', 'B16001_012E', 'B16001_015E', 'B16001_018E', 'B16001_021E', 'B16001_027E', 'B16001_030E', 'B16001_033E', 'B16001_036E', 'B16001_039E', 'B16001_045E', 'B16001_048E', 'B16001_051E', 'B16001_054E', 'B16001_057E', 'B16001_066E', 'B16001_069E', 'B16001_072E', 'B16001_075E', 'B16001_078E', 'B16001_081E', 'B16001_084E', 'B16001_087E', 'B16001_093E', 'B16001_099E', 'B16001_105E', 'B16001_108E', 'B16001_111E', 'B16001_114E']
 
-    languages_text = ['Spanish', 'French', 'French Creole', 'Italian', 'Portuguese or Portuguese Creole', 'German', 'Yiddish', 'a Scandinavian language', 'Greek', 'Russian', 'Polish', 'Serbo-Croatian', 'Armenian', 'Persian', 'Gujarati', 'Hindi', 'Urdu', 'Chinese', 'Japanese', 'Korean', 'Mon-Khmer, Cambodian', 'Hmong', 'Thai', 'Laotian', 'Vietnamese', 'Tagalog', 'Navajo', 'Hungarian', 'Arabic', 'Hebrew', 'an African language']
+    languages_text = ['English', 'Spanish', 'French', 'French Creole', 'Italian', 'Portuguese or Portuguese Creole', 'German', 'Yiddish', 'a Scandinavian language', 'Greek', 'Russian', 'Polish', 'Serbo-Croatian', 'Armenian', 'Persian', 'Gujarati', 'Hindi', 'Urdu', 'Chinese', 'Japanese', 'Korean', 'Mon-Khmer, Cambodian', 'Hmong', 'Thai', 'Laotian', 'Vietnamese', 'Tagalog', 'Navajo', 'Hungarian', 'Arabic', 'Hebrew', 'an African language']
     
     birthplace_codes = ['B05002_003E','B05002_005E','B05002_006E','B05002_007E','B05002_008E','B05002_013E']
     
@@ -108,6 +108,7 @@ class USCensusAnswer(ans.Answer):
             if (prop>1.1): #otherwise it's unremarkable
                 odd_age = USCensusAnswer._age_range[idx]
                 insights['uscensus_genderratio'] = 'There are %d%% more women than men aged %d to %d living in your area.' % (round((prop-1)*100), odd_age, odd_age+5)
+                #insights['future_uscensus_genderratio'] = {'value':'There are %d%% more women than men aged %d to %d living in your area.' % (round((prop-1)*100), odd_age, odd_age+5), 'type':'msg'}    #msg, dist or debug            
         if (np.max(gender_bias)>50):
             idx = np.argmax(gender_bias)
             prop = ((1.0*(ages[0,idx]/ages[1,idx])))
@@ -354,7 +355,7 @@ class USCensusAnswer(ans.Answer):
         """
         probs = self.age_probs
         @pm.deterministic    
-        def givenAge(age=features['factor_age'],bg=features['bg']):
+        def givenAge(age=features['factor_age'],bg=features['blockgroup']):
             pAge = probs
             return pAge[age,bg]
         return givenAge
@@ -367,7 +368,7 @@ class USCensusAnswer(ans.Answer):
                         return con['probability']
         return 0 #if it's not been found
 
-    def append_features(self,features,facts,relationships):
+    def append_features(self,features,facts,relationships,descriptions):
         """Alters the features dictionary in place, adds:
          - age
          - gender
@@ -388,17 +389,21 @@ class USCensusAnswer(ans.Answer):
             p = np.ones(101) #flat prior, will be unflattened by US stats (TODO confirm)
             p = p/p.sum()
             features['factor_age'] = pm.Categorical('factor_age',p);
-        if not 'bg' in features:
+        if not 'blockgroup' in features:
             p = self.get_list_of_bg_probs(facts)
-            features['bg'] = pm.Categorical('bg',p);
+            features['blockgroup'] = pm.Categorical('blockgroup',p);
             
         if self.featurename+"_age" in features:
             raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename+"_age");
         
-        features[self.featurename+"_age"]=pm.Categorical(self.featurename+"_age", self.get_pymc_function_age(features), value=True, observed=True)
+        features[self.featurename+"_blockgroup"]=pm.Categorical(self.featurename+"_age", self.get_pymc_function_age(features), value=True, observed=True)
         
-        relationship = {'parent':'factor_age', 'child':'bg'}
-        relationships.append(relationship)        
+        relationship = {'parent':'factor_age', 'child':'blockgroup'}
+        relationships.append(relationship)    
+        
+        descriptions['factor_age'] = {'desc':'Your age'}    
+        descriptions['blockgroup'] = {'desc':'Your geographical location'}
+        descriptions[self.featurename+"_blockgroup"] = {'desc':'Probability of being in this block group given your features'}  #TODO Figure this out        
 
     @classmethod
     def pick_question(self,questions_asked,facts,target):
