@@ -74,11 +74,11 @@ class UKCensusAnswer(ans.Answer):
     countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
     
     #0 No of Bedrooms: 1
-	   		#1 No of Bedrooms: 2
-	   		#2 No of Bedrooms: 3
-	   		#3 No of Bedrooms: 4
-	   		#4 No of Bedrooms: 5 0r more
-	   		#5 No bedrooms
+	#1 No of Bedrooms: 2
+	#2 No of Bedrooms: 3
+	#3 No of Bedrooms: 4
+	#4 No of Bedrooms: 5 0r more
+	#5 No bedrooms
 	bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
     bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
 
