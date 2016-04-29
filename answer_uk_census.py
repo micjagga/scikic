@@ -79,8 +79,8 @@ class UKCensusAnswer(ans.Answer):
 	   		#3 No of Bedrooms: 4
 	   		#4 No of Bedrooms: 5 0r more
 	   		#5 No bedrooms
-	   		bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
-	   		bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
+	bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
+    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
 
     transport = ['Taxi', 'Bicycle', 'On foot', 'Not in employment', 'Work mainly at or from home', 'Motorcycle, scooter or moped', 'Bus, minibus or coach', 'Train', 'Underground, metro, light rail, tram', 'Passenger in a car or van', 'Driving a car or van', 'Other method of travel to work']
     transport_text = ['take a taxi to work', 'cycle to work', 'go to work on foot', 'not be in work', 'mainly work from home', 'use a motorcycle to get to work', 'take the bus to work', 'take the train to work', 'use an underground or tram to get to work', 'get a lift in a car to work', 'drive to work', 'use an unusual method of travel to get to work']
