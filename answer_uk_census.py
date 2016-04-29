@@ -72,15 +72,6 @@ class UKCensusAnswer(ans.Answer):
     religion_text = ['Christian','Buddhist','Hindu','Jewish','Muslim','Sikh','religious (but I do\'t know which)','of no religion']
 
     countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
-    
-    #0 No of Bedrooms: 1
-	#1 No of Bedrooms: 2
-	#2 No of Bedrooms: 3
-	#3 No of Bedrooms: 4
-	#4 No of Bedrooms: 5 0r more
-	#5 No bedrooms
-	bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
-    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
 
     transport = ['Taxi', 'Bicycle', 'On foot', 'Not in employment', 'Work mainly at or from home', 'Motorcycle, scooter or moped', 'Bus, minibus or coach', 'Train', 'Underground, metro, light rail, tram', 'Passenger in a car or van', 'Driving a car or van', 'Other method of travel to work']
     transport_text = ['take a taxi to work', 'cycle to work', 'go to work on foot', 'not be in work', 'mainly work from home', 'use a motorcycle to get to work', 'take the bus to work', 'take the train to work', 'use an underground or tram to get to work', 'get a lift in a car to work', 'drive to work', 'use an unusual method of travel to get to work']
@@ -94,6 +85,14 @@ class UKCensusAnswer(ans.Answer):
     households_census_labels = ['One family only: Cohabiting couple: All children non-dependent','One family only: Cohabiting couple: Dependent children','One family only: Cohabiting couple: No children','One family only: Lone parent: All children non-dependent','One family only: Lone parent: Dependent children','One family only: Married or same-sex civil partnership couple: All children non-dependent','One family only: Married or same-sex civil partnership couple: Dependent children','One family only: Married or same-sex civil partnership couple: No children','One person household: Other','Other household types: With dependent children','One family only: All aged 65 and over','One person household: Aged 65 and over','Other household types: Other (including all full-time students and all aged 65 and over)']
     ##todo find out hello in every langauge      
     languages_hello = ['hallo']
+    #0 No of Bedrooms: 1
+	#1 No of Bedrooms: 2
+	#2 No of Bedrooms: 3
+	#3 No of Bedrooms: 4
+	#4 No of Bedrooms: 5 0r more
+	#5 No bedrooms
+	bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
+    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
 
     @classmethod
     def metaData(cls):
