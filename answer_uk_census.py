@@ -612,7 +612,8 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_age(facts)
         self.calc_probs_religion(facts)
         self.calc_probs_household(facts)
-        self.calc_probs_travelToWork(facts)        
+        self.calc_probs_travelToWork(facts) 
+        self.calc_probs_household_bedrooms(facts)       
         self.calc_probs_countryOfBirth(facts)        
         self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.        
         
