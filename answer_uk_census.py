@@ -243,6 +243,14 @@ class UKCensusAnswer(ans.Answer):
         logging.info(UKCensusAnswer.languages_text[np.argmax(self.languages)])
         insights['ukcensus_language_list'] = self.languages[0].tolist()
         
+                #we need to roughly handle the smoothing so that rare modes don't get over represented
+        bedrooms_probs = bedrooms_probs + (1.0/200) 
+        bedrooms_probs = bedrooms_probs / np.sum(bedrooms_probs)
+
+        lr = self.household_bedrooms_probs/bedrooms_probs
+        maxn = np.max(lr)
+        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lr)]
+        insights['ukcensus_household_bedrooms'] = 'People in your area are %0.0f times more likely to %s than the national average.' % (maxn, bedroom_type)
         return insights
 
     @classmethod
@@ -612,7 +620,8 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_age(facts)
         self.calc_probs_religion(facts)
         self.calc_probs_household(facts)
-        self.calc_probs_travelToWork(facts)        
+        self.calc_probs_travelToWork(facts)  
+        self.calc_probs_household_bedrooms(facts)      
         self.calc_probs_countryOfBirth(facts)        
         self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.        
         
