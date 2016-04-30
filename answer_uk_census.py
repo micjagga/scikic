@@ -250,6 +250,7 @@ class UKCensusAnswer(ans.Answer):
         lr = self.household_bedrooms_probs/bedrooms_probs
         maxnum = np.max(lr)
         bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lr)]
+        logging.info(bedroom_type, maxnum -------->)
         insights['ukcensus_household_bedrooms'] = 'Households in your area have %0.0f times more likely to %s than the national average.' % (maxnum, bedroom_type)
         return insights
 
