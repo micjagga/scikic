@@ -239,16 +239,16 @@ class UKCensusAnswer(ans.Answer):
           #  countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
 
 
-        noofbedrooms_probs = np.array([0.03459364, 0.04740108, 0.03334676, 0.02501559, 0.01863632, 0.00335524]) # Todo: This distribution should be gotten from the ONS API
+        # noofbedrooms_probs = np.array([0.03459364, 0.04740108, 0.03334676, 0.02501559, 0.01863632, 0.00335524]) # Todo: This distribution should be gotten from the ONS API
 
-        # getting the average
-        noofbedrooms_probs = noofbedrooms_probs + (1.0/200)
-        noofbedrooms_probs = noofbedrooms_probs / np.sum(noofbedrooms_probs)
-        xl = self.household_bedrooms_probs / noofbedrooms_probs
-        maxBedroomNum = np.max(xl)
-        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(xl)]
-        insights['ukcensus_household_bedrooms'] = 'Households in your area are %0.0f times more likely to have %s than the national average.' % (maxBedroomNum, bedroom_type)
-        logging.info(self.household_bedrooms_probs)
+        # # getting the average
+        # noofbedrooms_probs = noofbedrooms_probs + (1.0/200)
+        # noofbedrooms_probs = noofbedrooms_probs / np.sum(noofbedrooms_probs)
+        # xl = self.household_bedrooms_probs / noofbedrooms_probs
+        # maxBedroomNum = np.max(xl)
+        # bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(xl)]
+        # insights['ukcensus_household_bedrooms'] = 'Households in your area are %0.0f times more likely to have %s than the national average.' % (maxBedroomNum, bedroom_type)
+        # logging.info(self.household_bedrooms_probs)
 
         active_languages = [UKCensusAnswer.languages_text[i] for i in np.nonzero(np.array(self.languages))[1]]
         langaugestring = ', '.join(active_languages[0:-1])
@@ -498,15 +498,15 @@ class UKCensusAnswer(ans.Answer):
         for i,p in enumerate(localDists):
             self.countryofbirth[i,:] = p
 
-    def calc_probs_household_bedrooms(self,facts):
-        # returns p(oa|household_bedrooms)
-        oas = self.get_list_of_oas(facts)
-        localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
+    # def calc_probs_household_bedrooms(self,facts):
+    #     # returns p(oa|household_bedrooms)
+    #     oas = self.get_list_of_oas(facts)
+    #     localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
 
-        shape = localDists[0].shape
-        self.household_bedrooms_probs = np.empty((len(localDists),shape[0]))
-        for i,p in enumerate(localDists):
-            self.household_bedrooms_probs[i,:] = p
+    #     shape = localDists[0].shape
+    #     self.household_bedrooms_probs = np.empty((len(localDists),shape[0]))
+    #     for i,p in enumerate(localDists):
+    #         self.household_bedrooms_probs[i,:] = p
 
     def calc_probs_age(self,facts):
         oas = self.get_list_of_oas(facts)
@@ -627,7 +627,7 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_religion(facts)
         self.calc_probs_household(facts)
         self.calc_probs_travelToWork(facts)
-        self.calc_probs_household_bedrooms(facts)
+        # self.calc_probs_household_bedrooms(facts)
         self.calc_probs_countryOfBirth(facts)
         self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.
 
