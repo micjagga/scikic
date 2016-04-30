@@ -244,12 +244,12 @@ class UKCensusAnswer(ans.Answer):
         insights['ukcensus_language_list'] = self.languages[0].tolist()
         
       
-        bedroom_probs = np.array([ 0.00244898, 0.11526287, 0.27649496, 0.41621374, 0.14389724, 0.04568222])
+        bedroom_probs = np.array([ 0.00244898, 0.11526287, 0.27649496, 0.41621374, 0.14389724, 0.04568222]);
         
-        h_bedrooms_probs = bedrooms_probs + (1.0/200) 
-        h_bedrooms_probs = h_bedrooms_probs / np.sum(bedrooms_probs)
+        bedrooms_probs = bedrooms_probs + (1.0/200) 
+        bedrooms_probs = bedrooms_probs / np.sum(bedrooms_probs)
 
-        lr = self.household_bedrooms_probs/h_bedrooms_probs
+        lr = self.household_bedrooms_probs/bedrooms_probs
         maxnum = np.max(lr)
         bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lr)]
         logging.info(bedroom_type, maxnum, '---------->')
