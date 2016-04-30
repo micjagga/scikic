@@ -84,6 +84,12 @@ class UKCensusAnswer(ans.Answer):
     households_text = ['Cohabiting couple (children have left home)','Cohabiting couple with children','Cohabiting couple, without children','Single person (children have left home)','Lone parent','Married couple (children have left home)','Married couple with children','Married couple, without children','Single person','Other households, with children','Retired couple','Retired single person','Students and retired']
     
     households_census_labels = ['One family only: Cohabiting couple: All children non-dependent','One family only: Cohabiting couple: Dependent children','One family only: Cohabiting couple: No children','One family only: Lone parent: All children non-dependent','One family only: Lone parent: Dependent children','One family only: Married or same-sex civil partnership couple: All children non-dependent','One family only: Married or same-sex civil partnership couple: Dependent children','One family only: Married or same-sex civil partnership couple: No children','One person household: Other','Other household types: With dependent children','One family only: All aged 65 and over','One person household: Aged 65 and over','Other household types: Other (including all full-time students and all aged 65 and over)']
+    
+    # bedroom_probs = np.array([ 0.00244898,  0.11526287,  0.27649496,  0.41621374,  0.14389724,
+    #      0.04568222])
+    bedrooms = ['No bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
+    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
+    
     ##todo find out hello in every langauge      
     languages_hello = ['hallo']
 
@@ -369,6 +375,20 @@ class UKCensusAnswer(ans.Answer):
         arr = arr * 1.0
         returnList[0] = arr
     
+    @classmethod
+    def getHouseholdBedroomsDist(geoArea,returnList):
+        """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
+        data, mat = ONSapiQuery(geoArea,'QS411EW')
+        arr,labs = dict_to_array(mat) # Convert the dictionary hierarchy to a numpy array 
+        print labs
+        order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in bedrooms] # sort by the order we want it in.
+        arr = np.array(arr) #convert to numpy array
+        arr = arr[order] 
+        arr = arr * 1.0        
+        arr += 1.0
+        arr = 1.0*arr / np.sum(1.0*arr)
+        returnList[0] = arr # now return via the argument so this can be called as a thread
+
      
         
     def __init__(self,name,dataitem,itemdetails,answer=None):
@@ -496,6 +516,16 @@ class UKCensusAnswer(ans.Answer):
             p = (0.0001+dist)/nationalAgeDist
             self.age_probs[:,i,0] = 1-p
             self.age_probs[:,i,1] = p
+      
+    def calc_probs_household_bedrooms(self,facts):
+     # returns p(oa|household_bedrooms)
+        oas = self.get_list_of_oas(facts)
+        localDists = self.getDist(oas,UKCensusAnswer.getHouseholdBedroomsDist)
+        print localDists
+        shape = localDists[0].shape
+        self.household_bedrooms_probs = np.empty((len(localDists),shape[0]))
+        for i,p in enumerate(localDists): 
+            self.household_bedrooms_probs[i,:] = p
 
     def get_pymc_function_age(self,features):
         """Returns a function for use with the pyMC module:
