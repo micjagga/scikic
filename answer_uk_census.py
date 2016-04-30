@@ -82,13 +82,13 @@ class UKCensusAnswer(ans.Answer):
     languages_text = ['Afrikaans', 'Akan', 'Amharic', 'Igbo', 'Krio', 'Lingala', 'Luganda', 'Shona', 'Somali', 'Swahili', 'Tigrinya', 'Yoruba', 'Arabic', 'Caribbean Creole', 'Cantonese Chinese', 'Japanese', 'Korean', 'Malay', 'Mandarin Chinese', 'Tagalog/Filipino', 'Thai', 'Vietnamese', 'English', 'French', 'Bulgarian', 'Czech', 'Danish', 'Dutch', 'Estonian', 'Finnish', 'German', 'Greek', 'Hungarian', 'Italian', 'Latvian', 'Lithuanian', 'Maltese', 'Polish', 'Romanian', 'Slovak', 'Slovenian', 'Swedish', 'Albanian', 'Serbian, Croatian or Bosnian', 'Ukrainian', 'Yiddish', 'Cornish', 'Irish Gaelic', 'Gaelic', 'Scottish Gaelic', 'Scots', 'Portuguese', 'Russian', 'Sign Language', 'Bengali', 'Gujarati', 'Hindi', 'Malayalam', 'Marathi', 'Nepalese', 'Pakistani Pahari', 'Punjabi', 'Sinhala', 'Tamil', 'Telugu', 'Urdu', 'Spanish', 'Turkish', 'Welsh', 'Hebrew', 'Kurdish', 'Pashto', 'Farsi']
     
     households_text = ['Cohabiting couple (children have left home)','Cohabiting couple with children','Cohabiting couple, without children','Single person (children have left home)','Lone parent','Married couple (children have left home)','Married couple with children','Married couple, without children','Single person','Other households, with children','Retired couple','Retired single person','Students and retired']
-    
+
     households_census_labels = ['One family only: Cohabiting couple: All children non-dependent','One family only: Cohabiting couple: Dependent children','One family only: Cohabiting couple: No children','One family only: Lone parent: All children non-dependent','One family only: Lone parent: Dependent children','One family only: Married or same-sex civil partnership couple: All children non-dependent','One family only: Married or same-sex civil partnership couple: Dependent children','One family only: Married or same-sex civil partnership couple: No children','One person household: Other','Other household types: With dependent children','One family only: All aged 65 and over','One person household: Aged 65 and over','Other household types: Other (including all full-time students and all aged 65 and over)']
-    
+
     bedrooms = ['No bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
     bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
 
-    ##todo find out hello in every langauge      
+    ##todo find out hello in every langauge
     languages_hello = ['hallo']
 
     @classmethod
@@ -100,6 +100,8 @@ class UKCensusAnswer(ans.Answer):
         'languages':cls.languages,
         'languages_text':cls.languages_text,
         'households_text':cls.households_text,
+        'bedrooms':cls.bedrooms,
+        'bedrooms_text':cls.bedrooms_text,
         'households_census_labels':cls.households_census_labels,
         'countryofbirth_labels':cls.countryofbirth_labels,
         'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
@@ -372,7 +374,20 @@ class UKCensusAnswer(ans.Answer):
         arr = arr[order] #put in correct order.
         arr = arr * 1.0
         returnList[0] = arr
-     
+    
+    @classmethod
+    def getHouseholdBedroomsDist(geoArea,returnList):
+        """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
+        data, mat = ONSapiQuery(geoArea,'QS411EW')
+        arr,labs = dict_to_array(mat) # Convert the dictionary hierarchy to a numpy array 
+        print labs
+        order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in bedrooms] # sort by the order we want it in.
+        arr = np.array(arr) #convert to numpy array
+        arr = arr[order] 
+        arr = arr * 1.0        
+        arr += 1.0
+        arr = 1.0*arr / np.sum(1.0*arr)
+        returnList[0] = arr # now return via the argument so this can be called as a thread
         
     def __init__(self,name,dataitem,itemdetails,answer=None):
         """Constructor, instantiate an answer...
