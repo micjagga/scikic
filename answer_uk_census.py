@@ -225,6 +225,21 @@ class UKCensusAnswer(ans.Answer):
         trans_type = UKCensusAnswer.transport_text[np.argmax(localratios)]
         insights['ukcensus_traveltowork'] = 'People in your area are %0.0f times more likely to %s than the national average.' % (maxnum, trans_type)
         
+        bedrooms_probs = np.array([ 0.00244898, 0.11526287, 0.27649496, 0.41621374, 0.14389724, 0.04568222]);
+        
+        n_bedrooms_probs = bedrooms_probs + (1.0/200) 
+        n_bedrooms_probs = n_bedrooms_probs / np.sum(bedrooms_probs)
+
+        lr = self.household_bedrooms_probs/n_bedrooms_probs
+        mn = np.max(lr)
+        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lr)]
+        logging.info(bedroom_type, mn, '---------->')
+        insights['ukcensus_household_bedrooms'] = 'Households in your area have %0.0f times more likely to %s than the national average.' % (mn, bedroom_type)
+        
+        
+        
+        
+        
         logging.info('self.countryofbirth')
         insights['ukcensus_note'] = 'The probabilities provided by the insights have had smoothing/regularisation done to them to avoid p=0 scenarios.'
         cob = self.countryofbirth[0]
@@ -242,18 +257,6 @@ class UKCensusAnswer(ans.Answer):
         insights['ukcensus_languages'] = "Languages spoken in your area include " + langaugestring
         logging.info(UKCensusAnswer.languages_text[np.argmax(self.languages)])
         insights['ukcensus_language_list'] = self.languages[0].tolist()
-        
-      
-        n_bedrooms_probs = np.array([ 0.00244898, 0.11526287, 0.27649496, 0.41621374, 0.14389724, 0.04568222]);
-        
-        n_bedrooms_probs = n_bedrooms_probs + (1.0/200) 
-        n_bedrooms_probs = n_bedrooms_probs / np.sum(n_bedrooms_probs)
-
-        lr = self.household_bedrooms_probs/n_bedrooms_probs
-        maxnum = np.max(lr)
-        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lr)]
-        logging.info(bedroom_type, maxnum, '---------->')
-        insights['ukcensus_household_bedrooms'] = 'Households in your area have %0.0f times more likely to %s than the national average.' % (maxnum, bedroom_type)
         
         return insights
 
