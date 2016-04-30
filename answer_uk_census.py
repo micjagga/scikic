@@ -84,6 +84,10 @@ class UKCensusAnswer(ans.Answer):
     households_text = ['Cohabiting couple (children have left home)','Cohabiting couple with children','Cohabiting couple, without children','Single person (children have left home)','Lone parent','Married couple (children have left home)','Married couple with children','Married couple, without children','Single person','Other households, with children','Retired couple','Retired single person','Students and retired']
     
     households_census_labels = ['One family only: Cohabiting couple: All children non-dependent','One family only: Cohabiting couple: Dependent children','One family only: Cohabiting couple: No children','One family only: Lone parent: All children non-dependent','One family only: Lone parent: Dependent children','One family only: Married or same-sex civil partnership couple: All children non-dependent','One family only: Married or same-sex civil partnership couple: Dependent children','One family only: Married or same-sex civil partnership couple: No children','One person household: Other','Other household types: With dependent children','One family only: All aged 65 and over','One person household: Aged 65 and over','Other household types: Other (including all full-time students and all aged 65 and over)']
+    
+    bedrooms = ['No bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
+    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
+
     ##todo find out hello in every langauge      
     languages_hello = ['hallo']
 
