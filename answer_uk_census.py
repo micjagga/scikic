@@ -144,12 +144,11 @@ class UKCensusAnswer(ans.Answer):
                                 'One person household: Other', 'Other household types: With dependent children',
                                 'One family only: All aged 65 and over', 'One person household: Aged 65 and over',
                                 'Other household types: Other (including all full-time students and all aged 65 and over)']
+    ##todo find out hello in every langauge      
+    languages_hello = ['hallo']
 
     bedrooms = ['No bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
     bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
-
-    ##todo find out hello in every langauge
-    languages_hello = ['hallo']
 
     @classmethod
     def metaData(cls):
@@ -160,10 +159,10 @@ class UKCensusAnswer(ans.Answer):
                 'languages': cls.languages,
                 'languages_text': cls.languages_text,
                 'households_text': cls.households_text,
-                'bedrooms': cls.bedrooms,
-                'bedrooms_text': cls.bedrooms_text,
                 'households_census_labels': cls.households_census_labels,
                 'countryofbirth_labels': cls.countryofbirth_labels,
+                'bedrooms':cls.bedrooms,
+                'bedrooms_text':cls.bedrooms_text,
                 'citation': 'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
         return data
 
@@ -293,21 +292,6 @@ class UKCensusAnswer(ans.Answer):
             'ukcensus_traveltowork'] = 'People in your area are %0.0f times more likely to %s than the national average.' % (
             maxnum, trans_type)
 
-        bedrooms_probs = np.array([0.00244898, 0.11526287, 0.27649496, 0.41621374, 0.14389724, 0.04568222])
-
-        bedrooms_probs += 1.0 / 200
-        bedrooms_probs = bedrooms_probs / np.sum(bedrooms_probs)
-
-        lr = self.household_bedrooms_probs/bedrooms_probs
-        mn = np.max(lr)
-        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lr)]
-        logging.info(bedroom_type, mn, '---------->')
-        insights['ukcensus_household_bedrooms'] = 'Households in your area have %0.0f times more likely to %s than the national average.' % (mn, bedroom_type)
-
-
-
-
-
         logging.info('self.countryofbirth')
         insights[
             'ukcensus_note'] = 'The probabilities provided by the insights have had smoothing/regularisation done to them to avoid p=0 scenarios.'
@@ -322,6 +306,17 @@ class UKCensusAnswer(ans.Answer):
 
         #  countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
 
+        household_bedroom_probs = np.array([ 0.00244898,  0.11526287,  0.27649496,  0.41621374,  0.14389724,
+         0.04568222])
+        household_bedroom_probs += (1.0 / 200)
+        household_bedroom_probs = household_bedroom_probs / np.sum(household_bedroom_probs)
+
+        lrat = self.household_bedrooms_probs/ household_bedroom_probs
+        maxno = np.max(lrat)
+        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lrat)]
+        insights['ukcensus_household_bedrooms'] = 'Households in your area have approximately %0.0f times the number of %s flats on average' % (maxno, bedroom_type)
+
+        logging.info(self.household_bedrooms_probs)
         active_languages = [UKCensusAnswer.languages_text[i] for i in np.nonzero(np.array(self.languages))[1]]
         langaugestring = ', '.join(active_languages[0:-1])
         if (len(active_languages) > 1):
@@ -420,6 +415,19 @@ class UKCensusAnswer(ans.Answer):
         returnList[0] = arr  # now return via the argument so this can be called as a thread
 
     @classmethod
+    def getHouseholdBedroomsDist(cls, geoArea, returnList):
+        data, mat = cls.ONSapiQuery(geoArea, 'QS411EW')
+        arr, labs = dict_to_array(mat)  # Convert the dictionary hierarchy to a numpy array
+        order = [[i for i, l in enumerate(labs[0]) if l == r][0] for r in
+                 cls.bedrooms]  # sort by the order we want it in.
+        arr = np.array(arr)  # convert to numpy array
+        arr = arr[order]
+        arr = arr * 1.0
+        arr += 1.0
+        arr = 1.0 * arr / np.sum(1.0 * arr)
+        returnList[0] = arr  # now return via the argument so this can be called as a thread
+
+    @classmethod
     def getCountryOfBirth(cls, geoArea, returnList):
         """Gets the country of birth for an Output Area"""
         data, mat = cls.ONSapiQuery(geoArea, 'KS204EW')
@@ -464,20 +472,6 @@ class UKCensusAnswer(ans.Answer):
         arr = arr[order]  # put in correct order.
         arr = arr * 1.0
         returnList[0] = arr
-
-    @classmethod
-    def getHouseholdBedroomsDist(cls, geoArea, returnList):
-        """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
-        data, mat = cls.ONSapiQuery(geoArea, 'QS411EW')
-        arr, labs = dict_to_array(mat)  # Convert the dictionary hierarchy to a numpy array
-        order = [[i for i, l in enumerate(labs[0]) if l == r][0] for r in
-                 cls.bedrooms]  # sort by the order we want it in.
-        arr = np.array(arr)  # convert to numpy array
-        arr = arr[order]
-        arr = arr * 1.0
-        arr += 1.0
-        arr = 1.0 * arr / np.sum(1.0 * arr)
-        returnList[0] = arr  # now return via the argument so this can be called as a thread
 
     def __init__(self, name, dataitem, itemdetails, answer=None):
         """Constructor, instantiate an answer...
@@ -560,6 +554,17 @@ class UKCensusAnswer(ans.Answer):
         for i, p in enumerate(localDists):
             self.traveltowork_probs[i, :] = p
 
+    def calc_probs_household_bedrooms(self, facts):
+        # returns p(oa|bedrooms)
+        oas = self.get_list_of_oas(facts)
+        localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
+
+        shape = localDists[0].shape
+        self.household_bedrooms_probs = np.empty((len(localDists), shape[0]))
+        for i, p in enumerate(localDists):
+            self.household_bedrooms_probs[i, :] = p
+
+
     def calc_probs_countryOfBirth(self, facts):  # not actually called as only used for insights... TODO Delete?
         # returns p(oa|countryOfBirth)
         oas = self.get_list_of_oas(facts)
@@ -602,17 +607,6 @@ class UKCensusAnswer(ans.Answer):
             p = (0.0001 + dist) / nationalAgeDist
             self.age_probs[:, i, 0] = 1 - p
             self.age_probs[:, i, 1] = p
-
-    def calc_probs_household_bedrooms(self, facts):
-        # returns p(oa|household_bedrooms)
-        logging.info('Calculating bedrooms probabilities')
-        oas = self.get_list_of_oas(facts)
-        localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
-        shape = localDists[0].shape
-        self.household_bedrooms_probs = np.empty((len(localDists), shape[0]))
-        for i, p in enumerate(localDists):
-            self.household_bedrooms_probs[i, :] = p
-        logging.info(' setting up probs')
 
     def get_pymc_function_age(self, features):
         """Returns a function for use with the pyMC module:
@@ -706,10 +700,11 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_religion(facts)
         self.calc_probs_household(facts)
         self.calc_probs_travelToWork(facts)
-        self.calc_probs_countryOfBirth(facts)
-        self.get_other_distributions(facts)  # this isn't necessary here as these methods don't assist with the features.
         self.calc_probs_household_bedrooms(facts)
-        logging.info(facts, '---------->')
+        self.calc_probs_countryOfBirth(facts)
+        self.get_other_distributions(
+            facts)  # this isn't necessary here as these methods don't assist with the features.
+
         if not 'factor_age' in features:
             p = np.ones(101)  # flat prior
             p = p / p.sum()
@@ -723,10 +718,10 @@ class UKCensusAnswer(ans.Answer):
                                                     probs);  # if we don't have the ukcensus array then we just have a probability of one for one output area
 
         if self.featurename + "_age" in features:
-            raise DuplicateFeatureException(
+            raise ans.DuplicateFeatureException(
                 'The "%s" feature is already in the feature list.' % self.featurename + "_age");
         if "religion" in features:
-            raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % "religion")
+            raise ans.DuplicateFeatureException('The "%s" feature is already in the feature list.' % "religion");
 
         features[self.featurename + "_age"] = pm.Categorical(self.featurename + "_outputarea",
                                                              self.get_pymc_function_age(features), value=True,
