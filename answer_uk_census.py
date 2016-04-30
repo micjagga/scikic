@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 import urllib2
 import sqlite3
 import answer as ans
-
+import config
 from StringIO import StringIO
 from zipfile import ZipFile
 from threading import Thread
@@ -14,7 +14,6 @@ from threading import Thread
 import json
 
 import logging
-import config
 
 logging.basicConfig(filename=config.loggingFile, level=logging.DEBUG)
 
@@ -35,7 +34,7 @@ def dict_to_array(data):
         - a list of lists of labels (each list records the labels on that dimension)
     example:
         res, labs = dict_to_array({'aged 3-5':{'males':{'rabbits':3,'dogs':4,'cats':1},'females':{'rabbits':3,'dogs':0,'cats':2}},'aged 0-2':{'males':{'rabbits':4,'dogs':2,'cats':1},'females':{'rabbits':1,'dogs':0,'cats':4}}})
-        
+
         res   array([[[1, 4, 2],[4, 1, 0]],[[1, 3, 4],[2, 3, 0]]])
         labs  [['aged 0-2', 'aged 3-5'], ['males', 'females'], ['cats', 'rabbits', 'dogs']]
     '''
@@ -144,7 +143,7 @@ class UKCensusAnswer(ans.Answer):
                                 'One person household: Other', 'Other household types: With dependent children',
                                 'One family only: All aged 65 and over', 'One person household: Aged 65 and over',
                                 'Other household types: Other (including all full-time students and all aged 65 and over)']
-    ##todo find out hello in every langauge      
+    ##todo find out hello in every langauge
     languages_hello = ['hallo']
 
     bedrooms = ['No bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
@@ -161,15 +160,15 @@ class UKCensusAnswer(ans.Answer):
                 'households_text': cls.households_text,
                 'households_census_labels': cls.households_census_labels,
                 'countryofbirth_labels': cls.countryofbirth_labels,
-                'bedrooms':cls.bedrooms,
-                'bedrooms_text':cls.bedrooms_text,
+                'bedrooms': cls.bedrooms,
+                'bedrooms_text': cls.bedrooms_text,
                 'citation': 'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
         return data
 
     def insights(self, inference_result, facts):
         # returns a dictionary of insights:
         # - inference_result: probability distributions of the features
-        # - facts: a dictionary of 'facts' provided by the Answer classes      
+        # - facts: a dictionary of 'facts' provided by the Answer classes
         if self.prob_in_uk(facts) < 0.01:
             return {}  # we're not in the uk
 
@@ -306,17 +305,17 @@ class UKCensusAnswer(ans.Answer):
 
         #  countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
 
-        household_bedroom_probs = np.array([0.00244898,  0.11526287,  0.27649496,  0.41621374,  0.14389724,
-         0.04568222])
-        household_bedroom_probs += (1.0 / 200)
-        household_bedroom_probs = household_bedroom_probs / np.sum(household_bedroom_probs)
+        household_bedroom_probs = np.array([0.00244898, 0.11526287, 0.27649496, 0.41621374, 0.14389724,
+                                            0.04568222])
+        household_bedroom_probs = (household_bedroom_probs + (1.0 / 200)) / np.sum(household_bedroom_probs)
 
-        lrat = self.household_bedrooms_probs/ household_bedroom_probs
-        maxno = np.max(lrat)
+        lrat = self.household_bedrooms_probs / household_bedroom_probs
+        # maxno = np.max(lrat)
         bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lrat)]
-        insights['ukcensus_household_bedrooms'] = 'Households in your area have approximately %0.0f times the number of %s flats on average' % (maxno, bedroom_type)
-
+        insights['ukcensus_household_bedrooms'] = 'The Houses in your area are more likely to have %s on average' % (
+            bedroom_type)
         logging.info(self.household_bedrooms_probs)
+
         active_languages = [UKCensusAnswer.languages_text[i] for i in np.nonzero(np.array(self.languages))[1]]
         langaugestring = ', '.join(active_languages[0:-1])
         if (len(active_languages) > 1):
@@ -558,12 +557,10 @@ class UKCensusAnswer(ans.Answer):
         # returns p(oa|bedrooms)
         oas = self.get_list_of_oas(facts)
         localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
-
         shape = localDists[0].shape
         self.household_bedrooms_probs = np.empty((len(localDists), shape[0]))
         for i, p in enumerate(localDists):
             self.household_bedrooms_probs[i, :] = p
-
 
     def calc_probs_countryOfBirth(self, facts):  # not actually called as only used for insights... TODO Delete?
         # returns p(oa|countryOfBirth)
@@ -683,10 +680,10 @@ class UKCensusAnswer(ans.Answer):
          - age
          - gender
          - this instance's feature
-         
+
         Args:
           features (dictionary): Dictionary of pyMC probability distributions.
-        
+
         Raises:
           DuplicateFeatureException: If an identically named feature already exists that clashes with this instance
         """
