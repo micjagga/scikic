@@ -92,7 +92,7 @@ class UKCensusAnswer(ans.Answer):
 	#4 No of Bedrooms: 5 0r more
 	#5 No bedrooms
     bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
-    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
+    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom']
 
     @classmethod
     def metaData(cls):
@@ -232,7 +232,7 @@ class UKCensusAnswer(ans.Answer):
         cob = self.countryofbirth[0]
         logging.info(cob)
         logging.info(self.traveltowork_probs)
-        # logging.info(self.noofbedrooms_probs)
+
         insights['ukcensus_countryofbirth'] = '%d%% of the people who live in your area were born in England, %d%% in Wales, Scotland and Northern Ireland. %d%% were born elsewhere in the EU while %d%% were from outside the EU.' % (round(cob[0]*100.0), round((cob[2]+cob[4]+cob[6])*100.0), round((cob[1]+cob[7]+cob[8])*100.0), round(cob[3]*100))
         insights['ukcensus_countryofbirth_list'] = cob.tolist()
 
@@ -244,11 +244,11 @@ class UKCensusAnswer(ans.Answer):
         # getting the average
         noofbedrooms_probs = noofbedrooms_probs + (1.0/200)
         noofbedrooms_probs = noofbedrooms_probs / np.sum(noofbedrooms_probs)
-
-        maxBedroomNum = np.max(self.household_bedrooms_probs / noofbedrooms_probs)
-        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(self.household_bedrooms_probs/ noofbedrooms_probs)]
+        xl = self.household_bedrooms_probs / noofbedrooms_probs
+        maxBedroomNum = np.max(xl)
+        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(xl)]
         insights['ukcensus_household_bedrooms'] = 'Households in your area are %0.0f times more likely to have %s than the national average.' % (maxBedroomNum, bedroom_type)
-
+        logging.info(self.household_bedrooms_probs)
 
         active_languages = [UKCensusAnswer.languages_text[i] for i in np.nonzero(np.array(self.languages))[1]]
         langaugestring = ', '.join(active_languages[0:-1])
@@ -620,7 +620,7 @@ class UKCensusAnswer(ans.Answer):
 
         #if we're not in the uk then we just skip
         if self.prob_in_uk(facts)<0.01:
-            logging.info('      probably not in the UK, skipping')
+            logging.info('     probably not in the UK, skipping')
             return
 
         self.calc_probs_age(facts)
