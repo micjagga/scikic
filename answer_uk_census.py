@@ -103,7 +103,7 @@ class UKCensusAnswer(ans.Answer):
         'languages':cls.languages,
         'languages_text':cls.languages_text,
         'households_text':cls.households_text,
-        'bedrooms_text':cls.bedrooms_text,
+        # 'bedrooms_text':cls.bedrooms_text,
         'households_census_labels':cls.households_census_labels,
         'countryofbirth_labels':cls.countryofbirth_labels,
         'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
@@ -390,19 +390,19 @@ class UKCensusAnswer(ans.Answer):
         arr = arr * 1.0
         returnList[0] = arr
 
-    @classmethod
-    def getHouseholdBedroomsDist(cls,geoArea,returnList):
-        """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
+    # @classmethod
+    # def getHouseholdBedroomsDist(cls,geoArea,returnList):
+    #     """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
 
-        data, mat = cls.ONSapiQuery(geoArea,'QS411EW')
-        arr,labs = dict_to_array(mat) # Convert the dictionary hierarchy to a numpy array
-        order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.bedrooms] # sort by the order we want it in.
-        arr = np.array(arr) # convert to numpy array
-        arr = arr[order]
-        arr = arr * 1.0
-        arr += 1.0
-        arr = 1.0*arr / np.sum(1.0*arr)
-        returnList[0] = arr # now return via the argument so this can be called as a thread
+    #     data, mat = cls.ONSapiQuery(geoArea,'QS411EW')
+    #     arr,labs = dict_to_array(mat) # Convert the dictionary hierarchy to a numpy array
+    #     order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.bedrooms] # sort by the order we want it in.
+    #     arr = np.array(arr) # convert to numpy array
+    #     arr = arr[order]
+    #     arr = arr * 1.0
+    #     arr += 1.0
+    #     arr = 1.0*arr / np.sum(1.0*arr)
+    #     returnList[0] = arr # now return via the argument so this can be called as a thread
 
 
     def __init__(self,name,dataitem,itemdetails,answer=None):
