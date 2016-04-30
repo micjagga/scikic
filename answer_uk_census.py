@@ -380,7 +380,6 @@ class UKCensusAnswer(ans.Answer):
         """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
         data, mat = cls.ONSapiQuery(geoArea,'QS411EW')
         arr,labs = dict_to_array(mat) # Convert the dictionary hierarchy to a numpy array 
-        print labs
         order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.bedrooms] # sort by the order we want it in.
         arr = np.array(arr) #convert to numpy array
         arr = arr[order] 
