@@ -459,7 +459,7 @@ class UKCensusAnswer(ans.Answer):
         arr = arr * 1.0
         returnList[0] = arr
         
-   @classmethod
+    @classmethod
     def getHouseholdBedroomsDist(cls, geoArea, returnList):
         data, mat = cls.ONSapiQuery(geoArea, 'QS411EW')
         arr, labs = dict_to_array(mat)  # Convert the dictionary hierarchy to a numpy array
