@@ -88,7 +88,7 @@ class UKCensusAnswer(ans.Answer):
     # bedroom_probs = np.array([ 0.00244898,  0.11526287,  0.27649496,  0.41621374,  0.14389724,
     #      0.04568222])
     bedrooms = ['No bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
-    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
+    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
     
     ##todo find out hello in every langauge      
     languages_hello = ['hallo']
@@ -388,7 +388,6 @@ class UKCensusAnswer(ans.Answer):
         """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
         data, mat = ONSapiQuery(geoArea,'QS411EW')
         arr,labs = dict_to_array(mat) # Convert the dictionary hierarchy to a numpy array 
-        print labs
         order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in bedrooms] # sort by the order we want it in.
         arr = np.array(arr) #convert to numpy array
         arr = arr[order] 
