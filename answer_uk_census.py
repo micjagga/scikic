@@ -103,6 +103,7 @@ class UKCensusAnswer(ans.Answer):
         'languages':cls.languages,
         'languages_text':cls.languages_text,
         'households_text':cls.households_text,
+        'bedrooms_text':cls.bedrooms_text,
         'households_census_labels':cls.households_census_labels,
         'countryofbirth_labels':cls.countryofbirth_labels,
         'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
@@ -240,6 +241,7 @@ class UKCensusAnswer(ans.Answer):
         cob = self.countryofbirth[0]
         logging.info(cob)
         logging.info(self.traveltowork_probs)
+        logging.info(self.noofbedrooms_probs)
         insights['ukcensus_countryofbirth'] = '%d%% of the people who live in your area were born in England, %d%% in Wales, Scotland and Northern Ireland. %d%% were born elsewhere in the EU while %d%% were from outside the EU.' % (round(cob[0]*100.0), round((cob[2]+cob[4]+cob[6])*100.0), round((cob[1]+cob[7]+cob[8])*100.0), round(cob[3]*100))
         insights['ukcensus_countryofbirth_list'] = cob.tolist()
 
@@ -494,9 +496,9 @@ class UKCensusAnswer(ans.Answer):
             self.countryofbirth[i,:] = p
 
     def calc_probs_household_bedrooms(self,facts):
-        		 # returns p(oa|household_bedrooms)
+        # returns p(oa|household_bedrooms)
         oas = self.get_list_of_oas(facts)
-        localDists = self.getDist(oas,UKCensusAnswer.getHouseholdBedroomsDist)
+        localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
 
         shape = localDists[0].shape
         self.household_bedrooms_probs = np.empty((len(localDists),shape[0]))
