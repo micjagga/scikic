@@ -243,15 +243,16 @@ class UKCensusAnswer(ans.Answer):
         logging.info(UKCensusAnswer.languages_text[np.argmax(self.languages)])
         insights['ukcensus_language_list'] = self.languages[0].tolist()
         
-        bedroom_probs = np.array([ 0.00244898,  0.11526287,  0.27649496,  0.41621374,  0.14389724, 0.04568222])
-        bedrooms_probs = bedrooms_probs + (1.0/200) 
-        bedrooms_probs = bedrooms_probs / np.sum(bedrooms_probs)
+        # logging.info(bedroom_type, maxnum --------> ggg)
+        # bedroom_probs = np.array([ 0.00244898,  0.11526287,  0.27649496,  0.41621374,  0.14389724, 0.04568222])
+        # bedrooms_probs = bedrooms_probs + (1.0/200) 
+        # bedrooms_probs = bedrooms_probs / np.sum(bedrooms_probs)
 
-        lr = self.household_bedrooms_probs/bedrooms_probs
-        maxnum = np.max(lr)
-        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lr)]
-        logging.info(bedroom_type, maxnum -------->)
-        insights['ukcensus_household_bedrooms'] = 'Households in your area have %0.0f times more likely to %s than the national average.' % (maxnum, bedroom_type)
+        # lr = self.household_bedrooms_probs/bedrooms_probs
+        # maxnum = np.max(lr)
+        # bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lr)]
+        # logging.info(bedroom_type, maxnum -------->)
+        # insights['ukcensus_household_bedrooms'] = 'Households in your area have %0.0f times more likely to %s than the national average.' % (maxnum, bedroom_type)
         return insights
 
     @classmethod
@@ -622,7 +623,7 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_religion(facts)
         self.calc_probs_household(facts)
         self.calc_probs_travelToWork(facts) 
-        self.calc_probs_household_bedrooms(facts)       
+        #self.calc_probs_household_bedrooms(facts)       
         self.calc_probs_countryOfBirth(facts)        
         self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.        
         
