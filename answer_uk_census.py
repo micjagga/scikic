@@ -91,8 +91,8 @@ class UKCensusAnswer(ans.Answer):
 	#3 No of Bedrooms: 4
 	#4 No of Bedrooms: 5 0r more
 	#5 No bedrooms
-    bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
-    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
+    # bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
+    # bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
 
     @classmethod
     def metaData(cls):
@@ -217,14 +217,14 @@ class UKCensusAnswer(ans.Answer):
             insights['ukcensus_popage'] = popage
 
         national_traveltowork_probs = np.array([0.00335523,0.01853632,0.06921536,0.35500678,0.03459344,0.00520941,0.04740108,0.03333676,0.02501549,0.03300255,0.37115993,0.00416765]); #TODO Get this from the API
-        noofbedrooms_probs = np.array([0.03459364, 0.04740108, 0.03334676, 0.02501559, 0.01863632, 0.00335524]) # Todo: This distribution should be gotten from the ONS API
+        # noofbedrooms_probs = np.array([0.03459364, 0.04740108, 0.03334676, 0.02501559, 0.01863632, 0.00335524]) # Todo: This distribution should be gotten from the ONS API
 
-        # getting the average
-        noofbedrooms_probs = noofbedrooms_probs / np.sum(noofbedrooms_probs)
+        # # getting the average
+        # noofbedrooms_probs = noofbedrooms_probs / np.sum(noofbedrooms_probs)
 
-        maxBedroomNum = np.max(self.household_bedrooms_probs/ noofbedrooms_probs)
-        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(self.household_bedrooms_probs/ noofbedrooms_probs)]
-        insights['ukcensus_household_bedrooms'] = 'Households in your area are %0.0f times more likely to have %s than the national average.' % (maxBedroomNum, bedroom_type)
+        # maxBedroomNum = np.max(self.household_bedrooms_probs/ noofbedrooms_probs)
+        # bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(self.household_bedrooms_probs/ noofbedrooms_probs)]
+        # insights['ukcensus_household_bedrooms'] = 'Households in your area are %0.0f times more likely to have %s than the national average.' % (maxBedroomNum, bedroom_type)
 
 
         #we need to roughly handle the smoothing so that rare modes don't get over represented
@@ -241,7 +241,7 @@ class UKCensusAnswer(ans.Answer):
         cob = self.countryofbirth[0]
         logging.info(cob)
         logging.info(self.traveltowork_probs)
-        logging.info(self.noofbedrooms_probs)
+        # logging.info(self.noofbedrooms_probs)
         insights['ukcensus_countryofbirth'] = '%d%% of the people who live in your area were born in England, %d%% in Wales, Scotland and Northern Ireland. %d%% were born elsewhere in the EU while %d%% were from outside the EU.' % (round(cob[0]*100.0), round((cob[2]+cob[4]+cob[6])*100.0), round((cob[1]+cob[7]+cob[8])*100.0), round(cob[3]*100))
         insights['ukcensus_countryofbirth_list'] = cob.tolist()
 
@@ -387,19 +387,19 @@ class UKCensusAnswer(ans.Answer):
         arr = arr * 1.0
         returnList[0] = arr
 
-    @classmethod
-    def getHouseholdBedroomsDist(cls,geoArea,returnList):
-        """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
+    # @classmethod
+    # def getHouseholdBedroomsDist(cls,geoArea,returnList):
+    #     """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
 
-        data, mat = cls.ONSapiQuery(geoArea,'QS411EW')
-        arr,labs = dict_to_array(mat) # Convert the dictionary hierarchy to a numpy array
-        order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.bedrooms] # sort by the order we want it in.
-        arr = np.array(arr) # convert to numpy array
-        arr = arr[order]
-        arr = arr * 1.0
-        arr += 1.0
-        arr = 1.0*arr / np.sum(1.0*arr)
-        returnList[0] = arr # now return via the argument so this can be called as a thread
+    #     data, mat = cls.ONSapiQuery(geoArea,'QS411EW')
+    #     arr,labs = dict_to_array(mat) # Convert the dictionary hierarchy to a numpy array
+    #     order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.bedrooms] # sort by the order we want it in.
+    #     arr = np.array(arr) # convert to numpy array
+    #     arr = arr[order]
+    #     arr = arr * 1.0
+    #     arr += 1.0
+    #     arr = 1.0*arr / np.sum(1.0*arr)
+    #     returnList[0] = arr # now return via the argument so this can be called as a thread
 
 
     def __init__(self,name,dataitem,itemdetails,answer=None):
@@ -495,15 +495,15 @@ class UKCensusAnswer(ans.Answer):
         for i,p in enumerate(localDists):
             self.countryofbirth[i,:] = p
 
-    def calc_probs_household_bedrooms(self,facts):
-        # returns p(oa|household_bedrooms)
-        oas = self.get_list_of_oas(facts)
-        localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
+    # def calc_probs_household_bedrooms(self,facts):
+    #     # returns p(oa|household_bedrooms)
+    #     oas = self.get_list_of_oas(facts)
+    #     localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
 
-        shape = localDists[0].shape
-        self.household_bedrooms_probs = np.empty((len(localDists),shape[0]))
-        for i,p in enumerate(localDists):
-            self.household_bedrooms_probs[i,:] = p
+    #     shape = localDists[0].shape
+    #     self.household_bedrooms_probs = np.empty((len(localDists),shape[0]))
+    #     for i,p in enumerate(localDists):
+    #         self.household_bedrooms_probs[i,:] = p
 
     def calc_probs_age(self,facts):
         oas = self.get_list_of_oas(facts)
@@ -624,7 +624,7 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_religion(facts)
         self.calc_probs_household(facts)
         self.calc_probs_travelToWork(facts)
-        self.calc_probs_household_bedrooms(facts)
+        # self.calc_probs_household_bedrooms(facts)
         self.calc_probs_countryOfBirth(facts)
         self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.
 
