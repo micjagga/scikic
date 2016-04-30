@@ -91,8 +91,8 @@ class UKCensusAnswer(ans.Answer):
 	#3 No of Bedrooms: 4
 	#4 No of Bedrooms: 5 0r more
 	#5 No bedrooms
-    # bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
-    # bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
+    bedrooms = ['no_bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more']
+    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms', 'not sure you have a bedroom' ]
 
     @classmethod
     def metaData(cls):
@@ -200,7 +200,7 @@ class UKCensusAnswer(ans.Answer):
             d = d + (np.array(dist)*prob) / len(oa_probs)
 
         popage = None
-        if ('age' in facts): #if we know the person's age we'll give the stat in proportion to them...
+        if ('age' in facts): # if we know the person's age we'll give the stat in proportion to them...
             age = facts['age']
             prop_younger = 1.0*np.sum(d[0:age])/np.sum(d)
             if prop_younger>0.5:
@@ -217,15 +217,6 @@ class UKCensusAnswer(ans.Answer):
             insights['ukcensus_popage'] = popage
 
         national_traveltowork_probs = np.array([0.00335523,0.01853632,0.06921536,0.35500678,0.03459344,0.00520941,0.04740108,0.03333676,0.02501549,0.03300255,0.37115993,0.00416765]); #TODO Get this from the API
-        # noofbedrooms_probs = np.array([0.03459364, 0.04740108, 0.03334676, 0.02501559, 0.01863632, 0.00335524]) # Todo: This distribution should be gotten from the ONS API
-
-        # # getting the average
-        # noofbedrooms_probs = noofbedrooms_probs / np.sum(noofbedrooms_probs)
-
-        # maxBedroomNum = np.max(self.household_bedrooms_probs/ noofbedrooms_probs)
-        # bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(self.household_bedrooms_probs/ noofbedrooms_probs)]
-        # insights['ukcensus_household_bedrooms'] = 'Households in your area are %0.0f times more likely to have %s than the national average.' % (maxBedroomNum, bedroom_type)
-
 
         #we need to roughly handle the smoothing so that rare modes don't get over represented
         national_traveltowork_probs = national_traveltowork_probs + (1.0/200)
@@ -246,6 +237,17 @@ class UKCensusAnswer(ans.Answer):
         insights['ukcensus_countryofbirth_list'] = cob.tolist()
 
           #  countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
+
+
+        # noofbedrooms_probs = np.array([0.03459364, 0.04740108, 0.03334676, 0.02501559, 0.01863632, 0.00335524]) # Todo: This distribution should be gotten from the ONS API
+
+        # # getting the average
+        # noofbedrooms_probs = noofbedrooms_probs / np.sum(noofbedrooms_probs)
+
+        # maxBedroomNum = np.max(self.household_bedrooms_probs/ noofbedrooms_probs)
+        # bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(self.household_bedrooms_probs/ noofbedrooms_probs)]
+        # insights['ukcensus_household_bedrooms'] = 'Households in your area are %0.0f times more likely to have %s than the national average.' % (maxBedroomNum, bedroom_type)
+
 
         active_languages = [UKCensusAnswer.languages_text[i] for i in np.nonzero(np.array(self.languages))[1]]
         langaugestring = ', '.join(active_languages[0:-1])
