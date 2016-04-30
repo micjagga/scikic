@@ -243,7 +243,7 @@ class UKCensusAnswer(ans.Answer):
         logging.info(UKCensusAnswer.languages_text[np.argmax(self.languages)])
         insights['ukcensus_language_list'] = self.languages[0].tolist()
         
-        logging.info(bedroom_type, maxnum --------> ggg)
+        logging.info(bedroom_type, maxnum)
         bedroom_probs = np.array([ 0.00244898,  0.11526287,  0.27649496,  0.41621374,  0.14389724, 0.04568222])
         bedrooms_probs = bedrooms_probs + (1.0/200) 
         bedrooms_probs = bedrooms_probs / np.sum(bedrooms_probs)
@@ -251,7 +251,7 @@ class UKCensusAnswer(ans.Answer):
         lr = self.household_bedrooms_probs/bedrooms_probs
         maxnum = np.max(lr)
         bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lr)]
-        logging.info(bedroom_type, maxnum -------->)
+        logging.info(bedroom_type, maxnum '---------->')
         insights['ukcensus_household_bedrooms'] = 'Households in your area have %0.0f times more likely to %s than the national average.' % (maxnum, bedroom_type)
         return insights
 
