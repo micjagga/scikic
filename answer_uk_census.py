@@ -306,7 +306,7 @@ class UKCensusAnswer(ans.Answer):
 
         #  countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
 
-        household_bedroom_probs = np.array([ 0.00244898,  0.11526287,  0.27649496,  0.41621374,  0.14389724,
+        household_bedroom_probs = np.array([0.00244898,  0.11526287,  0.27649496,  0.41621374,  0.14389724,
          0.04568222])
         household_bedroom_probs += (1.0 / 200)
         household_bedroom_probs = household_bedroom_probs / np.sum(household_bedroom_probs)
