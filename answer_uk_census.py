@@ -376,12 +376,12 @@ class UKCensusAnswer(ans.Answer):
         returnList[0] = arr
     
     @classmethod
-    def getHouseholdBedroomsDist(geoArea,returnList):
+    def getHouseholdBedroomsDist(cls,geoArea,returnList):
         """Gets the Household bedrooms by household and count; given the label of a particular geographical area"""
-        data, mat = ONSapiQuery(geoArea,'QS411EW')
+        data, mat = cls.ONSapiQuery(geoArea,'QS411EW')
         arr,labs = dict_to_array(mat) # Convert the dictionary hierarchy to a numpy array 
         print labs
-        order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in bedrooms] # sort by the order we want it in.
+        order = [[i for i,l in enumerate(labs[0]) if l==r][0] for r in cls.bedrooms] # sort by the order we want it in.
         arr = np.array(arr) #convert to numpy array
         arr = arr[order] 
         arr = arr * 1.0        
@@ -520,7 +520,6 @@ class UKCensusAnswer(ans.Answer):
         # returns p(oa|household_bedrooms)
         oas = self.get_list_of_oas(facts)
         localDists = self.getDist(oas,UKCensusAnswer.getHouseholdBedroomsDist)
-        print localDists
         shape = localDists[0].shape
         self.household_bedrooms_probs = np.empty((len(localDists),shape[0]))
         for i,p in enumerate(localDists): 
