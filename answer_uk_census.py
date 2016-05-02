@@ -702,6 +702,7 @@ class UKCensusAnswer(ans.Answer):
         self.get_other_distributions(
             facts)  # this isn't necessary here as these methods don't assist with the features.
         self.calc_probs_household_bedrooms(facts)
+        logging.info('it activates')
 
         if not 'factor_age' in features:
             p = np.ones(101)  # flat prior
@@ -729,10 +730,10 @@ class UKCensusAnswer(ans.Answer):
         features["household"] = pm.Categorical("household", self.get_pymc_function_household(
             features))  # , value=True, observed=False)
 
-        relationships.append({'parent': 'factor_age', 'child': 'outputarea'})
-        relationships.append({'parent': 'factor_gender', 'child': 'outputarea'})
-        relationships.append({'parent': 'religion', 'child': 'outputarea'})
-        relationships.append({'parent': 'household', 'child': 'outputarea'})
+        # relationships.append({'parent': 'factor_age', 'child': 'outputarea'})
+        # relationships.append({'parent': 'factor_gender', 'child': 'outputarea'})
+        # relationships.append({'parent': 'religion', 'child': 'outputarea'})
+        # relationships.append({'parent': 'household', 'child': 'outputarea'})
 
         descriptions['factor_age'] = {'desc': 'Your age'}
         descriptions['factor_gender'] = {'desc': 'Your gender'}
