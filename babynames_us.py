@@ -19,7 +19,7 @@ from StringIO import StringIO
 from zipfile import ZipFile
 
 
-class BabyNamesAnswerUS():
+class BabyNamesAnswerUS(ans.Answer):
     """Babynames answer: produces a probability distribution based on the person's name"""
     # see: http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/index.html for info
     dataset = 'babynames_us'
@@ -82,7 +82,6 @@ class BabyNamesAnswerUS():
         # 1. download historic data and put into a pandas dataframe
         data = pd.read_csv('https://www.dropbox.com/s/zib6lt501j7yvsa/NationalNames.csv?dl=1&pv=1', skiprows=[1],
                            index_col=0)
-        data['Rank'] = data.groupby(['Year'])['Count'].rank(ascending=False)
         print data.head()
         baby_names = {'boys': data[data['Gender'] == "M"], 'girls': data[data['Gender'] == "F"]}
 
@@ -133,12 +132,11 @@ class BabyNamesAnswerUS():
             for name in allNames[gender][:1000]:
                 years, ps = cls.getPriorAgeDist(name, gender, baby_names, top)
                 results[gender][name] = ps
-                print 'adding %s ' % name
 
         # 6. save results in names.p
         print "Saving results"
         results['years'] = years
-        pickle.dump(results, open("names_us.p", "wb"))
+        pickle.dump(results, open(pathToData + "names_us.p", "wb"))
 
         # 7. We also need to know how people shorten their names
         # Download and scrape the wikipedia page of people's shortened names
@@ -315,13 +313,13 @@ class BabyNamesAnswerUS():
             p = np.ones(101)  # flat prior
             p = p / p.sum()
             features['factor_age'] = pm.Categorical('factor_age', p);
-        # if not 'factor_gender' in features:
-        #     # flat prior
-        #     features['factor_gender'] = pm.Categorical('factor_gender', np.array([0.5, 0.5]));
-        # if self.featurename in features:
-        #     raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
-        # features[self.featurename] = pm.Categorical(self.featurename, self.get_pymc_function(features), value=True,
-        #                                             observed=True)
+        if not 'factor_gender' in features:
+            # flat prior
+            features['factor_gender'] = pm.Categorical('factor_gender', np.array([0.5, 0.5]));
+        if self.featurename in features:
+            raise ans.DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
+        features[self.featurename] = pm.Categorical(self.featurename, self.get_pymc_function(features), value=True,
+                                                    observed=True)
 
         relationships.append({'parent': 'factor_gender', 'child': 'first_name'})
         relationships.append({'parent': 'factor_age', 'child': 'first_name'})
@@ -330,8 +328,3 @@ class BabyNamesAnswerUS():
     def metaData(cls):
         return {
             'citation': 'The ONS provide statistics on the distribution of the names of baby\'s in the UK: <a href="http://www.ons.gov.uk/ons/about-ons/business-transparency/freedom-of-information/what-can-i-request/published-ad-hoc-data/pop/august-2014/baby-names-1996-2013.xls">1996-2013</a> and <a href="http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/top-100-baby-names-historical-data.xls">1904-1994</a>.'}
-
-
-babies = BabyNamesAnswerUS('babynames','postcode','',answer='sarah')
-babies.calc_probs()
-babies.insights({},{'first_name': 'sarah'})
