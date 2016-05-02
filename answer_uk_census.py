@@ -703,6 +703,7 @@ class UKCensusAnswer(ans.Answer):
             facts)  # this isn't necessary here as these methods don't assist with the features.
         self.calc_probs_household_bedrooms(facts)
         logging.info('it activates')
+        logging.info(self.calc_probs_household_bedrooms(facts))
 
         if not 'factor_age' in features:
             p = np.ones(101)  # flat prior
