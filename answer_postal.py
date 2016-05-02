@@ -1,4 +1,4 @@
-mport pymc as pm
+import pymc as pm
 import numpy as np
 import pandas as pd
 import re
