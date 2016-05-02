@@ -241,6 +241,18 @@ class UKCensusAnswer(ans.Answer):
         logging.info(UKCensusAnswer.languages_text[np.argmax(self.languages)])
         insights['ukcensus_language_list'] = self.languages[0].tolist()
         
+        bedroom_probs = np.array([0.00244898, 0.11526287, 0.27649496, 0.41621374, 0.14389724,
+                                            0.04568222])
+        bedroom_probs = (bedroom_probs + (1.0 / 200)) / np.sum(bedroom_probs)
+
+        lrat = self.bed_probs / bedroom_probs
+        # maxno = np.max(lrat)
+        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lrat)]
+        insights['ukcensus_bedrooms'] = 'The Houses in your area are more likely to have %s on average' % (
+            bedroom_type)
+        logging.info(self.bed_probs)
+        logging.info(insights['ukcensus_bedrooms'])
+        
         return insights
 
     @classmethod
@@ -374,7 +386,7 @@ class UKCensusAnswer(ans.Answer):
         returnList[0] = arr
         
     @classmethod
-    def getHouseholdBedroomsDist(cls, geoArea, returnList):
+    def getBedroomsDist(cls, geoArea, returnList):
         data, mat = cls.ONSapiQuery(geoArea, 'QS411EW')
         arr, labs = dict_to_array(mat)  # Convert the dictionary hierarchy to a numpy array
         order = [[i for i, l in enumerate(labs[0]) if l == r][0] for r in
@@ -513,14 +525,14 @@ class UKCensusAnswer(ans.Answer):
             self.age_probs[:,i,0] = 1-p
             self.age_probs[:,i,1] = p
             
-    def calc_probs_household_bedrooms(self, facts):
+    def calc_probs_bedrooms(self, facts):
         # returns p(oa|bedrooms)
         oas = self.get_list_of_oas(facts)
-        localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
+        localDists = self.getDist(oas, UKCensusAnswer.getBedroomsDist)
         shape = localDists[0].shape
-        self.household_bedrooms_probs = np.empty((len(localDists), shape[0]))
+        self.bed_probs = np.empty((len(localDists), shape[0]))
         for i, p in enumerate(localDists):
-            self.household_bedrooms_probs[i, :] = p
+            self.bed_probs[i, :] = p
 
     def get_pymc_function_age(self,features):
         """Returns a function for use with the pyMC module:
@@ -610,7 +622,7 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_travelToWork(facts)        
         self.calc_probs_countryOfBirth(facts)        
         self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.        
-        self.calc_probs_household_bedrooms(facts)
+        self.calc_probs_bedrooms(facts)
         if not 'factor_age' in features:
             p = np.ones(101) #flat prior
             p = p/p.sum()
