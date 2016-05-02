@@ -513,14 +513,14 @@ class UKCensusAnswer(ans.Answer):
             self.age_probs[:,i,0] = 1-p
             self.age_probs[:,i,1] = p
             
-        def calc_probs_household_bedrooms(self, facts):
-            # returns p(oa|bedrooms)
-            oas = self.get_list_of_oas(facts)
-            localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
-            shape = localDists[0].shape
-            self.household_bedrooms_probs = np.empty((len(localDists), shape[0]))
-            for i, p in enumerate(localDists):
-                self.household_bedrooms_probs[i, :] = p
+    def calc_probs_household_bedrooms(self, facts):
+        # returns p(oa|bedrooms)
+        oas = self.get_list_of_oas(facts)
+        localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
+        shape = localDists[0].shape
+        self.household_bedrooms_probs = np.empty((len(localDists), shape[0]))
+        for i, p in enumerate(localDists):
+            self.household_bedrooms_probs[i, :] = p
 
     def get_pymc_function_age(self,features):
         """Returns a function for use with the pyMC module:
