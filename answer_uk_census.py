@@ -73,6 +73,8 @@ class UKCensusAnswer(ans.Answer):
 
     countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
     
+    bedrooms = ['No bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
+    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
 
     transport = ['Taxi', 'Bicycle', 'On foot', 'Not in employment', 'Work mainly at or from home', 'Motorcycle, scooter or moped', 'Bus, minibus or coach', 'Train', 'Underground, metro, light rail, tram', 'Passenger in a car or van', 'Driving a car or van', 'Other method of travel to work']
     transport_text = ['take a taxi to work', 'cycle to work', 'go to work on foot', 'not be in work', 'mainly work from home', 'use a motorcycle to get to work', 'take the bus to work', 'take the train to work', 'use an underground or tram to get to work', 'get a lift in a car to work', 'drive to work', 'use an unusual method of travel to get to work']
@@ -98,6 +100,8 @@ class UKCensusAnswer(ans.Answer):
         'households_text':cls.households_text,
         'households_census_labels':cls.households_census_labels,
         'countryofbirth_labels':cls.countryofbirth_labels,
+        'bedrooms': cls.bedrooms,
+        'bedrooms_text': cls.bedrooms_text,
         'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
         return data
 
@@ -368,6 +372,19 @@ class UKCensusAnswer(ans.Answer):
         arr = arr[order] #put in correct order.
         arr = arr * 1.0
         returnList[0] = arr
+        
+    @classmethod
+    def getHouseholdBedroomsDist(cls, geoArea, returnList):
+        data, mat = cls.ONSapiQuery(geoArea, 'QS411EW')
+        arr, labs = dict_to_array(mat)  # Convert the dictionary hierarchy to a numpy array
+        order = [[i for i, l in enumerate(labs[0]) if l == r][0] for r in
+                 cls.bedrooms]  # sort by the order we want it in.
+        arr = np.array(arr)  # convert to numpy array
+        arr = arr[order]
+        arr = arr * 1.0
+        arr += 1.0
+        arr = 1.0 * arr / np.sum(1.0 * arr)
+        returnList[0] = arr  # now return via the argument so this can be called as a thread
      
         
     def __init__(self,name,dataitem,itemdetails,answer=None):
@@ -495,6 +512,15 @@ class UKCensusAnswer(ans.Answer):
             p = (0.0001+dist)/nationalAgeDist
             self.age_probs[:,i,0] = 1-p
             self.age_probs[:,i,1] = p
+            
+        def calc_probs_household_bedrooms(self, facts):
+            # returns p(oa|bedrooms)
+            oas = self.get_list_of_oas(facts)
+            localDists = self.getDist(oas, UKCensusAnswer.getHouseholdBedroomsDist)
+            shape = localDists[0].shape
+            self.household_bedrooms_probs = np.empty((len(localDists), shape[0]))
+            for i, p in enumerate(localDists):
+                self.household_bedrooms_probs[i, :] = p
 
     def get_pymc_function_age(self,features):
         """Returns a function for use with the pyMC module:
@@ -584,7 +610,7 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_travelToWork(facts)        
         self.calc_probs_countryOfBirth(facts)        
         self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.        
-        
+        self.calc_probs_household_bedrooms(facts)
         if not 'factor_age' in features:
             p = np.ones(101) #flat prior
             p = p/p.sum()
