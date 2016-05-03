@@ -149,6 +149,7 @@ class PostalAnswer(ans.Answer):
     @classmethod
     def init_db(cls):
         """Connects to the geo database.
+
         Note:
           Only intended to be called by the constructor of an instance
         """
@@ -188,6 +189,7 @@ class PostalAnswer(ans.Answer):
     
     def __init__(self,name,dataitem,itemdetails,answer=None):
         """Constructor, instantiate an answer
+
         Args:
           name: The name of this feature
           dataitem: 'postcode' or 'zipcode'

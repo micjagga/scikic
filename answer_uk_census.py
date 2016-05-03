@@ -1,4 +1,3 @@
-
 import pymc as pm
 import numpy as np
 import pandas as pd
@@ -373,6 +372,7 @@ class UKCensusAnswer(ans.Answer):
         
     def __init__(self,name,dataitem,itemdetails,answer=None):
         """Constructor, instantiate an answer...
+
         Args:
           name: The name of this feature
           dataitem: 'agegender'
@@ -621,3 +621,6 @@ class UKCensusAnswer(ans.Answer):
     @classmethod
     def pick_question(cls,questions_asked,facts,target):
 	    return 'None','agegender'
+
+
+
