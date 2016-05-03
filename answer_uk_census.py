@@ -622,7 +622,7 @@ class UKCensusAnswer(ans.Answer):
         self.calc_probs_travelToWork(facts)
         self.calc_probs_countryOfBirth(facts)
         self.get_other_distributions(facts) # this isn't necessary here as these methods don't assist with the features.
-        #self.calc_probs_bedrooms(facts)
+        self.calc_probs_bedrooms(facts)
         if not 'factor_age' in features:
             p = np.ones(101) #flat prior
             p = p/p.sum()
