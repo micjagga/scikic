@@ -131,7 +131,7 @@ class PostalAnswer(ans.Answer):
             print "    Requesting processed CSV file"
             url = 'http://mcdc.missouri.edu/cgi-bin/broker?_PROGRAM=websas.geocorr12.sas&_SERVICE=bigtime&site=OSEDA%%2FMCDC%%2FUniv.+of+Missouri&state=%s&g1_=zcta5&g2_=bg&wtvar=pop10&nozerob=1&csvout=1&lstfmt=txt&namoptf=b&namoptr=b&title=s1&counties=&metros=&places=&distance=&y0lat=&x0long=&locname=&nrings=&r1=&r2=&r3=&r4=&r5=&r6=&r7=&r8=&r9=&r10=&lathi=&latlo=&longhi=&longlo=&_DEBUG=0' % (state)
             html = urllib2.urlopen(url).read()
-            csvfile = re.findall('href="([^"]*)"', html)[0]
+            csvfile = re.findall('href="([^"]*)"',html)[0]
             csvfile = 'http://mcdc.missouri.edu' + csvfile
             print "    Downloading CSV file (%s)" % csvfile
             urllib.urlretrieve(csvfile,filename='geocorr12.csv')
