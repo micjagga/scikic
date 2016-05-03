@@ -156,7 +156,6 @@ class UKCensusAnswer(ans.Answer):
             #TODO Check if the calc_probs_household method is always called.
             
             insights['ukcensus_household_list'] = (np.sum(self.households[0],(0,1))/10.0).tolist()
-            logging.info(self.households)
         
         if ('religion' in inference_result):
             rel = inference_result['religion']['distribution']
@@ -219,11 +218,8 @@ class UKCensusAnswer(ans.Answer):
         trans_type = UKCensusAnswer.transport_text[np.argmax(localratios)]
         insights['ukcensus_traveltowork'] = 'People in your area are %0.0f times more likely to %s than the national average.' % (maxnum, trans_type)
         
-        logging.info('self.countryofbirth')
         insights['ukcensus_note'] = 'The probabilities provided by the insights have had smoothing/regularisation done to them to avoid p=0 scenarios.'
-        cob = self.countryofbirth[0]
-        logging.info(cob)   
-        logging.info(self.traveltowork_probs) 
+        cob = self.countryofbirth[0]        
         insights['ukcensus_countryofbirth'] = '%d%% of the people who live in your area were born in England, %d%% in Wales, Scotland and Northern Ireland. %d%% were born elsewhere in the EU while %d%% were from outside the EU.' % (round(cob[0]*100.0), round((cob[2]+cob[4]+cob[6])*100.0), round((cob[1]+cob[7]+cob[8])*100.0), round(cob[3]*100))
         insights['ukcensus_countryofbirth_list'] = cob.tolist()
         
@@ -234,7 +230,6 @@ class UKCensusAnswer(ans.Answer):
         if (len(active_languages)>1):
             langaugestring += ' and ' + active_languages[-1]
         insights['ukcensus_languages'] = "Languages spoken in your area include " + langaugestring
-        logging.info(UKCensusAnswer.languages_text[np.argmax(self.languages)])
         insights['ukcensus_language_list'] = self.languages[0].tolist()
         
         return insights
@@ -248,7 +243,7 @@ class UKCensusAnswer(ans.Answer):
         geographicalHierarchy = '2011STATH';
         url = ('%s%s/dwn.csv?context=Census&geog=%s&dm/%s=%s&totals=false&apikey=%s' % 
         (pathToONS,dataSet,geographicalHierarchy,geographicalHierarchy,geoArea,apiKey))
-        logging.info('Opening URL: %s' % url)
+     #   logging.info('Opening URL: %s' % url) #not thread safe
         response = urllib2.urlopen(url);
         xml_data = response.read();
         root = ET.fromstring(xml_data);
@@ -416,12 +411,8 @@ class UKCensusAnswer(ans.Answer):
             t.join()
         return [td[0] for td in threadData]
     
-    #this just gets any other census data we're interested in
-    def get_other_distributions(self,facts):
-        oas = self.get_list_of_oas(facts)
-        self.popdensity = self.getDist(oas,UKCensusAnswer.getPopDensity)
-        self.languages = self.getDist(oas,UKCensusAnswer.getLanguages)        
-
+    
+    
      
     def calc_probs_religion(self,facts):
         #returns p(oa|religion)
@@ -462,10 +453,18 @@ class UKCensusAnswer(ans.Answer):
         self.countryofbirth = np.empty((len(localDists),shape[0]))
         for i,p in enumerate(localDists): 
             self.countryofbirth[i,:] = p
+            
 
+    def calc_probs_popdensity(self,facts):
+        oas = self.get_list_of_oas(facts)
+        self.popdensity = self.getDist(oas,UKCensusAnswer.getPopDensity)        
+
+    def calc_probs_languages(self,facts):
+        oas = self.get_list_of_oas(facts)
+        self.languages = self.getDist(oas,UKCensusAnswer.getLanguages)    
 
     def calc_probs_age(self,facts):
-        oas = self.get_list_of_oas(facts)        
+        oas = self.get_list_of_oas(facts)       
         oas.append('K04000001') #last OA is whole of England+Wales
         data = self.getDist(oas,UKCensusAnswer.getAgeDist)
         localAgeDists = data[:-1]
@@ -492,6 +491,7 @@ class UKCensusAnswer(ans.Answer):
         #so localAgeDist/nationalAgeDist
 
         self.age_probs = np.zeros([101,len(localAgeDists),2]) #age, in or not in the output area
+        
         for i,dist in enumerate(localAgeDists):
             p = (0.0001+dist)/nationalAgeDist
             self.age_probs[:,i,0] = 1-p
@@ -579,12 +579,38 @@ class UKCensusAnswer(ans.Answer):
             logging.info('      probably not in the UK, skipping')
             return
 
-        self.calc_probs_age(facts)
-        self.calc_probs_religion(facts)
-        self.calc_probs_household(facts)
-        self.calc_probs_travelToWork(facts)        
-        self.calc_probs_countryOfBirth(facts)        
-        self.get_other_distributions(facts) #this isn't necessary here as these methods don't assist with the features.        
+       # oas = self.get_list_of_oas(facts) #todo: Currently this is called by each method below, need to pass it to them
+   
+        #in parallel...
+        threads = []
+        threads.append(Thread(target=self.calc_probs_age,args=(facts,)))
+        threads.append(Thread(target=self.calc_probs_religion,args=(facts,)))
+        threads.append(Thread(target=self.calc_probs_household,args=(facts,)))        
+        threads.append(Thread(target=self.calc_probs_travelToWork,args=(facts,)))
+        threads.append(Thread(target=self.calc_probs_countryOfBirth,args=(facts,)))        
+        threads.append(Thread(target=self.calc_probs_popdensity,args=(facts,)))        
+        threads.append(Thread(target=self.calc_probs_languages,args=(facts,)))        
+
+        logging.info('     starting topic threads')
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        logging.info('     done')
+       
+        #in serial...
+        #self.calc_probs_age(facts)
+        #self.calc_probs_religion(facts)
+        #self.calc_probs_household(facts)
+        #self.calc_probs_travelToWork(facts)        
+        #self.calc_probs_countryOfBirth(facts)        
+        #self.calc_probs_popdensity(facts)
+        #self.calc_probs_languages(facts)
+        
+        #this isn't necessary here as these methods don't assist with the features, but they are used in insights later.        
+        #self.popdensity = self.getDist(oas,UKCensusAnswer.getPopDensity)
+        #self.languages = self.getDist(oas,UKCensusAnswer.getLanguages)        
+
         
         if not 'factor_age' in features:
             p = np.ones(101) #flat prior
