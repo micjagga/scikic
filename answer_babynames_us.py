@@ -173,7 +173,7 @@ class BabyNamesAnswerUS(ans.Answer):
         logging.info('Instantiating babynames')
         self.dataitem = dataitem
         self.itemdetails = itemdetails
-        self.featurename = 'first_name'  # overridden
+        self.featurename = 'other_name'  # overridden
         self.answer = answer
 
     def insights(self, inference_result, facts):
@@ -183,8 +183,8 @@ class BabyNamesAnswerUS(ans.Answer):
         #    female = self.probs[:,1,1]
         #    male = self.probs[:,1,1]
         #    male[:,1,1].argmax()
-        if 'first_name' in facts:
-            name = facts['first_name']
+        if 'other_name' in facts:
+            name = facts['other_name']
             print name
             insights = {}
             insights['babynames_us_name'] = "You're called %s" % name
@@ -199,11 +199,11 @@ class BabyNamesAnswerUS(ans.Answer):
         else:
             return {}
 
-    def question_to_text(self):
-        if self.dataitem == 'name':
-            return {'question': "What's your name?",
-                    'type': 'text'}  # "What's your name?" #TODO We don't need to ask a question, get it from Facts dictionary.
-        return "No question."
+    # def question_to_text(self):
+    #     if self.dataitem == 'name':
+    #         return {'question': "What's your name?",
+    #                 'type': 'text'}  # "What's your name?" #TODO We don't need to ask a question, get it from Facts dictionary.
+    #     return "No question."
 
     @classmethod
     def pick_question(self, questions_asked, facts, target):
@@ -300,11 +300,11 @@ class BabyNamesAnswerUS(ans.Answer):
         """
         # age: 0-100
 
-        if 'first_name' not in facts:  # we don't know their first name
+        if 'other_name' not in facts:  # we don't know their first name
             return
         logging.info('Appending babynames features')
-        if 'first_name' in facts:
-            self.answer = facts['first_name']
+        if 'other_name' in facts:
+            self.answer = facts['other_name']
         else:
             self.answer = None
         if not 'factor_age' in features:

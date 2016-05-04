@@ -10,6 +10,7 @@ import pickle
 import answer as ans
 import config
 import requests
+     
 import json
 import logging
 logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
@@ -23,7 +24,7 @@ class BabyNamesAnswer(ans.Answer):
     """Babynames answer: produces a probability distribution based on the person's name"""
         #see: http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/index.html for info
     dataset = 'babynames';
-
+ 
     @classmethod
     def init_db(cls):
         pass
@@ -48,8 +49,8 @@ class BabyNamesAnswer(ans.Answer):
     @classmethod
     def getPriorAgeDist(cls,name,gender,ranks,top):
         temp = [0]
-
-
+      
+        
         totpop = 56100000 #Total pop of england+wales (APPROX TODO!)
         years = range(1914,2004,10)
         ps = np.zeros(len(years))
@@ -67,7 +68,7 @@ class BabyNamesAnswer(ans.Answer):
     @classmethod
     def setup(cls,pathToData):
         """Creates files, downloads data, and populates the datafiles"""
-
+        
         import os
         if (os.path.isfile(pathToData+"names.p")):
             print "File 'names.p' found (setup already complete)"
@@ -90,7 +91,7 @@ class BabyNamesAnswer(ans.Answer):
             handle.write(block)
         handle.close()
         xd = pd.ExcelFile('/tmp/top-100-baby-names-historical-data.xls')
-
+    
         ranks = {}
         ranks['boys'] = xd.parse(sheetname='Boys',header=0,skiprows=[0,1,2,4],skip_footer=2,index_col=0)
         ranks['girls'] = xd.parse(sheetname='Girls',header=0,skiprows=[0,1,2,4],skip_footer=2,index_col=0)
@@ -103,11 +104,12 @@ class BabyNamesAnswer(ans.Answer):
         handle = open('/tmp/baby-names-1996-2013.xls', 'wb')
         for block in r.iter_content(1024):
             handle.write(block)
-        handle.close()
+        handle.close()            
         xd = pd.ExcelFile('/tmp/baby-names-1996-2013.xls')
 
 
-
+        
+        
         sheet = {}
         sheet['boys'] = xd.parse(sheetname='Boys',skiprows=4, index_col=0,skip_footer=3,na_values=':')
         sheet['girls'] = xd.parse(sheetname='Girls',skiprows=4, index_col=0,skip_footer=3,na_values=':')
@@ -187,10 +189,10 @@ class BabyNamesAnswer(ans.Answer):
                         contractions[ns.upper()].append(m[0].upper())
                     else:
                         contractions[ns.upper()]=[m[0].upper()]
-
+                
         #8. Save in contractions.p
         print "Saving contractions"
-        pickle.dump( contractions, open(pathToData+"contractions.p", "wb"))
+        pickle.dump( contractions, open( pathToData+"contractions.p", "wb" ) )
 
     def __init__(self,name,dataitem,itemdetails,answer=None):
         """Constructor, instantiate an answer associated with the name of the individual
@@ -210,7 +212,7 @@ class BabyNamesAnswer(ans.Answer):
     def insights(self,inference_result,facts):
         #returns a dictionary of insights:
         # - inference_result: probability distributions of the features
-        # - facts: a dictionary of 'facts' provided by the Answer classes
+        # - facts: a dictionary of 'facts' provided by the Answer classes      
     #    female = self.probs[:,1,1]
     #    male = self.probs[:,1,1]
     #    male[:,1,1].argmax()
@@ -236,8 +238,8 @@ class BabyNamesAnswer(ans.Answer):
 
     @classmethod
     def pick_question(self,questions_asked,facts,target):
-    #return 'name', '' #could return None,None in future, depending on if we get name from facebook
-        return 'None', 'None'#None string used to help database
+    	#return 'name', '' #could return None,None in future, depending on if we get name from facebook
+        return 'None', 'None' #None string used to help database
 
     def calc_probs(self):
         self.probs = np.zeros([101,2,2]) #age, gender(M,F), for and not for the person's name
@@ -256,7 +258,7 @@ class BabyNamesAnswer(ans.Answer):
         else:
             possible_name_list = [ans_given.upper()]
 
-        nameused = possible_name_list[0]#in future could search/integrate over.
+        nameused = possible_name_list[0] #in future could search/integrate over.
  #       print "(using name %s)" % nameused
         if (nameused in nameps['boys']):
             p_male = nameps['boys'][nameused]
