@@ -82,7 +82,6 @@ class BabyNamesAnswerUS(ans.Answer):
         # 1. download historic data and put into a pandas dataframe
         data = pd.read_csv('https://www.dropbox.com/s/zib6lt501j7yvsa/NationalNames.csv?dl=1&pv=1', skiprows=[1],
                            index_col=0)
-        print data.head()
         baby_names = {'boys': data[data['Gender'] == "M"], 'girls': data[data['Gender'] == "F"]}
 
         names = {}

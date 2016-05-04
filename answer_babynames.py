@@ -237,7 +237,7 @@ class BabyNamesAnswer(ans.Answer):
     @classmethod
     def pick_question(self,questions_asked,facts,target):
     #return 'name', '' #could return None,None in future, depending on if we get name from facebook
-        return 'None', 'None' #None string used to help database
+        return 'None', 'None'#None string used to help database
 
     def calc_probs(self):
         self.probs = np.zeros([101,2,2]) #age, gender(M,F), for and not for the person's name
