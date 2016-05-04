@@ -161,7 +161,7 @@ class BabyNamesAnswerUS(ans.Answer):
         print "Saving contractions"
         pickle.dump(contractions, open(config.pathToData + "contractions_us.p", "wb"))
 
-    def __init__(self, name, dataitem, itemdetails, answer=None):
+    def __init__(self, name2, dataitem, itemdetails, answer=None):
         """Constructor, instantiate an answer associated with the name of the individual
 
         Args:
@@ -184,10 +184,10 @@ class BabyNamesAnswerUS(ans.Answer):
         #    male = self.probs[:,1,1]
         #    male[:,1,1].argmax()
         if 'other_name' in facts:
-            name = facts['other_name']
-            print name
+            name2 = facts['other_name']
+            print name2
             insights = {}
-            insights['babynames_us_name'] = "You're called %s" % name
+            insights['babynames_us_name'] = "You're called %s" % name2
             ages = self.probs[:, 0, 1] + self.probs[:, 1, 1]
             cum_ps = np.cumsum(ages) / np.sum(ages)
             insights['babynames_us_age'] = 'People with your name are mostly aged between %d and %d' % (

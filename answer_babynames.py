@@ -10,7 +10,6 @@ import pickle
 import answer as ans
 import config
 import requests
-     
 import json
 import logging
 logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
