@@ -9,21 +9,22 @@ import answer as ans
 import pickle
 import config
 import requests
-
+from StringIO import StringIO
+from zipfile import ZipFile
 import json
 import logging
 
 logging.basicConfig(filename=config.loggingFile, level=logging.DEBUG)
 
-from StringIO import StringIO
-from zipfile import ZipFile
-
 
 class BabyNamesAnswerUS(ans.Answer):
-    """Babynames answer: produces a probability distribution based on the person's name"""
-    # see: http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/index.html for info
-    dataset = 'babynames_us'
+    """Babynames answer: produces a probability distribution
+        based on the person's name
 
+    see: http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904
+    -1994/index.html for info
+    """
+    dataset = 'babynames_us'
     count = {}
 
     @classmethod
@@ -40,7 +41,8 @@ class BabyNamesAnswerUS(ans.Answer):
         result = []
         for item in seq:
             marker = idfun(item)
-            if marker in seen: continue
+            if marker in seen:
+                continue
             seen[marker] = 1
             result.append(item)
         return result
@@ -48,8 +50,7 @@ class BabyNamesAnswerUS(ans.Answer):
     @classmethod
     def getPriorAgeDist(cls, name, gender, ranks, top):
         temp = [0]
-
-        totpop = 56100000  # Total pop of england+wales (APPROX TODO!)
+        totpop = 56100000  # Total pop of england+wales (APPROX -DONE!)
         years = range(1884, 2004, 10)
         ps = np.zeros(len(years))
         for yeari, year in enumerate(years):
@@ -60,7 +61,8 @@ class BabyNamesAnswerUS(ans.Answer):
             if not idxes.empty:
                 idy = r[r['Year'] == year]
                 rk = idy[idy['Name'] == name][['Count']].values
-                p = 1. * (rk - np.mean(BabyNamesAnswerUS.count[gender])) / (totpop / 2)  # roughly half of the same gender
+                # roughly half of the same gender for tot pop
+                p = 1. * (rk - np.mean(cls.count[gender])) / (totpop / 2)
             ps[yeari] = p + 0.000000001
             #   ps = ps / sum(ps)
         return years, ps
@@ -80,41 +82,43 @@ class BabyNamesAnswerUS(ans.Answer):
         # - contractions of people's names (from wikipedia)
 
         # 1. download historic data and put into a pandas dataframe
-        data = pd.read_csv('https://www.dropbox.com/s/zib6lt501j7yvsa/NationalNames.csv?dl=1&pv=1', skiprows=[1],
-                           index_col=0)
-        baby_names = {'boys': data[data['Gender'] == "M"], 'girls': data[data['Gender'] == "F"]}
+        print('Downloading the dataset')
+        data_source = 'https://www.dropbox.com/s/zib6lt501j7yvsa/NationalNames.csv?dl=1&pv=1'
+        data = pd.read_csv(data_source, skiprows=[1], index_col=0)
+        baby_names = {'boys': data[data['Gender'] == "M"],
+                      'girls': data[data['Gender'] == "F"]
+                      }
 
-        names = {}
+        # # not really essential but might come in handy
+        # print('adjusting the data set')
+        # names = {}
+        # for gender in baby_names:
+        #     baby_names[gender] = baby_names[gender].ix[1:]
+        #     df = baby_names[gender]
+        #     year = df.Year.unique()
+        #     for yr in year:
+        #         info = df[df['Year'] == yr][['Name', 'Gender', 'Count']]
+        #         names[yr] = info
 
-        # not really essential but might come in handy
-        print "(adjusting the data set)"
-        for gender in baby_names:
-            baby_names[gender] = baby_names[gender].ix[1:]
-            df = baby_names[gender]
-            year = df.Year.unique()
-            for yr in year:
-                info = df[df['Year'] == yr][['Name', 'Gender', 'Count']]
-                names[yr] = info
-
-        print "Integrating the data sets"
+        print("Integrating the data sets")
         top = {}
         q = {}
         for gender in baby_names:
-            print "(sorting %s)" % gender,
+            print("sorting %s") % gender,
             s = baby_names[gender]
             years = range(1884, 2004, 10)
             for year in years:
                 q[gender] = s[s['Year'] == year][['Name', 'Count']]
-                BabyNamesAnswerUS.count[gender] = s[s['Year'] == year][['Count']].values
+                cls.count[gender] = s[s['Year'] == year][['Count']].values
             top[gender] = q[gender]
             # print top[gender], np.sum(count[gender])
 
         # get list of all names
-        print "(calculating list of all names)"
+        print('calculating list of all names')
         allNames = {}
         for gender in baby_names:
             df = baby_names[gender]
-            print "  (%s)" % gender,
+            print('%s') % gender,
             allNames[gender] = []
             info = df['Name']
             allNames[gender].extend(info.values)
@@ -126,20 +130,20 @@ class BabyNamesAnswerUS(ans.Answer):
         # 5. add results to 'results' structure
         results = {}
         for gender in ['boys', 'girls']:
-            print "Adding %s to results" % gender
+            print("Adding %s to results") % gender
             results[gender] = {}
             for name in allNames[gender][:1000]:
                 years, ps = cls.getPriorAgeDist(name, gender, baby_names, top)
                 results[gender][name] = ps
 
         # 6. save results in names.p
-        print "Saving results"
+        print("Saving results")
         results['years'] = years
         pickle.dump(results, open(pathToData + "names_us.p", "wb"))
 
         # 7. We also need to know how people shorten their names
         # Download and scrape the wikipedia page of people's shortened names
-        print "Querying wikipedia for name contractions"
+        print("Querying wikipedia for name contractions")
         response = urllib2.urlopen('http://en.wiktionary.org/wiki/Appendix:English_given_names')
         html = response.read()
 
@@ -158,11 +162,14 @@ class BabyNamesAnswerUS(ans.Answer):
                         contractions[ns.upper()] = [m[0].upper()]
 
         # 8. Save in contractions.p
-        print "Saving contractions"
-        pickle.dump(contractions, open(config.pathToData + "contractions_us.p", "wb"))
+        print("Saving contractions")
+        pickle.dump(contractions, open(config.pathToData + "contractions_us.p",
+                                       "wb")
+                    )
 
     def __init__(self, name2, dataitem, itemdetails, answer=None):
-        """Constructor, instantiate an answer associated with the name of the individual
+        """Constructor, instantiate an answer associated
+            with the name of the individual
 
         Args:
           name: The name of this feature
@@ -184,10 +191,10 @@ class BabyNamesAnswerUS(ans.Answer):
         #    male = self.probs[:,1,1]
         #    male[:,1,1].argmax()
         if 'other_name' in facts:
-            name2 = facts['other_name']
-            print name2
+            name = facts['other_name']
+            # print name
             insights = {}
-            insights['babynames_us_name'] = "You're called %s" % name2
+            insights['babynames_us_name'] = "You're called %s" % name
             ages = self.probs[:, 0, 1] + self.probs[:, 1, 1]
             cum_ps = np.cumsum(ages) / np.sum(ages)
             insights['babynames_us_age'] = 'People with your name are mostly aged between %d and %d' % (
@@ -199,45 +206,51 @@ class BabyNamesAnswerUS(ans.Answer):
         else:
             return {}
 
-    # def question_to_text(self):
-    #     if self.dataitem == 'name':
-    #         return {'question': "What's your name?",
-    #                 'type': 'text'}  # "What's your name?" #TODO We don't need to ask a question, get it from Facts dictionary.
-    #     return "No question."
+    def question_to_text(self):
+        if self.dataitem == 'name':
+            return {'question': "What's is your name?",
+                    'type': 'text'}  # "What's your name?"
+    # TODO We don't need to ask a question, get it from Facts dictionary.
+    return "No question."
 
     @classmethod
     def pick_question(self, questions_asked, facts, target):
-        # return 'name', '' #could return None,None in future, depending on if we get name from facebook
+        # return 'name', '' #could return None,None in future, depending on
+        # if we get name from facebook
         return 'None', 'None'  # None string used to help database
 
     def calc_probs(self):
-        self.probs = np.zeros([1001, 2, 2])  # age, gender(M,F), for and not for the person's name
+        # age, gender(M,F), for and not for the person's name
+        self.probs = np.zeros([1001, 2, 2])
         nameps = pickle.load(open(config.pathToData + "names_us.p", "rb"))
-        #nameps =pickle.load(open("names_us.p", "rb"))
+        # nameps =pickle.load(open("names_us.p", "rb"))
         years = nameps['years']
         ages = [2016 - y for y in years]  # todo use current year
-        if self.answer == None:
-            ans_given = 'None'  # this won't be found and the default prior will be used instead
+        if self.answer is None:
+            # this won't be found and the default prior will be used instead
+            ans_given = 'None'
         else:
             ans_given = self.answer
-        contractions = pickle.load(open(config.pathToData + "contractions.p", "rb"))
-        #contractions = pickle.load(open("contractions_us.p", "rb"))
+        contractions = pickle.load(open(config.pathToData + "contractions.p",
+                                        "rb"))
+        # contractions = pickle.load(open("contractions_us.p", "rb"))
 
         #        ans_given = 'rachel'
         if ans_given.upper() in contractions:
             possible_name_list = contractions[ans_given.upper()]
-            print ans_given
         else:
             possible_name_list = [ans_given]
-
-        nameused = possible_name_list[0]  # in future could search/integrate over.TODO: make names start with initial caps
-        print "(using name %s)" % nameused
+        # in future could search/integrate over.
+        # TODO: make names start with initial caps
+        # import string string.capwords for above
+        nameused = possible_name_list[0]
+        print("using name %s") % nameused
         if nameused in nameps['boys']:
             p_male = nameps['boys'][nameused]
-           # print p_male
         else:
-            p_male = np.ones(len(years)) * 0.00000001  # todo: what if their name isn't in the list?
-            #print  p_male, '----',
+            # todo: what if their name isn't in the list?
+            p_male = np.ones(len(years)) * 0.00000001
+
         if (nameused in nameps['girls']):
             p_female = nameps['girls'][nameused]
         else:
@@ -252,7 +265,6 @@ class BabyNamesAnswerUS(ans.Answer):
 
         p_male = ans.distribute_probs(p_male, ages)
         p_female = ans.distribute_probs(p_female, ages)
-        # print p_male
 
         self.probs = np.zeros([101, 2, 2])
         self.probs[:, 0, 1] = p_male  # *5000
@@ -272,14 +284,17 @@ class BabyNamesAnswerUS(ans.Answer):
         Args:
           features (dictionary): Dictionary of pyMC probability distributions.
         Returns:
-          function (@pm.deterministic): outputs probability given the parameters.
+          function (@pm.deterministic): outputs probability given the
+         parameters.
         """
-        ## TODO HANDLE OF self.answer IS NONE
+        # TODO HANDLE OF self.answer IS NONE
         self.calc_probs()
         probs = self.probs
 
         @pm.deterministic
-        def seenGivenAgeGender(age=features['factor_age'], gender=features['factor_gender']):
+        def seenGivenAgeGender(age=features['factor_age'],
+                               gender=features['factor_gender']
+                               ):
             p = probs
             return p[age][gender]
 
@@ -296,7 +311,8 @@ class BabyNamesAnswerUS(ans.Answer):
           facts (dictionary): should already be populated with facts
 
         Raises:
-          DuplicateFeatureException: If an identically named feature already exists that clashes with this instance
+          DuplicateFeatureException: If an identically named feature
+          already exists that clashes with this instance
         """
         # age: 0-100
 
@@ -307,22 +323,36 @@ class BabyNamesAnswerUS(ans.Answer):
             self.answer = facts['other_name']
         else:
             self.answer = None
-        if not 'factor_age' in features:
+        if 'factor_age' not in features:
             p = np.ones(101)  # flat prior
             p = p / p.sum()
-            features['factor_age'] = pm.Categorical('factor_age', p);
-        if not 'factor_gender' in features:
+            features['factor_age'] = pm.Categorical('factor_age', p)
+        if 'factor_gender' not in features:
             # flat prior
-            features['factor_gender'] = pm.Categorical('factor_gender', np.array([0.5, 0.5]));
+            features['factor_gender'] = pm.Categorical('factor_gender',
+                                                       np.array([0.5,
+                                                                 0.5]))
         if self.featurename in features:
-            raise ans.DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
-        features[self.featurename] = pm.Categorical(self.featurename, self.get_pymc_function(features), value=True,
-                                                    observed=True)
+            raise ans.DuplicateFeatureException('The "%s" feature is already in the feature list.'
+                                                % self.featurename)
+        features[self.featurename] = pm.Categorical(self.featurename,
+                                                    self.get_pymc_function(
+                                                        features),
+                                                    value=True, observed=True)
 
-        relationships.append({'parent': 'factor_gender', 'child': 'first_name'})
-        relationships.append({'parent': 'factor_age', 'child': 'first_name'})
+        relationships.append({'parent': 'factor_gender',
+                             'child': 'first_name'
+                              })
+        relationships.append({'parent': 'factor_age',
+                             'child': 'first_name'
+                              })
 
     @classmethod
     def metaData(cls):
         return {
-            'citation': 'The ONS provide statistics on the distribution of the names of baby\'s in the UK: <a href="http://www.ons.gov.uk/ons/about-ons/business-transparency/freedom-of-information/what-can-i-request/published-ad-hoc-data/pop/august-2014/baby-names-1996-2013.xls">1996-2013</a> and <a href="http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/top-100-baby-names-historical-data.xls">1904-1994</a>.'}
+            'citation': 'The ONS provide statistics on the distribution of the \
+            names of baby\'s in the UK: \
+            <a href="http://www.ons.gov.uk/ons/about-ons/business-transparency/\
+            freedom-of-information/what-can-i-request/published-ad-hoc-data/\
+            pop/august-2014/baby-names-1996-2013.xls">1996-2013</a> and \
+            <a href="http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/top-100-baby-names-historical-data.xls">1904-1994</a>.'}

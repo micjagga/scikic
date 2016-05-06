@@ -1,4 +1,4 @@
-import pymc as pm
+
 import numpy as np
 import pandas as pd
 import re
@@ -12,6 +12,14 @@ import sqlalchemy as sa
 import pandas as pd
 import helper_functions as hf
 import config
+import sys
+import time
+import logging
+import pymc3 as pm
+import theano
+import theano.tensor as t
+import scipy as sp
+
 
 from StringIO import StringIO
 from zipfile import ZipFile
@@ -19,11 +27,10 @@ from zipfile import ZipFile
 
 class MovieAnswer(ans.Answer):
     """Movielens answer: handles seen, ratings, etc associated with movie rankings"""
-    
     #class database connections for movielens
     _movielens = None
     dataset = 'movielens';
-  
+
 
     @classmethod
     def setup(cls,pathToData):
@@ -208,3 +215,95 @@ class MovieAnswer(ans.Answer):
     @classmethod
     def metaData(cls):
         return {'citation':'The <a href="http://files.grouplens.org/datasets/movielens">movielens</a> database'}
+
+    def ReadMovieLens():
+        """
+        """
+        logging.info('reading data')
+        data_set = np.zeros([np.max(data.user),np.max(data.movie)])
+        w = np.zeros([np.max(data.user),np.max(data.movie)])
+        for d in data.values:
+            data_set[d[0]-1,d[1]-1]=d[2]
+            w[d[0]-1,d[1]-1]=1
+       
+        subsetSizeUsers = 200
+        subsetSizeMovies = 100
+        smalldata = data_set[0:subsetSizeUsers,0:subsetSizeMovies]
+        smallw = w[0:subsetSizeUsers,0:subsetSizeMovies]
+        
+    #     try:
+    #         data = pd.read_csv(fname)
+    #     except IOError as err:
+    #         print str(err)
+    #         url = 'https://gist.github.com/macks22/b40ac9c685e920ad3ca2'
+    #         print 'download from: %s' % url
+    #         sys.exit(DATA_NOT_FOUND)
+
+    #     # Calculate split sizes.
+    #     logging.info('splitting train/test sets')
+    #     n, m = data_set.shape           # # users, # movies
+    #     N = n * m                   # # cells in matrix
+    #     test_size = N / 100          # use 10% of data as test set
+    #     train_size = N - test_size  # and remainder for training
+
+    #     # Prepare train/test ndarrays.
+    #     train = data_set.copy()
+    #     test = np.ones(data_set.shape) * np.nan
+
+    #     # Draw random sample of training data to use for testing.
+    #     tosample = np.where(~np.isnan(train))        # only sample non-missing values
+    #     idx_pairs = zip(tosample[0], tosample[1])    # zip row/col indices
+    #     indices = np.arange(len(idx_pairs))          # indices of row/col index pairs
+    #     sample = np.random.choice(indices, replace=False, size=test_size)  # draw sample
+
+    #     # Transfer random sample from train set to test set.
+    #     for idx in sample:
+    #         idx_pair = idx_pairs[idx]         # retrieve sampled index pair
+    #         test[idx_pair] = train[idx_pair]  # transfer to test set
+    #         train[idx_pair] = np.nan          # remove from train set
+
+    #     # Verify everything worked properly
+    #     assert(np.isnan(train).sum() == test_size)
+    #     assert(np.isnan(test).sum() == train_size)
+
+    #     # Return the two numpy ndarrays
+        return smalldata, smallw
+
+
+    def build_pmf_model(train, alpha=2, dim=10, std=0.01):
+        """Construct the Probabilistic Matrix Factorization model using pymc3.
+        Note that the `testval` param for U and V initialize the model away from
+        0 using a small amount of Gaussian noise.
+        :param np.ndarray train: Training data (observed) to learn the model on.
+        :param int alpha: Fixed precision to use for the rating likelihood function.
+        :param int dim: Dimensionality of the model; rank of low-rank approximation.
+        :param float std: Standard deviation for Gaussian noise in model initialization.
+        """
+        # Mean value imputation on training data.
+        train = train.copy()
+        nan_mask = np.isnan(train)
+        train[nan_mask] = train[~nan_mask].mean()
+
+        # Low precision reflects uncertainty; prevents overfitting.
+        # We use point estimates from the data to intialize.
+        # Set to mean variance across users and items.
+        alpha_u = 1 / train.var(axis=1).mean()
+        alpha_v = 1 / train.var(axis=0).mean()
+
+        logging.info('building the PMF model')
+        n, m = train.shape
+        with pm.Model() as pmf:
+            U = pm.MvNormal(
+                'U', mu=0, tau=alpha_u * np.eye(dim),
+                shape=(n, dim), testval=np.random.randn(n, dim) * std)
+            V = pm.MvNormal(
+                'V', mu=0, tau=alpha_v * np.eye(dim),
+                shape=(m, dim), testval=np.random.randn(m, dim) * std)
+            R = pm.Normal(
+                'R', mu=t.dot(U, V.T), tau=alpha * np.ones(train.shape),
+                observed=train)
+
+        logging.info('done building PMF model')
+        return pmf
+
+

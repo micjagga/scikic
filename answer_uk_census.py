@@ -17,7 +17,7 @@ import logging
 import config
 logging.basicConfig(filename=config.loggingFile,level=logging.DEBUG)
 
-#Some helpful functions
+# Some helpful functions
 def hasNumbers(strings):
     '''Returns true if any of the strings in the 'strings' array have a digit in them.'''
     for s in strings:
@@ -32,21 +32,21 @@ def dict_to_array(data):
         - a list of lists of labels (each list records the labels on that dimension)
     example:
         res, labs = dict_to_array({'aged 3-5':{'males':{'rabbits':3,'dogs':4,'cats':1},'females':{'rabbits':3,'dogs':0,'cats':2}},'aged 0-2':{'males':{'rabbits':4,'dogs':2,'cats':1},'females':{'rabbits':1,'dogs':0,'cats':4}}})
-        
+
         res   array([[[1, 4, 2],[4, 1, 0]],[[1, 3, 4],[2, 3, 0]]])
         labs  [['aged 0-2', 'aged 3-5'], ['males', 'females'], ['cats', 'rabbits', 'dogs']]
     '''
-    
+
     res = []
     if not isinstance(data,dict):
         return data, []
     labels = []
-    for e in data:        
+    for e in data:
         if 'Total' not in e:
             lower_dict, lower_labels = dict_to_array(data[e])
             res.append(lower_dict)
             labels.append(e)
-    if hasNumbers(labels): #automatically sorts labels containing numbers by the numerical value of the first number.
+    if hasNumbers(labels):  # automatically sorts labels containing numbers by the numerical value of the first number.
         numbers = []
         for lab in labels:
             digits = re.search(r'\d+', lab)
@@ -108,10 +108,10 @@ class UKCensusAnswer(ans.Answer):
     def insights(self,inference_result,facts):
         #returns a dictionary of insights:
         # - inference_result: probability distributions of the features
-        # - facts: a dictionary of 'facts' provided by the Answer classes      
+        # - facts: a dictionary of 'facts' provided by the Answer classes
         if self.prob_in_uk(facts)<0.01:
             return {} #we're not in the uk
-        
+
         insights = {}
         if 'factor_age' in inference_result:
             if 'age' not in facts: #there's nothing impressive about us guessing their exact age if we've already been told it.
@@ -120,7 +120,7 @@ class UKCensusAnswer(ans.Answer):
                 if upper==lower: #if it's exact
                     msg = 'You are %d years old.' % lower
                     #compare to local area...
-                    
+
                 else:
                     msg = 'You are aged between %d and %d.' % (lower,upper)
                 insights['ukcensus_ages'] = msg
@@ -131,15 +131,14 @@ class UKCensusAnswer(ans.Answer):
                     insights['ukcensus_gender'] = 'You are female'
                 elif (inference_result['factor_gender']['quartiles']['mean']<0.1):
                     insights['ukcensus_gender'] = 'You are male'
-        
-    
+
 #0 One family only: Cohabiting couple: All children non-dependent
 #1 One family only: Cohabiting couple: Dependent children
 #2 One family only: Cohabiting couple: No children <20%
 #3 One family only: Lone parent: All children non-dependent
 #4 One family only: Lone parent: Dependent children
 #5 One family only: Married or same-sex civil partnership couple: All children non-dependent
-#6 One family only: Married or same-sex civil partnership couple: Dependent children<<<<<<<<
+#6 One family only: Married or same-sex civil partnership couple: Dependent children
 #7 One family only: Married or same-sex civil partnership couple: No children
 #8 One person household: Other <21%
 #9 Other household types: With dependent children
@@ -158,10 +157,10 @@ class UKCensusAnswer(ans.Answer):
             if alone<0.3:
                 insights['ukcensus_household'] = "You are in a relationship and living with your partner/spouse."
             #TODO Check if the calc_probs_household method is always called.
-            
+
             insights['ukcensus_household_list'] = (np.sum(self.households[0],(0,1))/10.0).tolist()
             logging.info(self.households)
-        
+
         if ('religion' in inference_result):
             rel = inference_result['religion']['distribution']
             listOfReligions = []
@@ -181,12 +180,12 @@ class UKCensusAnswer(ans.Answer):
             insights['ukcensus_popdensity'] = "Your neighbourhood has a population density of %d people per square kilometre, %0.1f times the average for England." % (round(popd),ratio)
         if (ratio<0.5):
             insights['ukcensus_popdensity'] = "Your neighbourhood has a population density of %d people per square kilometre, 1/%0.0f the average for England." % (round(popd),1.0/ratio)
-        #oas = self.get_list_of_oas(facts)        
+        #oas = self.get_list_of_oas(facts)
         #localAgeDists = self.getDist(oas,UKCensusAnswer.getAgeDist) #TODO: We've already called this once. Need to cache. 
         localAgeDists = self.localAgeDists
         nationalAgeDist = self.nationalAgeDist
-        
-        oa_probs = [1.0] * len(localAgeDists)       
+
+        oa_probs = [1.0] * len(localAgeDists)
         if 'where' in facts:
             if 'ukcensus' in facts['where']:
                 oa_probs = [it['probability'] for it in facts['where']['ukcensus']] #get the list of OA probabilities
@@ -209,30 +208,30 @@ class UKCensusAnswer(ans.Answer):
                 popage = 'Half the people in your neighbourhood are younger than %d years old.' % halfway
             else:
                 popage = 'Half the people in your neighbourhood are older than %d years old.' % halfway
-        if popage is not None:        
+        if popage is not None:
             insights['ukcensus_popage'] = popage
-            
+
         national_traveltowork_probs = np.array([0.00335523,0.01853632,0.06921536,0.35500678,0.03459344,0.00520941,0.04740108,0.03333676,0.02501549,0.03300255,0.37115993,0.00416765]); #TODO Get this from the API
-        
+
         #we need to roughly handle the smoothing so that rare modes don't get over represented
-        national_traveltowork_probs = national_traveltowork_probs + (1.0/200) 
+        national_traveltowork_probs = national_traveltowork_probs + (1.0/200)
         national_traveltowork_probs = national_traveltowork_probs / np.sum(national_traveltowork_probs)
-        
+
         localratios = self.traveltowork_probs/national_traveltowork_probs
         maxnum = np.max(localratios)
         trans_type = UKCensusAnswer.transport_text[np.argmax(localratios)]
         insights['ukcensus_traveltowork'] = 'People in your area are %0.0f times more likely to %s than the national average.' % (maxnum, trans_type)
-        
+
         logging.info('self.countryofbirth')
         insights['ukcensus_note'] = 'The probabilities provided by the insights have had smoothing/regularisation done to them to avoid p=0 scenarios.'
         cob = self.countryofbirth[0]
-        logging.info(cob)   
-        logging.info(self.traveltowork_probs) 
+        logging.info(cob)
+        logging.info(self.traveltowork_probs)
         insights['ukcensus_countryofbirth'] = '%d%% of the people who live in your area were born in England, %d%% in Wales, Scotland and Northern Ireland. %d%% were born elsewhere in the EU while %d%% were from outside the EU.' % (round(cob[0]*100.0), round((cob[2]+cob[4]+cob[6])*100.0), round((cob[1]+cob[7]+cob[8])*100.0), round(cob[3]*100))
         insights['ukcensus_countryofbirth_list'] = cob.tolist()
-        
+
           #  countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
-        
+
         active_languages = [UKCensusAnswer.languages_text[i] for i in np.nonzero(np.array(self.languages))[1]]
         langaugestring = ', '.join(active_languages[0:-1])
         if (len(active_languages)>1):
@@ -241,13 +240,16 @@ class UKCensusAnswer(ans.Answer):
         logging.info(UKCensusAnswer.languages_text[np.argmax(self.languages)])
         insights['ukcensus_language_list'] = self.languages[0].tolist()
 
-        bedroom_probs = np.array([0.00244898, 0.11526287, 0.27649496, 0.41621374, 0.14389724, 0.04568222])
-        bedroom_probs = (bedroom_probs + (1.0 / 200)) / np.sum(bedroom_probs)
+        # np.array([0.00244898, 0.11526287, 0.27649496, 0.41621374, 0.14389724, 0.04568222])
+        bedroom_probs = [0]
+        ans.getBedroomsDist('K04000001', bedroom_probs)
+        bedroom_probs = np.array(bedroom_probs)
+        bedroom_probs = (bedroom_probs[0] + (1.0 / 200)) / np.sum(bedroom_probs[0])
 
-        lrat = self.bed_probs / bedroom_probs
-        # maxno = np.max(lrat)
-        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(lrat)]
-        insights['ukcensus_bedrooms'] = 'The Houses in your area are more likely to have %s on average' % (
+        rooms_ratio = self.bed_probs / bedroom_probs
+        # maxno = np.max(room_ratio)
+        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(rooms_ratio)]
+        insights['ukcensus_bedrooms'] = 'Homes in your area are more likely to have %s on average' % (
             bedroom_type)
         logging.info(self.bed_probs)
         logging.info(insights['ukcensus_bedrooms'])
@@ -269,7 +271,7 @@ class UKCensusAnswer(ans.Answer):
         root = ET.fromstring(xml_data);
         href = root[1][0][0].text #TODO: Need to get the path to the href using names not indices.
         url = urllib2.urlopen(href);
-        zipfile = ZipFile(StringIO(url.read()))    
+        zipfile = ZipFile(StringIO(url.read()))
         for filename in zipfile.namelist():
             if (filename[-3:]=='csv'):
                 data = pd.read_csv(zipfile.open(filename),skiprows=np.array(range(8)),skipfooter=1,header=0)
@@ -387,7 +389,8 @@ class UKCensusAnswer(ans.Answer):
     @classmethod
     def getBedroomsDist(cls, geoArea, returnList):
         data, mat = cls.ONSapiQuery(geoArea, 'QS411EW')
-        arr, labs = dict_to_array(mat)  # Convert the dictionary hierarchy to a numpy array
+        # Convert the dictionary hierarchy to a numpy array
+        arr, labs = dict_to_array(mat)
         order = [[i for i, l in enumerate(labs[0]) if l == r][0] for r in
                  cls.bedrooms]  # sort by the order we want it in.
         arr = np.array(arr)  # convert to numpy array
@@ -395,7 +398,8 @@ class UKCensusAnswer(ans.Answer):
         arr = arr * 1.0
         arr += 1.0
         arr = 1.0 * arr / np.sum(1.0 * arr)
-        returnList[0] = arr  # now return via the argument so this can be called as a thread
+        # now return via the argument so this can be called as a thread
+        returnList[0] = arr
 
 
     def __init__(self,name,dataitem,itemdetails,answer=None):
@@ -408,7 +412,7 @@ class UKCensusAnswer(ans.Answer):
           answer=None
         """
         self.dataitem = dataitem
-        self.itemdetails = itemdetails 
+        self.itemdetails = itemdetails
         self.featurename = name
         self.answer = answer
 

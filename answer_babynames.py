@@ -23,7 +23,7 @@ class BabyNamesAnswer(ans.Answer):
     """Babynames answer: produces a probability distribution based on the person's name"""
         #see: http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/index.html for info
     dataset = 'babynames';
- 
+
     @classmethod
     def init_db(cls):
         pass
@@ -241,7 +241,7 @@ class BabyNamesAnswer(ans.Answer):
         return 'None', 'None' #None string used to help database
 
     def calc_probs(self):
-        self.probs = np.zeros([101,2,2]) #age, gender(M,F), for and not for the person's name
+        self.probs = np.zeros([101, 2, 2]) #age, gender(M,F), for and not for the person's name
         nameps = pickle.load( open( config.pathToData+"names.p", "rb" ) )
         years = nameps['years']
         ages = [2015-y for y in years] #todo use current year
@@ -277,20 +277,18 @@ class BabyNamesAnswer(ans.Answer):
 
         p_male = ans.distribute_probs(p_male,ages)
         p_female = ans.distribute_probs(p_female,ages)
-        
-        
-        
+
         self.probs = np.zeros([101,2,2])
         self.probs[:,0,1] = p_male#*5000
         self.probs[:,0,0] = 1-p_male#*5000
         self.probs[:,1,1] = p_female#*5000
         self.probs[:,1,0] = 1-p_female#*5000
-        
+
         logging.info('***************************************')
         logging.info(self.probs)
         logging.info('***************************************')
-        
-        
+
+
     def get_pymc_function(self,features):
         """Returns a function for use with the pyMC module:
           - p(name|age,gender)
@@ -300,15 +298,15 @@ class BabyNamesAnswer(ans.Answer):
         Returns:
           function (@pm.deterministic): outputs probability given the parameters.
         """
-        ##TODO HANDLE OF self.answer IS NONE
+        # TODO: HANDLE OF self.answer IS NONE
         self.calc_probs()
         probs = self.probs
-        @pm.deterministic    
+        @pm.deterministic
         def seenGivenAgeGender(age=features['factor_age'], gender=features['factor_gender']):
             p = probs
             return p[age][gender]
         return seenGivenAgeGender
-    
+
     def append_features(self,features,facts,relationships,descriptions):
         """Alters the features dictionary in place, adds:
          - age
