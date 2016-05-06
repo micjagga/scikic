@@ -72,7 +72,9 @@ class UKCensusAnswer(ans.Answer):
     religion_text = ['Christian','Buddhist','Hindu','Jewish','Muslim','Sikh','religious (but I do\'t know which)','of no religion']
 
     countryofbirth_labels = ['England', 'Ireland', 'Northern Ireland', 'Other countries', 'Scotland', 'United Kingdom not otherwise specified', 'Wales', 'Other EU: Accession countries April 2001 to March 2011', 'Other EU: Member countries in March 2001'] #for some reason this ONS query outputs a bunch of percentages too.
-    
+
+    bedrooms = ['No bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
+    bedrooms_text = ['no bedrooms', '1 bedroom', '2 bedrooms', '3 bedrooms', '4 bedrooms', '5 or more bedrooms']
 
     transport = ['Taxi', 'Bicycle', 'On foot', 'Not in employment', 'Work mainly at or from home', 'Motorcycle, scooter or moped', 'Bus, minibus or coach', 'Train', 'Underground, metro, light rail, tram', 'Passenger in a car or van', 'Driving a car or van', 'Other method of travel to work']
     transport_text = ['take a taxi to work', 'cycle to work', 'go to work on foot', 'not be in work', 'mainly work from home', 'use a motorcycle to get to work', 'take the bus to work', 'take the train to work', 'use an underground or tram to get to work', 'get a lift in a car to work', 'drive to work', 'use an unusual method of travel to get to work']
@@ -98,6 +100,8 @@ class UKCensusAnswer(ans.Answer):
         'households_text':cls.households_text,
         'households_census_labels':cls.households_census_labels,
         'countryofbirth_labels':cls.countryofbirth_labels,
+        'bedrooms': cls.bedrooms,
+        'bedrooms_text': cls.bedrooms_text,
         'citation':'The <a href="http://www.ons.gov.uk/ons/guide-method/census/2011/census-data/ons-data-explorer--beta-/index.html">UK office of national statistics</a>'}
         return data
 
@@ -231,7 +235,20 @@ class UKCensusAnswer(ans.Answer):
             langaugestring += ' and ' + active_languages[-1]
         insights['ukcensus_languages'] = "Languages spoken in your area include " + langaugestring
         insights['ukcensus_language_list'] = self.languages[0].tolist()
-        
+
+        bedroom_probs = [0]
+        ans.getBedroomsDist('K04000001', bedroom_probs)
+        bedroom_probs = np.array(bedroom_probs)
+        bedroom_probs = (bedroom_probs[0] + (1.0 / 200)) / np.sum(bedroom_probs[0])
+
+        rooms_ratio = self.bed_probs / bedroom_probs
+        # maxno = np.max(room_ratio)
+        bedroom_type = UKCensusAnswer.bedrooms_text[np.argmax(rooms_ratio)]
+        insights['ukcensus_bedrooms'] = 'Homes in your area are more likely to have %s on average' % (
+            bedroom_type)
+        logging.info(self.bed_probs)
+        logging.info(insights['ukcensus_bedrooms'])
+
         return insights
 
     @classmethod
@@ -364,7 +381,22 @@ class UKCensusAnswer(ans.Answer):
         arr = arr * 1.0
         returnList[0] = arr
      
-        
+    @classmethod
+    def getBedroomsDist(cls, geoArea, returnList):
+        data, mat = cls.ONSapiQuery(geoArea, 'QS411EW')
+        # Convert the dictionary hierarchy to a numpy array
+        arr, labs = dict_to_array(mat)
+        order = [[i for i, l in enumerate(labs[0]) if l == r][0] for r in
+                 cls.bedrooms]  # sort by the order we want it in.
+        arr = np.array(arr)  # convert to numpy array
+        arr = arr[order]
+        arr = arr * 1.0
+        arr += 1.0
+        arr = 1.0 * arr / np.sum(1.0 * arr)
+        # now return via the argument so this can be called as a thread
+        returnList[0] = arr
+
+
     def __init__(self,name,dataitem,itemdetails,answer=None):
         """Constructor, instantiate an answer...
         Args:
@@ -496,6 +528,15 @@ class UKCensusAnswer(ans.Answer):
             self.age_probs[:,i,0] = 1-p
             self.age_probs[:,i,1] = p
 
+        def calc_probs_bedrooms(self, facts):
+            # returns p(oa|bedrooms)
+            oas = self.get_list_of_oas(facts)
+            localDists = self.getDist(oas, UKCensusAnswer.getBedroomsDist)
+            shape = localDists[0].shape
+            self.bed_probs = np.empty((len(localDists), shape[0]))
+            for i, p in enumerate(localDists):
+                self.bed_probs[i, :] = p
+
     def get_pymc_function_age(self,features):
         """Returns a function for use with the pyMC module:
         Args:
@@ -580,15 +621,16 @@ class UKCensusAnswer(ans.Answer):
 
        # oas = self.get_list_of_oas(facts) #todo: Currently this is called by each method below, need to pass it to them
    
-        #in parallel...
+        # in parallel...
         threads = []
         threads.append(Thread(target=self.calc_probs_age,args=(facts,)))
         threads.append(Thread(target=self.calc_probs_religion,args=(facts,)))
-        threads.append(Thread(target=self.calc_probs_household,args=(facts,)))        
+        threads.append(Thread(target=self.calc_probs_household,args=(facts,)))
         threads.append(Thread(target=self.calc_probs_travelToWork,args=(facts,)))
-        threads.append(Thread(target=self.calc_probs_countryOfBirth,args=(facts,)))        
-        threads.append(Thread(target=self.calc_probs_popdensity,args=(facts,)))        
-        threads.append(Thread(target=self.calc_probs_languages,args=(facts,)))        
+        threads.append(Thread(target=self.calc_probs_countryOfBirth,args=(facts,)))
+        threads.append(Thread(target=self.calc_probs_popdensity,args=(facts,)))
+        threads.append(Thread(target=self.calc_probs_languages,args=(facts,)))
+        threads.append(Thread(target=self.calc_probs_bedrooms,args=(facts,)))
 
         logging.info('     starting topic threads')
         for t in threads:
@@ -601,8 +643,8 @@ class UKCensusAnswer(ans.Answer):
         #self.calc_probs_age(facts)
         #self.calc_probs_religion(facts)
         #self.calc_probs_household(facts)
-        #self.calc_probs_travelToWork(facts)        
-        #self.calc_probs_countryOfBirth(facts)        
+        #self.calc_probs_travelToWork(facts)
+        #self.calc_probs_countryOfBirth(facts)
         #self.calc_probs_popdensity(facts)
         #self.calc_probs_languages(facts)
         
@@ -623,9 +665,9 @@ class UKCensusAnswer(ans.Answer):
             features['outputarea'] = pm.Categorical('outputarea',probs); #if we don't have the ukcensus array then we just have a probability of one for one output area
 
         if self.featurename+"_age" in features:
-            raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename+"_age");
+            raise ans.DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename+"_age");
         if "religion" in features:
-            raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % "religion");
+            raise ans.DuplicateFeatureException('The "%s" feature is already in the feature list.' % "religion");
 
         features[self.featurename+"_age"]=pm.Categorical(self.featurename+"_outputarea", self.get_pymc_function_age(features), value=True, observed=True)
         features["religion"]=pm.Categorical("religion", self.get_pymc_function_religion(features)) #, value=True, observed=False)
