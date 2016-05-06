@@ -167,7 +167,7 @@ class BabyNamesAnswerUS(ans.Answer):
                                        "wb")
                     )
 
-    def __init__(self, name2, dataitem, itemdetails, answer=None):
+    def __init__(self, name, dataitem, itemdetails, answer=None):
         """Constructor, instantiate an answer associated
             with the name of the individual
 
