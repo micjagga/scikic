@@ -64,6 +64,7 @@ class BabyNamesAnswer(ans.Answer):
      #   ps = ps / sum(ps)
         return years,ps
 
+
     @classmethod
     def setup(cls,pathToData):
         """Creates files, downloads data, and populates the datafiles"""
@@ -242,9 +243,10 @@ class BabyNamesAnswer(ans.Answer):
 
     def calc_probs(self):
         self.probs = np.zeros([101, 2, 2]) #age, gender(M,F), for and not for the person's name
-        nameps = pickle.load( open( config.pathToData+"names.p", "rb" ) )
+        nameps = pickle.load( open( config.pathToData+"names.p", "rb" ))
+        nameusps=pickle.load(open(config.pathToData+"names_us.p", "rb"))
         years = nameps['years']
-        ages = [2015-y for y in years] #todo use current year
+        ages = [2016-y for y in years] #todo use current year
         if self.answer == None:
             ans_given = 'None' #this won't be found and the default prior will be used instead
         else:
@@ -261,10 +263,14 @@ class BabyNamesAnswer(ans.Answer):
  #       print "(using name %s)" % nameused
         if (nameused in nameps['boys']):
             p_male = nameps['boys'][nameused]
+        elif (nameused in nameusps['boys']):
+            p_male = nameusps['boys'][nameused]
         else:
             p_male = np.ones(len(years))*0.00000001 #todo: what if their name isn't in the list?
         if (nameused in nameps['girls']):
             p_female = nameps['girls'][nameused]
+        elif (nameused in nameusps['girls']):
+            p_male = nameusps['girls'][nameused]
         else:
             p_female = np.ones(len(years))*0.00000001 #TODO
 
@@ -346,4 +352,3 @@ class BabyNamesAnswer(ans.Answer):
     @classmethod
     def metaData(cls):
         return {'citation':'The ONS provide statistics on the distribution of the names of baby\'s in the UK: <a href="http://www.ons.gov.uk/ons/about-ons/business-transparency/freedom-of-information/what-can-i-request/published-ad-hoc-data/pop/august-2014/baby-names-1996-2013.xls">1996-2013</a> and <a href="http://www.ons.gov.uk/ons/rel/vsob1/baby-names--england-and-wales/1904-1994/top-100-baby-names-historical-data.xls">1904-1994</a>.'}
-
