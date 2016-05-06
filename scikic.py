@@ -143,10 +143,7 @@ def route_inference():
     facts = recursive_numpy_array_removal(facts)
     output_string = json.dumps({'features':features,'facts':facts,'insights':insights,'relationships':relationships,'feature_descriptions':descriptions})
     return output_string
-    
 
-
-    
 @app.route('/question', methods=['POST'])
 @crossdomain(origin='*')
 def route_question():

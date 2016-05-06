@@ -1,6 +1,7 @@
 import answer as ans
 import random
 import logging
+from timeit import default_timer as time
 
 #import all answer_something.py classes
 import os
@@ -37,6 +38,7 @@ def process_answers(questions_asked=[],unprocessed_questions=[],facts={}):
 
     answers = []
     for it,qa in enumerate(questions_asked):
+        t0 = time()        
         if 'answer' not in qa:
             continue #this question doesn't have an answer
         c = [cls for cls in ans.Answer.__subclasses__() if cls.dataset==qa['dataset']]
@@ -48,21 +50,43 @@ def process_answers(questions_asked=[],unprocessed_questions=[],facts={}):
         if qa in unprocessed_questions:
             logging.info("process_answers: adding facts from %s" % new_answer.dataset)
             new_answer.append_facts(facts, answers)
+        logging.info('Time (class %s) append_facts %fms' % (new_answer.dataset,(time()-t0)*1000))            
     return answers
+
+
+def smooth(dist, its):
+    """Smooths a distribution (if it's not categorical - i.e. more continuous).
+    We do this so that we can have fewer iterations and still have a plausible looking
+    distribution of ages.
+    We decide if the dist is 'continous' if it's got more than 30 items - not ideal
+    We also smooth more if fewer iterations have been used."""
+    N = 1000/np.sqrt(its) #e.g. its = 5000 -> size = 31. its=50,000 -> size = 4
+    logging.info("Smoothing kernel size %f" % N)
+    if N<2: #if we don't need to smooth...
+        return dist
+    if len(dist)<30: #if it's not categorical don't smooth
+        return dist
+        
+    box = np.ones(N)/N
+    dist = np.convolve(dist, box, mode='same').tolist()
+    return dist
 
 def do_inference(data):
 #parameters in data's dictionary:
-# 'questions_asked', 'unprocessed_questions', 'facts'
+# 'questions_asked', 'unprocessed_questions', 'facts', 'config'
 #
 #we need to:
 #1. Add any other questions that are unprocessed (i.e don't have items added to the facts dictionary)
 #2. process the unprocessed questions,
 #   using:
 #3. 
+    t0_start = time()
     questions_asked = []
     unprocessed_questions = []
     facts = {}
+    config = {}
     datasets = None
+    mcmc_iterations = 1000 #default
 
     if 'questions_asked' in data:
         questions_asked = data['questions_asked']
@@ -72,12 +96,16 @@ def do_inference(data):
         facts = data['facts']
     if 'datasets' in data:
         datasets = data['datasets']
+    if 'config' in data:
+        if 'mcmc_iterations' in data['config']:
+            mcmc_iterations = data['config']['mcmc_iterations']
 
     #Some datasets we won't have asked questions about as they don't need question/answer responses (such as the babynames dataset,
     #which just gets its 'name' value from the 'facts' structure).
     #We still need to add these to our 'unprocessed_questions' array so that they get used.
     c = [cls for cls in ans.Answer.__subclasses__()]
     for cl in c:
+        t0 = time()
         if (datasets is not None): #allows us to only use a subset of classes if we wish
             if cl.dataset not in datasets:
                 continue
@@ -88,6 +116,7 @@ def do_inference(data):
             item = {'dataset':dataset, 'dataitem':dataitem, 'detail':detail, 'answer':0} #no answer provided to this type of dataset
             unprocessed_questions.append(item)
             questions_asked.append(item)
+        logging.info('Time (class %s) initialising %fms' % (cl.dataset,(time()-t0)*1000))
 
     answers = process_answers(questions_asked,unprocessed_questions,facts)
     
@@ -95,16 +124,20 @@ def do_inference(data):
     relationships = []
     descriptions = {}
     for a in answers:
+        t0 = time()    
         logging.info('   adding %s' % a.dataset)
         a.append_features(features,facts,relationships,descriptions)
+        logging.info('Time (class %s) append_features %fms' % (a.dataset,(time()-t0)*1000))        
 
     logging.info('   features has %d items' % (len(features)))
     for f in features:
         logging.info('      %s' % (f))
 
+    t0 = time()    
     model = pm.Model(features)
     mcmc = pm.MCMC(model)
-    mcmc.sample(50000,1000,4,progress_bar=False)
+    mcmc.sample(mcmc_iterations,mcmc_iterations/50,4,progress_bar=False)
+    logging.info('Time MCMC %fms' % ((time()-t0)*1000))
     output = {}
 
     for feature in features:
@@ -120,8 +153,10 @@ def do_inference(data):
             #pass #we silently discard features we can't get a trace on, as these are the observed features.
 
     answer_range = {}
+        
     for o in output:
-        vals = output[o]['distribution']        
+        vals = output[o]['distribution']    
+        output[o]['distribution'] = smooth(output[o]['distribution'], mcmc_iterations) #smooth the output (hack to make things quicker)
         tally = 0
         mean = 0
         for i,v in enumerate(vals):
@@ -136,7 +171,9 @@ def do_inference(data):
     insights = {}
     for a in answers:
         insights.update(a.insights(output, facts))
-
+        
+    logging.info('Time Inference Total %fms' % ((time()-t0_start)*1000))
+    insights['debug_total_inference_time'] = '%fms' % ((time()-t0_start)*1000)
     return output, facts, insights, relationships, descriptions
 
 #Some datasets need to process an answer (for example lookup where a location is, etc). It's best to do this once, when you get
