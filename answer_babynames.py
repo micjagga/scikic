@@ -343,7 +343,7 @@ class BabyNamesAnswer(ans.Answer):
             #flat prior
             features['factor_gender'] = pm.Categorical('factor_gender',np.array([0.5,0.5]));
         if self.featurename in features:
-            raise DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
+            raise ans.DuplicateFeatureException('The "%s" feature is already in the feature list.' % self.featurename);
         features[self.featurename]=pm.Categorical(self.featurename, self.get_pymc_function(features), value=True, observed=True)
 
         relationships.append({'parent':'factor_gender', 'child':'first_name'})
